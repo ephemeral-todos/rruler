@@ -1,0 +1,33 @@
+name: php-cs-fixer
+
+on: # yamllint disable-line rule:truthy
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.4]
+        composer-flags: [ '' ]
+        stability: ['prefer-stable']
+        experimental: [false]
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: php-cs-fixer, cs2pr
+
+      - name: Run PHP CS Fixer
+        if: ${{ matrix.experimental == false }}
+        run: php-cs-fixer fix -v --dry-run --using-cache=no --format=checkstyle | cs2pr
