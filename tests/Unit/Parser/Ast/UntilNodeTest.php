@@ -18,7 +18,6 @@ final class UntilNodeTest extends TestCase
         $node = new UntilNode($input);
 
         $this->assertEquals($expected, $node->getValue());
-        $node->validate(); // Should not throw
     }
 
     #[DataProvider('provideUnhappyPathData')]
@@ -27,8 +26,7 @@ final class UntilNodeTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $node = new UntilNode($input);
-        $node->validate();
+        new UntilNode($input);
     }
 
     public static function provideHappyPathData(): array

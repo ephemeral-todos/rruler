@@ -9,19 +9,19 @@ use EphemeralTodos\Rruler\Exception\CannotBeEmptyException;
 use EphemeralTodos\Rruler\Exception\ValidationException;
 use Exception;
 
-final class UntilNode extends Node
+final class UntilNode implements Node
 {
     private readonly DateTimeImmutable $until;
 
-    public function __construct(string $until)
+    public function __construct(private readonly string $rawUntil)
     {
-        $trimmed = trim($until);
+        $trimmedRawUntil = trim($rawUntil);
 
-        if ($trimmed === '') {
+        if ($trimmedRawUntil === '') {
             throw new CannotBeEmptyException($this);
         }
 
-        $this->until = $this->parseUntilDate($trimmed);
+        $this->until = $this->parseUntilDate($trimmedRawUntil);
     }
 
     public function getValue(): DateTimeImmutable
@@ -29,9 +29,9 @@ final class UntilNode extends Node
         return $this->until;
     }
 
-    public function validate(): void
+    public function getRawValue(): string
     {
-        // Validation is performed in constructor
+        return $this->rawUntil;
     }
 
     private function parseUntilDate(string $dateString): DateTimeImmutable

@@ -7,23 +7,26 @@ namespace EphemeralTodos\Rruler\Parser\Ast;
 use EphemeralTodos\Rruler\Exception\CannotBeEmptyException;
 use EphemeralTodos\Rruler\Exception\InvalidIntegerException;
 
-final class IntervalNode extends Node
+final class IntervalNode implements Node
 {
     private readonly int $interval;
 
-    public function __construct(string $interval)
+    public function __construct(private readonly string $rawInterval)
     {
-        $trimmed = trim($interval);
+        $trimmedRawInterval = trim($rawInterval);
+        $this->interval = (int) $trimmedRawInterval;
 
-        if ($trimmed === '') {
+        if ($trimmedRawInterval === '') {
             throw new CannotBeEmptyException($this);
         }
 
-        if (!is_numeric($trimmed) || str_contains($trimmed, '.')) {
-            throw new InvalidIntegerException($this, $trimmed);
+        if (!is_numeric($trimmedRawInterval) || str_contains($trimmedRawInterval, '.')) {
+            throw new InvalidIntegerException($this, $trimmedRawInterval);
         }
 
-        $this->interval = (int) $trimmed;
+        if ($this->interval <= 0) {
+            throw new InvalidIntegerException($this, $trimmedRawInterval, true);
+        }
     }
 
     public function getValue(): int
@@ -31,10 +34,8 @@ final class IntervalNode extends Node
         return $this->interval;
     }
 
-    public function validate(): void
+    public function getRawValue(): string
     {
-        if ($this->interval <= 0) {
-            throw new InvalidIntegerException($this, (string) $this->interval, true);
-        }
+        return $this->rawInterval;
     }
 }

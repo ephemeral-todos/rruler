@@ -17,7 +17,6 @@ final class FrequencyNodeTest extends TestCase
         $node = new FrequencyNode($input);
 
         $this->assertEquals($expected, $node->getValue());
-        $node->validate(); // Should not throw
     }
 
     #[DataProvider('provideUnhappyPathData')]
@@ -26,8 +25,7 @@ final class FrequencyNodeTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $node = new FrequencyNode($input);
-        $node->validate();
+        new FrequencyNode($input);
     }
 
     public static function provideHappyPathData(): array

@@ -17,7 +17,6 @@ final class CountNodeTest extends TestCase
         $node = new CountNode($input);
 
         $this->assertEquals($expected, $node->getValue());
-        $node->validate(); // Should not throw
     }
 
     #[DataProvider('provideUnhappyPathData')]
@@ -26,8 +25,7 @@ final class CountNodeTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $node = new CountNode($input);
-        $node->validate();
+        new CountNode($input);
     }
 
     public static function provideHappyPathData(): array

@@ -10,7 +10,7 @@ use EphemeralTodos\Rruler\Exception\InvalidChoiceException;
 /**
  * @phpstan-type FrequencyString self::FREQUENCY_*
  */
-final class FrequencyNode extends Node implements NodeWithChoices
+final class FrequencyNode implements Node, NodeWithChoices
 {
     public const string FREQUENCY_DAILY = 'DAILY';
     public const string FREQUENCY_WEEKLY = 'WEEKLY';
@@ -26,18 +26,10 @@ final class FrequencyNode extends Node implements NodeWithChoices
 
     private readonly string $frequency;
 
-    public function __construct(string $frequency)
+    public function __construct(private readonly string $rawFrequency)
     {
-        $this->frequency = strtoupper(trim($frequency));
-    }
+        $this->frequency = strtoupper(trim($rawFrequency));
 
-    public function getValue(): string
-    {
-        return $this->frequency;
-    }
-
-    public function validate(): void
-    {
         if ($this->frequency === '') {
             throw new CannotBeEmptyException($this);
         }
@@ -45,6 +37,16 @@ final class FrequencyNode extends Node implements NodeWithChoices
         if (!in_array($this->frequency, self::VALID_FREQUENCIES, true)) {
             throw new InvalidChoiceException($this);
         }
+    }
+
+    public function getValue(): string
+    {
+        return $this->frequency;
+    }
+
+    public function getRawValue(): string
+    {
+        return $this->rawFrequency;
     }
 
     public static function getChoices(): array

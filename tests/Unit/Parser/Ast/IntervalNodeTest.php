@@ -17,7 +17,6 @@ final class IntervalNodeTest extends TestCase
         $node = new IntervalNode($input);
 
         $this->assertEquals($expected, $node->getValue());
-        $node->validate(); // Should not throw
     }
 
     #[DataProvider('provideUnhappyPathData')]
@@ -26,8 +25,7 @@ final class IntervalNodeTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $node = new IntervalNode($input);
-        $node->validate();
+        new IntervalNode($input);
     }
 
     public static function provideHappyPathData(): array

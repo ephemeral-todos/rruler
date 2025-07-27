@@ -7,23 +7,26 @@ namespace EphemeralTodos\Rruler\Parser\Ast;
 use EphemeralTodos\Rruler\Exception\CannotBeEmptyException;
 use EphemeralTodos\Rruler\Exception\InvalidIntegerException;
 
-final class CountNode extends Node
+final class CountNode implements Node
 {
     private readonly int $count;
 
-    public function __construct(string $count)
+    public function __construct(private readonly string $rawCount)
     {
-        $trimmed = trim($count);
+        $trimmedRawCount = trim($rawCount);
+        $this->count = (int) $trimmedRawCount;
 
-        if ($trimmed === '') {
+        if ($trimmedRawCount === '') {
             throw new CannotBeEmptyException($this);
         }
 
-        if (!is_numeric($trimmed) || str_contains($trimmed, '.')) {
-            throw new InvalidIntegerException($this, $trimmed);
+        if (!is_numeric($trimmedRawCount) || str_contains($trimmedRawCount, '.')) {
+            throw new InvalidIntegerException($this, $trimmedRawCount);
         }
 
-        $this->count = (int) $trimmed;
+        if ($this->count <= 0) {
+            throw new InvalidIntegerException($this, $trimmedRawCount, true);
+        }
     }
 
     public function getValue(): int
@@ -31,10 +34,8 @@ final class CountNode extends Node
         return $this->count;
     }
 
-    public function validate(): void
+    public function getRawValue(): string
     {
-        if ($this->count <= 0) {
-            throw new InvalidIntegerException($this, (string) $this->count, true);
-        }
+        return $this->rawCount;
     }
 }
