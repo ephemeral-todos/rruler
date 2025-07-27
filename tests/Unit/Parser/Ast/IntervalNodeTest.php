@@ -31,6 +31,7 @@ final class IntervalNodeTest extends TestCase
     public static function provideHappyPathData(): array
     {
         return [
+            [0, '0'],
             [1, '1'],
             [2, '2'],
             [10, '10'],
@@ -43,9 +44,8 @@ final class IntervalNodeTest extends TestCase
     {
         return [
             ['Interval cannot be empty', ''],
-            ['Interval must be a positive integer, got: 0', '0'],
-            ['Interval must be a positive integer, got: -1', '-1'],
-            ['Interval must be a positive integer, got: -5', '-5'],
+            ['Interval must be a non-negative integer, got: -1', '-1'],
+            ['Interval must be a non-negative integer, got: -5', '-5'],
             ['Interval must be a valid integer, got: abc', 'abc'],
             ['Interval must be a valid integer, got: 1.5', '1.5'],
             ['Interval must be a valid integer, got: 1a', '1a'],

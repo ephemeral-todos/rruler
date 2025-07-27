@@ -31,6 +31,7 @@ final class CountNodeTest extends TestCase
     public static function provideHappyPathData(): array
     {
         return [
+            [0, '0'],
             [1, '1'],
             [5, '5'],
             [10, '10'],
@@ -43,9 +44,8 @@ final class CountNodeTest extends TestCase
     {
         return [
             ['Count cannot be empty', ''],
-            ['Count must be a positive integer, got: 0', '0'],
-            ['Count must be a positive integer, got: -1', '-1'],
-            ['Count must be a positive integer, got: -10', '-10'],
+            ['Count must be a non-negative integer, got: -1', '-1'],
+            ['Count must be a non-negative integer, got: -10', '-10'],
             ['Count must be a valid integer, got: abc', 'abc'],
             ['Count must be a valid integer, got: 5.5', '5.5'],
             ['Count must be a valid integer, got: 5a', '5a'],

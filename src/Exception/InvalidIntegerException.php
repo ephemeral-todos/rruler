@@ -9,27 +9,37 @@ use EphemeralTodos\Rruler\Parser\Ast\NodeTypeUtils;
 
 final class InvalidIntegerException extends ValidationException
 {
-    public function __construct(
+    private function __construct(
         Node $node,
-        string $invalidValue,
-        bool $mustBePositive = false,
+        string $messageTemplate = '%s must be a positive integer, got: %s',
     ) {
         $prettyType = NodeTypeUtils::toPrettyName($node);
 
-        if ($mustBePositive && is_numeric($invalidValue) && (int) $invalidValue <= 0) {
-            $message = sprintf(
-                '%s must be a positive integer, got: %s',
-                $prettyType,
-                $invalidValue
-            );
-        } else {
-            $message = sprintf(
-                '%s must be a valid integer, got: %s',
-                $prettyType,
-                $invalidValue
-            );
-        }
+        $rawValue = $node->getRawValue();
+
+        $rawValue = match (true) {
+            is_scalar($rawValue) => (string) $rawValue,
+            default => json_encode($rawValue),
+        };
+
+        $message = sprintf($messageTemplate, $prettyType, $rawValue);
 
         parent::__construct($node, $message);
+    }
+
+    public static function dueToNotBeingAnInteger(Node $node): self
+    {
+        return new self(
+            $node,
+            '%s must be a valid integer, got: %s',
+        );
+    }
+
+    public static function dueToBeingNegative(Node $node): self
+    {
+        return new self(
+            $node,
+            '%s must be a non-negative integer, got: %s',
+        );
     }
 }
