@@ -16,11 +16,11 @@ final class CountNode extends Node
         $trimmed = trim($count);
 
         if ($trimmed === '') {
-            throw new CannotBeEmptyException(self::class);
+            throw new CannotBeEmptyException($this);
         }
 
         if (!is_numeric($trimmed) || str_contains($trimmed, '.')) {
-            throw new InvalidIntegerException(self::class, $trimmed);
+            throw new InvalidIntegerException($this, $trimmed);
         }
 
         $this->count = (int) $trimmed;
@@ -34,7 +34,7 @@ final class CountNode extends Node
     public function validate(): void
     {
         if ($this->count <= 0) {
-            throw new InvalidIntegerException(self::class, (string) $this->count, true);
+            throw new InvalidIntegerException($this, (string) $this->count, true);
         }
     }
 }

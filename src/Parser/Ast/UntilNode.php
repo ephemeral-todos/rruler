@@ -18,7 +18,7 @@ final class UntilNode extends Node
         $trimmed = trim($until);
 
         if ($trimmed === '') {
-            throw new CannotBeEmptyException(self::class);
+            throw new CannotBeEmptyException($this);
         }
 
         $this->until = $this->parseUntilDate($trimmed);
@@ -38,7 +38,7 @@ final class UntilNode extends Node
     {
         // RFC 5545 format: YYYYMMDDTHHMMSSZ
         if (!preg_match('/^\d{8}T\d{6}Z$/', $dateString)) {
-            throw new ValidationException(sprintf('Invalid until date format. Expected YYYYMMDDTHHMMSSZ, got: %s', $dateString));
+            throw new ValidationException($this, sprintf('Invalid until date format. Expected YYYYMMDDTHHMMSSZ, got: %s', $dateString));
         }
 
         $year = substr($dateString, 0, 4);
@@ -53,7 +53,7 @@ final class UntilNode extends Node
         try {
             return new DateTimeImmutable($formatted);
         } catch (Exception) {
-            throw new ValidationException(sprintf('Invalid until date format. Expected YYYYMMDDTHHMMSSZ, got: %s', $dateString));
+            throw new ValidationException($this, sprintf('Invalid until date format. Expected YYYYMMDDTHHMMSSZ, got: %s', $dateString));
         }
     }
 }

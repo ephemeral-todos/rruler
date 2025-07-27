@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 final class CannotBeEmptyExceptionTest extends TestCase
 {
     #[DataProvider('provideExceptionData')]
-    public function testExceptionMessage(string $expected, string|object $type): void
+    public function testExceptionMessage(string $expected, object $node): void
     {
-        $exception = new CannotBeEmptyException($type);
+        $exception = new CannotBeEmptyException($node);
 
         $this->assertEquals($expected, $exception->getMessage());
         $this->assertInstanceOf(ValidationException::class, $exception);
@@ -27,10 +27,8 @@ final class CannotBeEmptyExceptionTest extends TestCase
     public static function provideExceptionData(): array
     {
         return [
-            ['Frequency cannot be empty', FrequencyNode::class],
-            ['Interval cannot be empty', IntervalNode::class],
             ['Frequency cannot be empty', new FrequencyNode('DAILY')],
-            ['Unknown cannot be empty', 'SomeRandomClass'],
+            ['Interval cannot be empty', new IntervalNode('5')],
         ];
     }
 }

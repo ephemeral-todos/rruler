@@ -18,11 +18,14 @@ final class InvalidChoiceException extends ValidationException
 
         assert(is_string($value), 'NodeWithChoices implementations must return string values');
 
-        parent::__construct(sprintf(
-            'Invalid %s value: %s. Valid values are: %s',
-            strtolower($prettyType),
-            $value,
-            $choicesList
-        ));
+        parent::__construct(
+            $node,
+            sprintf(
+                'Invalid %s value: %s. Valid values are: %s',
+                strtolower($prettyType),
+                $value,
+                $choicesList
+            )
+        );
     }
 }

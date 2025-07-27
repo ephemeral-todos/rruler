@@ -16,11 +16,11 @@ final class IntervalNode extends Node
         $trimmed = trim($interval);
 
         if ($trimmed === '') {
-            throw new CannotBeEmptyException(self::class);
+            throw new CannotBeEmptyException($this);
         }
 
         if (!is_numeric($trimmed) || str_contains($trimmed, '.')) {
-            throw new InvalidIntegerException(self::class, $trimmed);
+            throw new InvalidIntegerException($this, $trimmed);
         }
 
         $this->interval = (int) $trimmed;
@@ -34,7 +34,7 @@ final class IntervalNode extends Node
     public function validate(): void
     {
         if ($this->interval <= 0) {
-            throw new InvalidIntegerException(self::class, (string) $this->interval, true);
+            throw new InvalidIntegerException($this, (string) $this->interval, true);
         }
     }
 }
