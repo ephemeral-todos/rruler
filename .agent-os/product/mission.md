@@ -5,7 +5,7 @@
 
 ## Pitch
 
-RRuler is a standalone RFC 5545 Recurrence Rule (RRULE) Parser and Occurrence Dates Calculator that helps developers building TODO applications and calendar systems by providing comprehensive support for complex recurring patterns with strict validation and error handling.
+Rruler is a standalone RFC 5545 Recurrence Rule (RRULE) Parser and Occurrence Dates Calculator that helps developers building TODO applications and calendar systems by providing comprehensive support for complex recurring patterns with strict validation and error handling.
 
 ## Users
 

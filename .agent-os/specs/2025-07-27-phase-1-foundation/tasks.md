@@ -1,0 +1,45 @@
+# Spec Tasks
+
+These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-07-27-phase-1-foundation/spec.md
+
+> Created: 2025-07-27
+> Status: Ready for Implementation
+
+## Tasks
+
+- [ ] 1. Development Environment Setup
+  - [ ] 1.1 Write tests for Composer package configuration
+  - [ ] 1.2 Configure composer.json with PHP 8.3+ requirement and PSR-4 autoloading
+  - [ ] 1.3 Set up PHPUnit configuration with proper test directory structure
+  - [ ] 1.4 Configure PHPStan for maximum level static analysis
+  - [ ] 1.5 Set up PHP-CS-Fixer with PER-CS and Symfony rules
+  - [ ] 1.6 Create Justfile with test, lint, fix, and analyze commands
+  - [ ] 1.7 Verify all development tools work correctly
+
+- [ ] 2. AST Foundation Implementation
+  - [ ] 2.1 Write tests for basic AST node classes
+  - [ ] 2.2 Implement base Node class with common functionality
+  - [ ] 2.3 Create specific node classes (FrequencyNode, IntervalNode, CountNode, UntilNode)
+  - [ ] 2.4 Implement node validation logic with error reporting
+  - [ ] 2.5 Verify all AST node tests pass
+
+- [ ] 3. Tokenizer Implementation
+  - [ ] 3.1 Write tests for RRULE string tokenization
+  - [ ] 3.2 Implement Tokenizer class for parsing parameter=value pairs
+  - [ ] 3.3 Add support for whitespace handling and case insensitivity
+  - [ ] 3.4 Implement token validation and error reporting
+  - [ ] 3.5 Verify all tokenizer tests pass
+
+- [ ] 4. Core RRULE Parser
+  - [ ] 4.1 Write tests for RruleParser functionality
+  - [ ] 4.2 Implement RruleParser class with AST generation
+  - [ ] 4.3 Add support for FREQ, INTERVAL, COUNT, UNTIL parameters
+  - [ ] 4.4 Implement comprehensive validation with specific error messages
+  - [ ] 4.5 Verify all parser tests pass
+
+- [ ] 5. Rrule Value Object
+  - [ ] 5.1 Write tests for Rrule immutable object
+  - [ ] 5.2 Implement Rrule class as immutable value object
+  - [ ] 5.3 Add getter methods for all parsed parameters
+  - [ ] 5.4 Implement string representation for debugging
+  - [ ] 5.5 Verify all Rrule object tests pass
