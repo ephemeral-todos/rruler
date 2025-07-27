@@ -1,7 +1,6 @@
 parameters:
-	level: 6
+	level: max
 	paths:
 		- src
-	reportUnmatchedIgnoredErrors: false
 	parallel:
 		maximumNumberOfProcesses: 4

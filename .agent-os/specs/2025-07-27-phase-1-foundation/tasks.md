@@ -7,21 +7,21 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 ## Tasks
 
-- [ ] 1. Development Environment Setup
-  - [ ] 1.1 Write tests for Composer package configuration
-  - [ ] 1.2 Configure composer.json with PHP 8.3+ requirement and PSR-4 autoloading
-  - [ ] 1.3 Set up PHPUnit configuration with proper test directory structure
-  - [ ] 1.4 Configure PHPStan for maximum level static analysis
-  - [ ] 1.5 Set up PHP-CS-Fixer with PER-CS and Symfony rules
-  - [ ] 1.6 Create Justfile with test, lint, fix, and analyze commands
-  - [ ] 1.7 Verify all development tools work correctly
+- [x] 1. Development Environment Setup
+  - [x] 1.1 Write tests for Composer package configuration
+  - [x] 1.2 Configure composer.json with PHP 8.3+ requirement and PSR-4 autoloading
+  - [x] 1.3 Set up PHPUnit configuration with proper test directory structure
+  - [x] 1.4 Configure PHPStan for maximum level static analysis
+  - [x] 1.5 Set up PHP-CS-Fixer with PER-CS and Symfony rules
+  - [x] 1.6 Create Justfile with test, lint, fix, and analyze commands
+  - [x] 1.7 Verify all development tools work correctly
 
-- [ ] 2. AST Foundation Implementation
-  - [ ] 2.1 Write tests for basic AST node classes
-  - [ ] 2.2 Implement base Node class with common functionality
-  - [ ] 2.3 Create specific node classes (FrequencyNode, IntervalNode, CountNode, UntilNode)
-  - [ ] 2.4 Implement node validation logic with error reporting
-  - [ ] 2.5 Verify all AST node tests pass
+- [x] 2. AST Foundation Implementation
+  - [x] 2.1 Write tests for basic AST node classes
+  - [x] 2.2 Implement base Node class with common functionality
+  - [x] 2.3 Create specific node classes (FrequencyNode, IntervalNode, CountNode, UntilNode)
+  - [x] 2.4 Implement node validation logic with error reporting
+  - [x] 2.5 Verify all AST node tests pass
 
 - [ ] 3. Tokenizer Implementation
   - [ ] 3.1 Write tests for RRULE string tokenization

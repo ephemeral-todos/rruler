@@ -30,3 +30,30 @@ phpunit-unit: vendor
 phpunit-integration: vendor
     composer test:integration
 
+[group('development')]
+[doc('Runs all tests')]
+test: vendor
+    composer test
+
+[group('development')]
+[doc('Runs static analysis')]
+analyse: vendor
+    composer analyse
+
+[group('development')]
+[doc('Formats code')]
+format: vendor
+    composer format
+
+[group('development')]
+[doc('Checks code formatting')]
+format-check: vendor
+    composer format:check
+
+[group('development')]
+[doc('Runs all quality checks')]
+check: vendor
+    composer analyse
+    composer format:check
+    composer test
+
