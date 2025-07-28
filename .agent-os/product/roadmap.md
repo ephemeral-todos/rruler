@@ -11,15 +11,15 @@
 
 ### Must-Have Features
 
-- [ ] Project Setup - Composer package, PHPUnit, PHPStan, PHP-CS-Fixer configuration `M`
-- [ ] AST Parser Foundation - Basic tokenizer and AST node structure for RRULE parsing `L`
-- [ ] Core RRULE Parser - Parse FREQ, INTERVAL, COUNT, UNTIL basic parameters `L`
-- [ ] Basic Validation - Input validation and error handling for malformed RRULE strings `M`
-- [ ] Unit Test Foundation - Test framework setup with initial parser tests `M`
+- [x] Project Setup - Composer package, PHPUnit, PHPStan, PHP-CS-Fixer configuration `M`
+- [x] AST Parser Foundation - Basic tokenizer and AST node structure for RRULE parsing `L`
+- [x] Core RRULE Parser - Parse FREQ, INTERVAL, COUNT, UNTIL basic parameters `L`
+- [x] Basic Validation - Input validation and error handling for malformed RRULE strings `M`
+- [x] Unit Test Foundation - Test framework setup with initial parser tests `M`
 
 ### Should-Have Features
 
-- [ ] Development Tools - Justfile/Makefile with common tasks (test, lint, fix) `S`
+- [x] Development Tools - Justfile/Makefile with common tasks (test, lint, fix) `S`
 - [ ] CI Pipeline - GitHub Actions for testing across PHP versions `M`
 
 ### Dependencies

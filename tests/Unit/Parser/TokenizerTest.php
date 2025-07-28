@@ -53,23 +53,23 @@ final class TokenizerTest extends TestCase
         return [
             'single parameter' => [
                 ['FREQ' => 'DAILY'],
-                'FREQ=DAILY'
+                'FREQ=DAILY',
             ],
             'multiple parameters' => [
                 ['FREQ' => 'DAILY', 'INTERVAL' => '2'],
-                'FREQ=DAILY;INTERVAL=2'
+                'FREQ=DAILY;INTERVAL=2',
             ],
             'all basic parameters' => [
                 ['FREQ' => 'WEEKLY', 'INTERVAL' => '1', 'COUNT' => '10'],
-                'FREQ=WEEKLY;INTERVAL=1;COUNT=10'
+                'FREQ=WEEKLY;INTERVAL=1;COUNT=10',
             ],
             'with until parameter' => [
                 ['FREQ' => 'MONTHLY', 'UNTIL' => '20251231T235959Z'],
-                'FREQ=MONTHLY;UNTIL=20251231T235959Z'
+                'FREQ=MONTHLY;UNTIL=20251231T235959Z',
             ],
             'complex parameter order' => [
                 ['COUNT' => '5', 'FREQ' => 'YEARLY', 'INTERVAL' => '3'],
-                'COUNT=5;FREQ=YEARLY;INTERVAL=3'
+                'COUNT=5;FREQ=YEARLY;INTERVAL=3',
             ],
         ];
     }
@@ -79,27 +79,27 @@ final class TokenizerTest extends TestCase
         return [
             'empty string' => [
                 'RRULE string cannot be empty',
-                ''
+                '',
             ],
             'missing value' => [
                 'Invalid parameter format: FREQ=. Expected parameter=value',
-                'FREQ='
+                'FREQ=',
             ],
             'missing parameter name' => [
                 'Invalid parameter format: =DAILY. Expected parameter=value',
-                '=DAILY'
+                '=DAILY',
             ],
             'missing equals sign' => [
                 'Invalid parameter format: FREQ. Expected parameter=value',
-                'FREQ'
+                'FREQ',
             ],
             'multiple equals signs' => [
                 'Invalid parameter format: FREQ=DAILY=EXTRA. Expected parameter=value',
-                'FREQ=DAILY=EXTRA'
+                'FREQ=DAILY=EXTRA',
             ],
             'duplicate parameter' => [
                 'Duplicate parameter: FREQ',
-                'FREQ=DAILY;FREQ=WEEKLY'
+                'FREQ=DAILY;FREQ=WEEKLY',
             ],
         ];
     }
@@ -109,19 +109,19 @@ final class TokenizerTest extends TestCase
         return [
             'spaces around parameters' => [
                 ['FREQ' => 'DAILY', 'INTERVAL' => '2'],
-                ' FREQ=DAILY ; INTERVAL=2 '
+                ' FREQ=DAILY ; INTERVAL=2 ',
             ],
             'spaces around equals' => [
                 ['FREQ' => 'WEEKLY'],
-                'FREQ = WEEKLY'
+                'FREQ = WEEKLY',
             ],
             'tabs and spaces mixed' => [
                 ['FREQ' => 'MONTHLY', 'COUNT' => '5'],
-                "\tFREQ=MONTHLY\t;\tCOUNT=5\t"
+                "\tFREQ=MONTHLY\t;\tCOUNT=5\t",
             ],
             'newlines and spaces' => [
                 ['FREQ' => 'YEARLY'],
-                "\nFREQ=YEARLY\n"
+                "\nFREQ=YEARLY\n",
             ],
         ];
     }
@@ -131,15 +131,15 @@ final class TokenizerTest extends TestCase
         return [
             'lowercase parameters' => [
                 ['FREQ' => 'DAILY', 'INTERVAL' => '1'],
-                'freq=daily;interval=1'
+                'freq=daily;interval=1',
             ],
             'mixed case parameters' => [
                 ['FREQ' => 'WEEKLY', 'COUNT' => '10'],
-                'Freq=Weekly;Count=10'
+                'Freq=Weekly;Count=10',
             ],
             'uppercase values' => [
                 ['FREQ' => 'MONTHLY', 'UNTIL' => '20251231T235959Z'],
-                'FREQ=MONTHLY;UNTIL=20251231T235959Z'
+                'FREQ=MONTHLY;UNTIL=20251231T235959Z',
             ],
         ];
     }

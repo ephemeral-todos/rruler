@@ -30,16 +30,16 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 3.4 Implement token validation and error reporting
   - [x] 3.5 Verify all tokenizer tests pass
 
-- [ ] 4. Core RRULE Parser
-  - [ ] 4.1 Write tests for RruleParser functionality
-  - [ ] 4.2 Implement RruleParser class with AST generation
-  - [ ] 4.3 Add support for FREQ, INTERVAL, COUNT, UNTIL parameters
-  - [ ] 4.4 Implement comprehensive validation with specific error messages
-  - [ ] 4.5 Verify all parser tests pass
+- [x] 4. Core RRULE Parser
+  - [x] 4.1 Write tests for RruleParser functionality
+  - [x] 4.2 Implement RruleParser class with AST generation
+  - [x] 4.3 Add support for FREQ, INTERVAL, COUNT, UNTIL parameters
+  - [x] 4.4 Implement comprehensive validation with specific error messages
+  - [x] 4.5 Verify all parser tests pass
 
-- [ ] 5. Rrule Value Object
-  - [ ] 5.1 Write tests for Rrule immutable object
-  - [ ] 5.2 Implement Rrule class as immutable value object
-  - [ ] 5.3 Add getter methods for all parsed parameters
-  - [ ] 5.4 Implement string representation for debugging
-  - [ ] 5.5 Verify all Rrule object tests pass
+- [x] 5. Rrule Value Object
+  - [x] 5.1 Write tests for Rrule immutable object
+  - [x] 5.2 Implement Rrule class as immutable value object
+  - [x] 5.3 Add getter methods for all parsed parameters
+  - [x] 5.4 Implement string representation for debugging
+  - [x] 5.5 Verify all Rrule object tests pass
