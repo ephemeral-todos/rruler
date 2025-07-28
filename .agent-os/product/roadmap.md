@@ -34,16 +34,16 @@
 
 ### Must-Have Features
 
-- [ ] DateTime Handling - Robust DateTime/DateTimeImmutable integration `M`
-- [ ] Basic Occurrence Calculator - Generate occurrences for DAILY, WEEKLY patterns `L`
-- [ ] Count/Until Logic - Implement COUNT and UNTIL termination conditions `M`
-- [ ] Date Range Filtering - Generate occurrences between specified date ranges `M`
-- [ ] Occurrence Validation - Check if specific DateTime is a valid occurrence `M`
+- [x] DateTime Handling - Robust DateTime/DateTimeImmutable integration `M`
+- [x] Basic Occurrence Calculator - Generate occurrences for DAILY, WEEKLY patterns `L`
+- [x] Count/Until Logic - Implement COUNT and UNTIL termination conditions `M`
+- [x] Date Range Filtering - Generate occurrences between specified date ranges `M`
+- [x] Occurrence Validation - Check if specific DateTime is a valid occurrence `M`
 
 ### Should-Have Features
 
-- [ ] Performance Optimization - Generator patterns for large occurrence sets `S`
-- [ ] Memory Efficiency - Lazy evaluation implementation `S`
+- [x] Performance Optimization - Generator patterns for large occurrence sets `S`
+- [x] Memory Efficiency - Lazy evaluation implementation `S`
 
 ### Dependencies
 
