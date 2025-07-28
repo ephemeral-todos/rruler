@@ -23,12 +23,12 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 2.4 Implement node validation logic with error reporting
   - [x] 2.5 Verify all AST node tests pass
 
-- [ ] 3. Tokenizer Implementation
-  - [ ] 3.1 Write tests for RRULE string tokenization
-  - [ ] 3.2 Implement Tokenizer class for parsing parameter=value pairs
-  - [ ] 3.3 Add support for whitespace handling and case insensitivity
-  - [ ] 3.4 Implement token validation and error reporting
-  - [ ] 3.5 Verify all tokenizer tests pass
+- [x] 3. Tokenizer Implementation
+  - [x] 3.1 Write tests for RRULE string tokenization
+  - [x] 3.2 Implement Tokenizer class for parsing parameter=value pairs
+  - [x] 3.3 Add support for whitespace handling and case insensitivity
+  - [x] 3.4 Implement token validation and error reporting
+  - [x] 3.5 Verify all tokenizer tests pass
 
 - [ ] 4. Core RRULE Parser
   - [ ] 4.1 Write tests for RruleParser functionality
