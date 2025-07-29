@@ -167,13 +167,6 @@ final class RruleTest extends TestCase
                 10,
                 null,
             ],
-            'case insensitive' => [
-                'freq=daily;interval=5',
-                'DAILY',
-                5,
-                null,
-                null,
-            ],
         ];
     }
 
@@ -194,6 +187,11 @@ final class RruleTest extends TestCase
                 ValidationException::class,
                 'Invalid frequency value: INVALID. Valid values are: DAILY, WEEKLY, MONTHLY, YEARLY',
                 'FREQ=INVALID',
+            ],
+            'case sensitive frequency' => [
+                ValidationException::class,
+                'Invalid frequency value: daily. Valid values are: DAILY, WEEKLY, MONTHLY, YEARLY',
+                'freq=daily',
             ],
             'count and until together' => [
                 ValidationException::class,

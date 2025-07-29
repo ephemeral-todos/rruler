@@ -38,7 +38,7 @@ final class Tokenizer
                 throw new ParseException("Duplicate parameter: {$normalizedName}");
             }
 
-            $tokens[$normalizedName] = $this->normalizeValue($normalizedName, $value);
+            $tokens[$normalizedName] = $value;
         }
 
         return $tokens;
@@ -88,15 +88,5 @@ final class Tokenizer
             trim($parts[0]),
             trim($parts[1]),
         ];
-    }
-
-    private function normalizeValue(string $parameterName, string $value): string
-    {
-        // Normalize frequency values to uppercase
-        if ($parameterName === 'FREQ') {
-            return strtoupper($value);
-        }
-
-        return $value;
     }
 }

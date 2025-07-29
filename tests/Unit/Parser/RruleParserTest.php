@@ -109,10 +109,6 @@ final class RruleParserTest extends TestCase
                 ['FREQ' => 'YEARLY', 'INTERVAL' => 3, 'COUNT' => 5],
                 'FREQ=YEARLY;INTERVAL=3;COUNT=5',
             ],
-            'case insensitive parameters' => [
-                ['FREQ' => 'DAILY', 'INTERVAL' => 1],
-                'freq=daily;interval=1',
-            ],
             'whitespace handling' => [
                 ['FREQ' => 'WEEKLY', 'COUNT' => 15],
                 ' FREQ = WEEKLY ; COUNT = 15 ',
@@ -141,6 +137,11 @@ final class RruleParserTest extends TestCase
                 ValidationException::class,
                 'Invalid frequency value: INVALID. Valid values are: DAILY, WEEKLY, MONTHLY, YEARLY',
                 'FREQ=INVALID',
+            ],
+            'case sensitive frequency' => [
+                ValidationException::class,
+                'Invalid frequency value: daily. Valid values are: DAILY, WEEKLY, MONTHLY, YEARLY',
+                'freq=daily',
             ],
             'invalid interval non-numeric' => [
                 ValidationException::class,

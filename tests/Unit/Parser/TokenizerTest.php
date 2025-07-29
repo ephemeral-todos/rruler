@@ -130,11 +130,11 @@ final class TokenizerTest extends TestCase
     {
         return [
             'lowercase parameters' => [
-                ['FREQ' => 'DAILY', 'INTERVAL' => '1'],
+                ['FREQ' => 'daily', 'INTERVAL' => '1'],
                 'freq=daily;interval=1',
             ],
             'mixed case parameters' => [
-                ['FREQ' => 'WEEKLY', 'COUNT' => '10'],
+                ['FREQ' => 'Weekly', 'COUNT' => '10'],
                 'Freq=Weekly;Count=10',
             ],
             'uppercase values' => [

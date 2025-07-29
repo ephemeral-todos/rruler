@@ -14,11 +14,18 @@ use EphemeralTodos\Rruler\Parser\Ast\UntilNode;
 
 final class RruleParser
 {
-    private Tokenizer $tokenizer;
+    /**
+     * @var array<string,class-string<Node>>
+     */
+    private const array NODE_MAP = [
+        FrequencyNode::NAME => FrequencyNode::class,
+        IntervalNode::NAME => IntervalNode::class,
+        CountNode::NAME => CountNode::class,
+        UntilNode::NAME => UntilNode::class,
+    ];
 
-    public function __construct()
+    public function __construct(private Tokenizer $tokenizer = new Tokenizer())
     {
-        $this->tokenizer = new Tokenizer();
     }
 
     public function parse(string $rruleString): RruleAst
@@ -96,12 +103,8 @@ final class RruleParser
 
     private function createNode(string $parameterName, string $value): Node
     {
-        return match ($parameterName) {
-            'FREQ' => new FrequencyNode($value),
-            'INTERVAL' => new IntervalNode($value),
-            'COUNT' => new CountNode($value),
-            'UNTIL' => new UntilNode($value),
-            default => throw new ValidationException(
+        if (!array_key_exists($parameterName, self::NODE_MAP)) {
+            throw new ValidationException(
                 new class implements Node {
                     public function getName(): string
                     {
@@ -119,7 +122,11 @@ final class RruleParser
                     }
                 },
                 "Unsupported parameter: {$parameterName}"
-            ),
-        };
+            );
+        }
+
+        $nodeClass = self::NODE_MAP[$parameterName];
+
+        return new $nodeClass($value);
     }
 }
