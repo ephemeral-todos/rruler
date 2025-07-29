@@ -13,25 +13,37 @@ final class RruleAst
      */
     private array $nodes = [];
 
-    public function addNode(string $parameterName, Node $node): void
+    public function addNode(Node $node): void
     {
-        $this->nodes[strtoupper($parameterName)] = $node;
+        $this->nodes[$node->getName()] = $node;
     }
 
+    /**
+     * @param string|class-string<Node> $parameterName
+     */
     public function hasNode(string $parameterName): bool
     {
-        return isset($this->nodes[strtoupper($parameterName)]);
+        // @todo Revisit this implementation to handle class-string properly
+        // @phpstan-ignore property.staticAccess
+        $normalizedParameterName = interface_exists($parameterName) ? $parameterName::NAME : $parameterName;
+
+        return isset($this->nodes[$normalizedParameterName]);
     }
 
+    /**
+     * @param string|class-string<Node> $parameterName
+     */
     public function getNode(string $parameterName): Node
     {
-        $normalizedName = strtoupper($parameterName);
+        // @todo Revisit this implementation to handle class-string properly
+        // @phpstan-ignore property.staticAccess
+        $normalizedParameterName = interface_exists($parameterName) ? $parameterName::NAME : $parameterName;
 
-        if (!isset($this->nodes[$normalizedName])) {
-            throw new ParseException("Node {$normalizedName} not found in AST");
+        if (!isset($this->nodes[$normalizedParameterName])) {
+            throw new ParseException("Node {$normalizedParameterName} not found in AST");
         }
 
-        return $this->nodes[$normalizedName];
+        return $this->nodes[$normalizedParameterName];
     }
 
     /**

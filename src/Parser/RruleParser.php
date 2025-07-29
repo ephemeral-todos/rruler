@@ -39,7 +39,7 @@ final class RruleParser
 
         foreach ($tokens as $parameterName => $value) {
             $node = $this->createNode($parameterName, $value);
-            $ast->addNode($parameterName, $node);
+            $ast->addNode($node);
         }
 
         return $ast;
