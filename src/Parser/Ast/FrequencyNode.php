@@ -12,6 +12,8 @@ use EphemeralTodos\Rruler\Exception\InvalidChoiceException;
  */
 final class FrequencyNode implements Node, NodeWithChoices
 {
+    public const string NAME = 'FREQ';
+
     public const string FREQUENCY_DAILY = 'DAILY';
     public const string FREQUENCY_WEEKLY = 'WEEKLY';
     public const string FREQUENCY_MONTHLY = 'MONTHLY';
@@ -24,29 +26,34 @@ final class FrequencyNode implements Node, NodeWithChoices
         self::FREQUENCY_YEARLY,
     ];
 
-    private readonly string $frequency;
+    private readonly string $value;
 
-    public function __construct(private readonly string $rawFrequency)
+    public function __construct(private readonly string $rawValue)
     {
-        $this->frequency = strtoupper(trim($rawFrequency));
+        $this->value = $rawValue;
 
-        if ($this->frequency === '') {
+        if ($this->value === '') {
             throw new CannotBeEmptyException($this);
         }
 
-        if (!in_array($this->frequency, self::VALID_FREQUENCIES, true)) {
+        if (!in_array($this->value, self::VALID_FREQUENCIES, true)) {
             throw new InvalidChoiceException($this);
         }
     }
 
+    public function getName(): string
+    {
+        return self::NAME;
+    }
+
     public function getValue(): string
     {
-        return $this->frequency;
+        return $this->value;
     }
 
     public function getRawValue(): string
     {
-        return $this->rawFrequency;
+        return $this->rawValue;
     }
 
     public static function getChoices(): array

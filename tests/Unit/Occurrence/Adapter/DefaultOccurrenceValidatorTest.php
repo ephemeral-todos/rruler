@@ -89,37 +89,37 @@ final class DefaultOccurrenceValidatorTest extends TestCase
             'daily first occurrence' => [
                 'FREQ=DAILY;COUNT=5',
                 '2025-01-01',
-                '2025-01-01'
+                '2025-01-01',
             ],
             'daily second occurrence' => [
                 'FREQ=DAILY;COUNT=5',
                 '2025-01-01',
-                '2025-01-02'
+                '2025-01-02',
             ],
             'daily with interval' => [
                 'FREQ=DAILY;INTERVAL=2;COUNT=3',
                 '2025-01-01',
-                '2025-01-03'
+                '2025-01-03',
             ],
             'weekly first occurrence' => [
                 'FREQ=WEEKLY;COUNT=3',
                 '2025-01-01',
-                '2025-01-01'
+                '2025-01-01',
             ],
             'weekly second occurrence' => [
                 'FREQ=WEEKLY;COUNT=3',
                 '2025-01-01',
-                '2025-01-08'
+                '2025-01-08',
             ],
             'weekly with interval' => [
                 'FREQ=WEEKLY;INTERVAL=2;COUNT=3',
                 '2025-01-01',
-                '2025-01-15'
+                '2025-01-15',
             ],
             'until boundary date' => [
                 'FREQ=DAILY;UNTIL=20250103T235959Z',
                 '2025-01-01',
-                '2025-01-03'
+                '2025-01-03',
             ],
         ];
     }
@@ -130,22 +130,22 @@ final class DefaultOccurrenceValidatorTest extends TestCase
             'daily wrong interval' => [
                 'FREQ=DAILY;INTERVAL=2;COUNT=5',
                 '2025-01-01',
-                '2025-01-02' // Should be every 2 days
+                '2025-01-02', // Should be every 2 days
             ],
             'weekly wrong day' => [
                 'FREQ=WEEKLY;COUNT=3',
                 '2025-01-01', // Wednesday
-                '2025-01-02'  // Thursday, not a weekly occurrence
+                '2025-01-02',  // Thursday, not a weekly occurrence
             ],
             'before start date' => [
                 'FREQ=DAILY;COUNT=5',
                 '2025-01-01',
-                '2024-12-31'
+                '2024-12-31',
             ],
             'weekly wrong interval' => [
                 'FREQ=WEEKLY;INTERVAL=2;COUNT=3',
                 '2025-01-01',
-                '2025-01-08' // Should be every 2 weeks
+                '2025-01-08', // Should be every 2 weeks
             ],
         ];
     }

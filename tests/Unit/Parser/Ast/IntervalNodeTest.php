@@ -49,6 +49,7 @@ final class IntervalNodeTest extends TestCase
             ['Interval must be a valid integer, got: abc', 'abc'],
             ['Interval must be a valid integer, got: 1.5', '1.5'],
             ['Interval must be a valid integer, got: 1a', '1a'],
+            ['Interval cannot be empty', ' '],
         ];
     }
 }

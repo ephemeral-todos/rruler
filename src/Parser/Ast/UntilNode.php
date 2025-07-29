@@ -11,27 +11,32 @@ use Exception;
 
 final class UntilNode implements Node
 {
-    private readonly DateTimeImmutable $until;
+    public const string NAME = 'UNTIL';
 
-    public function __construct(private readonly string $rawUntil)
+    private readonly DateTimeImmutable $value;
+
+    public function __construct(private readonly string $rawValue)
     {
-        $trimmedRawUntil = trim($rawUntil);
-
-        if ($trimmedRawUntil === '') {
+        if ($rawValue === '') {
             throw new CannotBeEmptyException($this);
         }
 
-        $this->until = $this->parseUntilDate($trimmedRawUntil);
+        $this->value = $this->parseUntilDate($rawValue);
+    }
+
+    public function getName(): string
+    {
+        return self::NAME;
     }
 
     public function getValue(): DateTimeImmutable
     {
-        return $this->until;
+        return $this->value;
     }
 
     public function getRawValue(): string
     {
-        return $this->rawUntil;
+        return $this->rawValue;
     }
 
     private function parseUntilDate(string $dateString): DateTimeImmutable

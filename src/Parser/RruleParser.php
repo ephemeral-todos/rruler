@@ -46,6 +46,11 @@ final class RruleParser
         if (!isset($tokens['FREQ'])) {
             throw new ValidationException(
                 new class implements Node {
+                    public function getName(): string
+                    {
+                        throw new \LogicException('Not implemented yet.');
+                    }
+
                     public function getValue(): mixed
                     {
                         return null;
@@ -69,6 +74,11 @@ final class RruleParser
         if (isset($tokens['COUNT']) && isset($tokens['UNTIL'])) {
             throw new ValidationException(
                 new class implements Node {
+                    public function getName(): string
+                    {
+                        throw new \LogicException('Not implemented yet.');
+                    }
+
                     public function getValue(): mixed
                     {
                         return null;
@@ -93,6 +103,11 @@ final class RruleParser
             'UNTIL' => new UntilNode($value),
             default => throw new ValidationException(
                 new class implements Node {
+                    public function getName(): string
+                    {
+                        throw new \LogicException('Not implemented yet.');
+                    }
+
                     public function getValue(): mixed
                     {
                         return null;

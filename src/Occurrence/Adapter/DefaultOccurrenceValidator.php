@@ -12,14 +12,14 @@ use EphemeralTodos\Rruler\Rrule;
 final class DefaultOccurrenceValidator implements OccurrenceValidator
 {
     public function __construct(
-        private OccurrenceGenerator $occurrenceGenerator
+        private OccurrenceGenerator $occurrenceGenerator,
     ) {
     }
 
     public function isValidOccurrence(
         Rrule $rrule,
         DateTimeImmutable $start,
-        DateTimeImmutable $candidate
+        DateTimeImmutable $candidate,
     ): bool {
         // Quick check: candidate must be at or after start date
         if ($candidate < $start) {
@@ -36,7 +36,7 @@ final class DefaultOccurrenceValidator implements OccurrenceValidator
             if ($occurrence == $candidate) {
                 return true;
             }
-            
+
             // If we've passed the candidate date without finding it, it's invalid
             if ($occurrence > $candidate) {
                 break;

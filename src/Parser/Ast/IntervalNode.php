@@ -6,26 +6,32 @@ namespace EphemeralTodos\Rruler\Parser\Ast;
 
 final class IntervalNode implements Node
 {
-    private readonly int $interval;
+    public const string NAME = 'INTERVAL';
 
-    public function __construct(private readonly string $rawInterval)
+    private readonly int $value;
+
+    public function __construct(private readonly string $rawValue)
     {
         AssertThatNode::isNotEmpty($this);
         AssertThatNode::containsAnInteger($this);
 
-        $trimmedRawInterval = trim($rawInterval);
-        $this->interval = (int) $trimmedRawInterval;
+        $this->value = (int) $rawValue;
 
         AssertThatNode::isNotNegative($this);
     }
 
+    public function getName(): string
+    {
+        return self::NAME;
+    }
+
     public function getValue(): int
     {
-        return $this->interval;
+        return $this->value;
     }
 
     public function getRawValue(): string
     {
-        return $this->rawInterval;
+        return $this->rawValue;
     }
 }

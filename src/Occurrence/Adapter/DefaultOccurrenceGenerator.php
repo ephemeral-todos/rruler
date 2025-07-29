@@ -14,12 +14,12 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     public function generateOccurrences(
         Rrule $rrule,
         DateTimeImmutable $start,
-        ?int $limit = null
+        ?int $limit = null,
     ): Generator {
         $current = $start;
         $count = 0;
         $maxCount = $limit ?? $rrule->getCount();
-        
+
         // Early termination for COUNT=0
         if ($maxCount === 0) {
             return;
@@ -32,7 +32,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             }
 
             yield $current;
-            $count++;
+            ++$count;
 
             // Check COUNT condition
             if ($maxCount !== null && $count >= $maxCount) {
@@ -47,17 +47,17 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         Rrule $rrule,
         DateTimeImmutable $start,
         DateTimeImmutable $rangeStart,
-        DateTimeImmutable $rangeEnd
+        DateTimeImmutable $rangeEnd,
     ): Generator {
         foreach ($this->generateOccurrences($rrule, $start) as $occurrence) {
             if ($occurrence < $rangeStart) {
                 continue;
             }
-            
+
             if ($occurrence > $rangeEnd) {
                 break;
             }
-            
+
             yield $occurrence;
         }
     }
@@ -65,7 +65,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     private function getNextOccurrence(Rrule $rrule, DateTimeImmutable $current): DateTimeImmutable
     {
         $interval = $rrule->getInterval();
-        
+
         return match ($rrule->getFrequency()) {
             'DAILY' => $current->modify("+{$interval} days"),
             'WEEKLY' => $current->modify("+{$interval} weeks"),

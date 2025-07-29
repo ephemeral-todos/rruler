@@ -28,7 +28,7 @@ final class OccurrenceGenerationTest extends TestCase
         string $startDate,
         array $expectedOccurrences,
         array $validCandidates,
-        array $invalidCandidates
+        array $invalidCandidates,
     ): void {
         // Parse RRULE
         $rrule = Rrule::fromString($rruleString);
@@ -52,7 +52,7 @@ final class OccurrenceGenerationTest extends TestCase
         foreach ($results as $occurrence) {
             $this->assertTrue(
                 $this->validator->isValidOccurrence($rrule, $start, $occurrence),
-                "Generated occurrence should be valid: " . $occurrence->format('Y-m-d')
+                'Generated occurrence should be valid: '.$occurrence->format('Y-m-d')
             );
         }
 
@@ -129,7 +129,7 @@ final class OccurrenceGenerationTest extends TestCase
         $start = new DateTimeImmutable('2025-01-01');
 
         $occurrences = iterator_to_array($this->generator->generateOccurrences($rruleWithCount, $start));
-        
+
         $this->assertCount(3, $occurrences); // COUNT=3 should limit
         $this->assertEquals(new DateTimeImmutable('2025-01-01'), $occurrences[0]);
         $this->assertEquals(new DateTimeImmutable('2025-01-02'), $occurrences[1]);
@@ -138,7 +138,7 @@ final class OccurrenceGenerationTest extends TestCase
         // Test UNTIL limiting occurrences
         $rruleWithUntil = Rrule::fromString('FREQ=DAILY;UNTIL=20250103T235959Z');
         $occurrences = iterator_to_array($this->generator->generateOccurrences($rruleWithUntil, $start));
-        
+
         $this->assertCount(3, $occurrences); // UNTIL should limit to 3 days
         $this->assertEquals(new DateTimeImmutable('2025-01-01'), $occurrences[0]);
         $this->assertEquals(new DateTimeImmutable('2025-01-02'), $occurrences[1]);
@@ -151,13 +151,13 @@ final class OccurrenceGenerationTest extends TestCase
         $start = new DateTimeImmutable('2025-01-01');
 
         $startTime = microtime(true);
-        
+
         $count = 0;
         foreach ($this->generator->generateOccurrences($rrule, $start) as $occurrence) {
-            $count++;
+            ++$count;
             // Just iterate, don't collect all in memory
         }
-        
+
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
 
@@ -173,35 +173,35 @@ final class OccurrenceGenerationTest extends TestCase
                 '2025-01-01',
                 ['2025-01-01', '2025-01-02', '2025-01-03'],
                 ['2025-01-01', '2025-01-02', '2025-01-03'],
-                ['2024-12-31', '2025-01-04', '2025-01-05']
+                ['2024-12-31', '2025-01-04', '2025-01-05'],
             ],
             'daily with interval' => [
                 'FREQ=DAILY;INTERVAL=2;COUNT=3',
                 '2025-01-01',
                 ['2025-01-01', '2025-01-03', '2025-01-05'],
                 ['2025-01-01', '2025-01-03', '2025-01-05'],
-                ['2025-01-02', '2025-01-04', '2025-01-06']
+                ['2025-01-02', '2025-01-04', '2025-01-06'],
             ],
             'weekly with count' => [
                 'FREQ=WEEKLY;COUNT=3',
                 '2025-01-01', // Wednesday
                 ['2025-01-01', '2025-01-08', '2025-01-15'],
                 ['2025-01-01', '2025-01-08', '2025-01-15'],
-                ['2025-01-02', '2025-01-07', '2025-01-09', '2025-01-22']
+                ['2025-01-02', '2025-01-07', '2025-01-09', '2025-01-22'],
             ],
             'weekly with interval' => [
                 'FREQ=WEEKLY;INTERVAL=2;COUNT=3',
                 '2025-01-01', // Wednesday
                 ['2025-01-01', '2025-01-15', '2025-01-29'],
                 ['2025-01-01', '2025-01-15', '2025-01-29'],
-                ['2025-01-08', '2025-01-22', '2025-02-05']
+                ['2025-01-08', '2025-01-22', '2025-02-05'],
             ],
             'daily with until' => [
                 'FREQ=DAILY;UNTIL=20250103T235959Z',
                 '2025-01-01',
                 ['2025-01-01', '2025-01-02', '2025-01-03'],
                 ['2025-01-01', '2025-01-02', '2025-01-03'],
-                ['2024-12-31', '2025-01-04', '2025-01-05']
+                ['2024-12-31', '2025-01-04', '2025-01-05'],
             ],
         ];
     }

@@ -18,7 +18,7 @@ interface OccurrenceGenerator
     public function generateOccurrences(
         Rrule $rrule,
         DateTimeImmutable $start,
-        ?int $limit = null
+        ?int $limit = null,
     ): Generator;
 
     /**
@@ -30,6 +30,6 @@ interface OccurrenceGenerator
         Rrule $rrule,
         DateTimeImmutable $start,
         DateTimeImmutable $rangeStart,
-        DateTimeImmutable $rangeEnd
+        DateTimeImmutable $rangeEnd,
     ): Generator;
 }

@@ -15,6 +15,6 @@ interface OccurrenceValidator
     public function isValidOccurrence(
         Rrule $rrule,
         DateTimeImmutable $start,
-        DateTimeImmutable $candidate
+        DateTimeImmutable $candidate,
     ): bool;
 }

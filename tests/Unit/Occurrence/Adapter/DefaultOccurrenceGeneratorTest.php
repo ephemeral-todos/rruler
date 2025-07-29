@@ -123,19 +123,19 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=DAILY;COUNT=3',
                 '2025-01-01',
                 3,
-                ['2025-01-01', '2025-01-02', '2025-01-03']
+                ['2025-01-01', '2025-01-02', '2025-01-03'],
             ],
             'daily every 2 days with count 3' => [
                 'FREQ=DAILY;INTERVAL=2;COUNT=3',
                 '2025-01-01',
                 3,
-                ['2025-01-01', '2025-01-03', '2025-01-05']
+                ['2025-01-01', '2025-01-03', '2025-01-05'],
             ],
             'daily until specific date' => [
                 'FREQ=DAILY;UNTIL=20250103T235959Z',
                 '2025-01-01',
                 3,
-                ['2025-01-01', '2025-01-02', '2025-01-03']
+                ['2025-01-01', '2025-01-02', '2025-01-03'],
             ],
         ];
     }
@@ -147,19 +147,19 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=WEEKLY;COUNT=3',
                 '2025-01-01', // Wednesday
                 3,
-                ['2025-01-01', '2025-01-08', '2025-01-15']
+                ['2025-01-01', '2025-01-08', '2025-01-15'],
             ],
             'weekly every 2 weeks with count 3' => [
                 'FREQ=WEEKLY;INTERVAL=2;COUNT=3',
                 '2025-01-01', // Wednesday
                 3,
-                ['2025-01-01', '2025-01-15', '2025-01-29']
+                ['2025-01-01', '2025-01-15', '2025-01-29'],
             ],
             'weekly until specific date' => [
                 'FREQ=WEEKLY;UNTIL=20250115T235959Z',
                 '2025-01-01', // Wednesday
                 3,
-                ['2025-01-01', '2025-01-08', '2025-01-15']
+                ['2025-01-01', '2025-01-08', '2025-01-15'],
             ],
         ];
     }
