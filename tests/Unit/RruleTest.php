@@ -7,12 +7,14 @@ namespace EphemeralTodos\Rruler\Tests\Unit;
 use DateTimeImmutable;
 use EphemeralTodos\Rruler\Exception\ParseException;
 use EphemeralTodos\Rruler\Exception\ValidationException;
-use EphemeralTodos\Rruler\Rrule;
+use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class RruleTest extends TestCase
 {
+    use TestRrulerBehavior;
+
     #[DataProvider('provideValidRruleStrings')]
     public function testCreateFromValidRruleString(
         string $rruleString,
@@ -21,7 +23,7 @@ final class RruleTest extends TestCase
         ?int $expectedCount,
         ?DateTimeImmutable $expectedUntil,
     ): void {
-        $rrule = Rrule::fromString($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
 
         $this->assertEquals($expectedFrequency, $rrule->getFrequency());
         $this->assertEquals($expectedInterval ?? 1, $rrule->getInterval());
@@ -35,12 +37,12 @@ final class RruleTest extends TestCase
         $this->expectException($expectedExceptionClass);
         $this->expectExceptionMessage($expectedMessage);
 
-        Rrule::fromString($rruleString);
+        $this->testRruler->parse($rruleString);
     }
 
     public function testImmutability(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;INTERVAL=2;COUNT=10');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;INTERVAL=2;COUNT=10');
 
         // Test that all properties are read-only (no setters)
         $reflection = new \ReflectionClass($rrule);
@@ -52,7 +54,7 @@ final class RruleTest extends TestCase
 
     public function testStringRepresentation(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;INTERVAL=2;COUNT=10');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;INTERVAL=2;COUNT=10');
         $stringRepresentation = (string) $rrule;
 
         $this->assertStringContainsString('FREQ=DAILY', $stringRepresentation);
@@ -63,8 +65,8 @@ final class RruleTest extends TestCase
     public function testToStringProducesValidRrule(): void
     {
         $originalString = 'FREQ=WEEKLY;INTERVAL=3;COUNT=5';
-        $rrule = Rrule::fromString($originalString);
-        $recreatedRrule = Rrule::fromString((string) $rrule);
+        $rrule = $this->testRruler->parse($originalString);
+        $recreatedRrule = $this->testRruler->parse((string) $rrule);
 
         $this->assertEquals($rrule->getFrequency(), $recreatedRrule->getFrequency());
         $this->assertEquals($rrule->getInterval(), $recreatedRrule->getInterval());
@@ -74,7 +76,7 @@ final class RruleTest extends TestCase
 
     public function testDefaultValues(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY');
+        $rrule = $this->testRruler->parse('FREQ=DAILY');
 
         $this->assertEquals('DAILY', $rrule->getFrequency());
         $this->assertEquals(1, $rrule->getInterval());
@@ -84,8 +86,8 @@ final class RruleTest extends TestCase
 
     public function testGettersReturnCorrectTypes(): void
     {
-        $rruleWithCount = Rrule::fromString('FREQ=MONTHLY;INTERVAL=2;COUNT=15');
-        $rruleWithUntil = Rrule::fromString('FREQ=WEEKLY;UNTIL=20251231T235959Z');
+        $rruleWithCount = $this->testRruler->parse('FREQ=MONTHLY;INTERVAL=2;COUNT=15');
+        $rruleWithUntil = $this->testRruler->parse('FREQ=WEEKLY;UNTIL=20251231T235959Z');
 
         $this->assertIsString($rruleWithCount->getFrequency());
         $this->assertIsInt($rruleWithCount->getInterval());
@@ -100,9 +102,9 @@ final class RruleTest extends TestCase
 
     public function testHasCountAndHasUntilMethods(): void
     {
-        $rruleWithCount = Rrule::fromString('FREQ=DAILY;COUNT=10');
-        $rruleWithUntil = Rrule::fromString('FREQ=DAILY;UNTIL=20251231T235959Z');
-        $rruleWithNeither = Rrule::fromString('FREQ=DAILY');
+        $rruleWithCount = $this->testRruler->parse('FREQ=DAILY;COUNT=10');
+        $rruleWithUntil = $this->testRruler->parse('FREQ=DAILY;UNTIL=20251231T235959Z');
+        $rruleWithNeither = $this->testRruler->parse('FREQ=DAILY');
 
         $this->assertTrue($rruleWithCount->hasCount());
         $this->assertFalse($rruleWithCount->hasUntil());
@@ -116,7 +118,7 @@ final class RruleTest extends TestCase
 
     public function testToArrayRepresentation(): void
     {
-        $rrule = Rrule::fromString('FREQ=WEEKLY;INTERVAL=2;COUNT=5');
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;INTERVAL=2;COUNT=5');
         $array = $rrule->toArray();
 
         $expectedArray = [

@@ -8,11 +8,13 @@ use DateTimeImmutable;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceValidator;
 use EphemeralTodos\Rruler\Rrule;
+use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class OccurrenceGenerationTest extends TestCase
 {
+    use TestRrulerBehavior;
     private DefaultOccurrenceGenerator $generator;
     private DefaultOccurrenceValidator $validator;
 
@@ -31,7 +33,7 @@ final class OccurrenceGenerationTest extends TestCase
         array $invalidCandidates,
     ): void {
         // Parse RRULE
-        $rrule = Rrule::fromString($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
         // Generate occurrences
@@ -87,7 +89,7 @@ final class OccurrenceGenerationTest extends TestCase
         ];
 
         foreach ($scenarios as [$rruleString, $startDate]) {
-            $rrule = Rrule::fromString($rruleString);
+            $rrule = $this->testRruler->parse($rruleString);
             $start = new DateTimeImmutable($startDate);
 
             $occurrences = iterator_to_array($this->generator->generateOccurrences($rrule, $start));
@@ -103,7 +105,7 @@ final class OccurrenceGenerationTest extends TestCase
 
     public function testDateRangeFiltering(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY');
+        $rrule = $this->testRruler->parse('FREQ=DAILY');
         $start = new DateTimeImmutable('2025-01-01');
         $rangeStart = new DateTimeImmutable('2025-01-05');
         $rangeEnd = new DateTimeImmutable('2025-01-10');
@@ -125,7 +127,7 @@ final class OccurrenceGenerationTest extends TestCase
     public function testComplexCountUntilScenarios(): void
     {
         // Test COUNT limiting occurrences
-        $rruleWithCount = Rrule::fromString('FREQ=DAILY;COUNT=3');
+        $rruleWithCount = $this->testRruler->parse('FREQ=DAILY;COUNT=3');
         $start = new DateTimeImmutable('2025-01-01');
 
         $occurrences = iterator_to_array($this->generator->generateOccurrences($rruleWithCount, $start));
@@ -136,7 +138,7 @@ final class OccurrenceGenerationTest extends TestCase
         $this->assertEquals(new DateTimeImmutable('2025-01-03'), $occurrences[2]);
 
         // Test UNTIL limiting occurrences
-        $rruleWithUntil = Rrule::fromString('FREQ=DAILY;UNTIL=20250103T235959Z');
+        $rruleWithUntil = $this->testRruler->parse('FREQ=DAILY;UNTIL=20250103T235959Z');
         $occurrences = iterator_to_array($this->generator->generateOccurrences($rruleWithUntil, $start));
 
         $this->assertCount(3, $occurrences); // UNTIL should limit to 3 days
@@ -147,7 +149,7 @@ final class OccurrenceGenerationTest extends TestCase
 
     public function testPerformanceWithLargeOccurrenceSets(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;COUNT=1000');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;COUNT=1000');
         $start = new DateTimeImmutable('2025-01-01');
 
         $startTime = microtime(true);

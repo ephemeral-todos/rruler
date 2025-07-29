@@ -7,13 +7,14 @@ namespace EphemeralTodos\Rruler\Tests\Unit\Occurrence\Adapter;
 use DateTimeImmutable;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
 use EphemeralTodos\Rruler\Occurrence\OccurrenceGenerator;
-use EphemeralTodos\Rruler\Rrule;
+use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DefaultOccurrenceGeneratorTest extends TestCase
 {
+    use TestRrulerBehavior;
     private OccurrenceGenerator $generator;
 
     protected function setUp(): void
@@ -29,7 +30,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
     #[DataProvider('provideDailyOccurrenceData')]
     public function testGenerateOccurrencesDaily(string $rruleString, string $startDate, int $expectedCount, array $expectedDates): void
     {
-        $rrule = Rrule::fromString($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
         $occurrences = $this->generator->generateOccurrences($rrule, $start);
@@ -47,7 +48,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
     #[DataProvider('provideWeeklyOccurrenceData')]
     public function testGenerateOccurrencesWeekly(string $rruleString, string $startDate, int $expectedCount, array $expectedDates): void
     {
-        $rrule = Rrule::fromString($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
         $occurrences = $this->generator->generateOccurrences($rrule, $start);
@@ -64,7 +65,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
 
     public function testGenerateOccurrencesWithLimit(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY');
+        $rrule = $this->testRruler->parse('FREQ=DAILY');
         $start = new DateTimeImmutable('2025-01-01');
 
         $occurrences = $this->generator->generateOccurrences($rrule, $start, 3);
@@ -78,7 +79,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
 
     public function testGenerateOccurrencesInRange(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY');
+        $rrule = $this->testRruler->parse('FREQ=DAILY');
         $start = new DateTimeImmutable('2025-01-01');
         $rangeStart = new DateTimeImmutable('2025-01-03');
         $rangeEnd = new DateTimeImmutable('2025-01-05');
@@ -96,7 +97,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
 
     public function testGenerateOccurrencesWithCountZero(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;COUNT=0');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;COUNT=0');
         $start = new DateTimeImmutable('2025-01-01');
 
         $occurrences = $this->generator->generateOccurrences($rrule, $start);
@@ -107,7 +108,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
 
     public function testGenerateOccurrencesWithUntilBeforeStart(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;UNTIL=20241231T235959Z');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;UNTIL=20241231T235959Z');
         $start = new DateTimeImmutable('2025-01-01');
 
         $occurrences = $this->generator->generateOccurrences($rrule, $start);

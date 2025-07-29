@@ -24,20 +24,21 @@ final class RruleAst
     public function hasNode(string $parameterName): bool
     {
         // @todo Revisit this implementation to handle class-string properly
-        // @phpstan-ignore property.staticAccess
-        $normalizedParameterName = interface_exists($parameterName) ? $parameterName::NAME : $parameterName;
+        $normalizedParameterName = class_exists($parameterName) ? $parameterName::NAME : $parameterName;
 
         return isset($this->nodes[$normalizedParameterName]);
     }
 
     /**
-     * @param string|class-string<Node> $parameterName
+     * @template T of string|class-string<Node>
+     *
+     * @param T $parameterName
+     * @return (T is class-string<Node> ? new<T> : Node)
      */
     public function getNode(string $parameterName): Node
     {
-        // @todo Revisit this implementation to handle class-string properly
-        // @phpstan-ignore property.staticAccess
-        $normalizedParameterName = interface_exists($parameterName) ? $parameterName::NAME : $parameterName;
+        /** @var string $normalizedParameterName */
+        $normalizedParameterName = class_exists($parameterName) ? $parameterName::NAME : $parameterName;
 
         if (!isset($this->nodes[$normalizedParameterName])) {
             throw new ParseException("Node {$normalizedParameterName} not found in AST");

@@ -8,12 +8,13 @@ use DateTimeImmutable;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceValidator;
 use EphemeralTodos\Rruler\Occurrence\OccurrenceValidator;
-use EphemeralTodos\Rruler\Rrule;
+use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DefaultOccurrenceValidatorTest extends TestCase
 {
+    use TestRrulerBehavior;
     private OccurrenceValidator $validator;
 
     protected function setUp(): void
@@ -30,7 +31,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
     #[DataProvider('provideValidOccurrenceData')]
     public function testIsValidOccurrenceReturnsTrue(string $rruleString, string $startDate, string $candidateDate): void
     {
-        $rrule = Rrule::fromString($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
         $candidate = new DateTimeImmutable($candidateDate);
 
@@ -42,7 +43,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
     #[DataProvider('provideInvalidOccurrenceData')]
     public function testIsValidOccurrenceReturnsFalse(string $rruleString, string $startDate, string $candidateDate): void
     {
-        $rrule = Rrule::fromString($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
         $candidate = new DateTimeImmutable($candidateDate);
 
@@ -53,7 +54,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
 
     public function testValidateStartDateItself(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;COUNT=5');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;COUNT=5');
         $start = new DateTimeImmutable('2025-01-01');
 
         $result = $this->validator->isValidOccurrence($rrule, $start, $start);
@@ -63,7 +64,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
 
     public function testValidateBeyondCountLimit(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;COUNT=3');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;COUNT=3');
         $start = new DateTimeImmutable('2025-01-01');
         $candidate = new DateTimeImmutable('2025-01-04'); // 4th occurrence, but COUNT=3
 
@@ -74,7 +75,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
 
     public function testValidateBeyondUntilLimit(): void
     {
-        $rrule = Rrule::fromString('FREQ=DAILY;UNTIL=20250103T235959Z');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;UNTIL=20250103T235959Z');
         $start = new DateTimeImmutable('2025-01-01');
         $candidate = new DateTimeImmutable('2025-01-04'); // Beyond UNTIL date
 
