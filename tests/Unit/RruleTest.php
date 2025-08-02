@@ -126,6 +126,7 @@ final class RruleTest extends TestCase
             'interval' => 2,
             'count' => 5,
             'until' => null,
+            'byDay' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);

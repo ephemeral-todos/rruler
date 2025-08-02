@@ -35,7 +35,7 @@ final class Tokenizer
             $normalizedName = strtoupper($name);
 
             if (isset($tokens[$normalizedName])) {
-                throw new ParseException("Duplicate parameter: {$normalizedName}");
+                throw new ParseException("Duplicate parameter: $normalizedName");
             }
 
             $tokens[$normalizedName] = $value;
@@ -61,19 +61,19 @@ final class Tokenizer
         $equalsCount = substr_count($parameter, '=');
 
         if ($equalsCount === 0) {
-            throw new ParseException("Invalid parameter format: {$parameter}. Expected parameter=value");
+            throw new ParseException("Invalid parameter format: $parameter. Expected parameter=value");
         }
 
         if ($equalsCount > 1) {
-            throw new ParseException("Invalid parameter format: {$parameter}. Expected parameter=value");
+            throw new ParseException("Invalid parameter format: $parameter. Expected parameter=value");
         }
 
         if (str_starts_with($parameter, '=')) {
-            throw new ParseException("Invalid parameter format: {$parameter}. Expected parameter=value");
+            throw new ParseException("Invalid parameter format: $parameter. Expected parameter=value");
         }
 
         if (str_ends_with($parameter, '=')) {
-            throw new ParseException("Invalid parameter format: {$parameter}. Expected parameter=value");
+            throw new ParseException("Invalid parameter format: $parameter. Expected parameter=value");
         }
     }
 

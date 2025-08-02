@@ -11,6 +11,7 @@ final class NodeTypeUtils
         IntervalNode::class => 'Interval',
         CountNode::class => 'Count',
         UntilNode::class => 'Until',
+        ByDayNode::class => 'BYDAY',
     ];
 
     public static function toPrettyName(string|object $nodeClass): string

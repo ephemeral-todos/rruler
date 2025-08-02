@@ -9,11 +9,15 @@ use Stringable;
 
 final readonly class Rrule implements Stringable
 {
+    /**
+     * @param array<array{position: int|null, weekday: string}>|null $byDay
+     */
     public function __construct(
         private string $frequency,
         private int $interval,
         private ?int $count,
         private ?DateTimeImmutable $until,
+        private ?array $byDay = null,
     ) {
     }
 
@@ -48,7 +52,20 @@ final readonly class Rrule implements Stringable
     }
 
     /**
-     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null}
+     * @return array<array{position: int|null, weekday: string}>|null
+     */
+    public function getByDay(): ?array
+    {
+        return $this->byDay;
+    }
+
+    public function hasByDay(): bool
+    {
+        return $this->byDay !== null;
+    }
+
+    /**
+     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null}
      */
     public function toArray(): array
     {
@@ -57,6 +74,7 @@ final readonly class Rrule implements Stringable
             'interval' => $this->interval,
             'count' => $this->count,
             'until' => $this->until,
+            'byDay' => $this->byDay,
         ];
     }
 
@@ -77,6 +95,14 @@ final readonly class Rrule implements Stringable
         if ($this->until !== null) {
             $utcUntil = $this->until->setTimezone(new \DateTimeZone('UTC'));
             $parts[] = 'UNTIL='.$utcUntil->format('Ymd\THis\Z');
+        }
+
+        if ($this->byDay !== null) {
+            $byDayStrings = [];
+            foreach ($this->byDay as $daySpec) {
+                $byDayStrings[] = ($daySpec['position'] !== null ? $daySpec['position'] : '').$daySpec['weekday'];
+            }
+            $parts[] = 'BYDAY='.implode(',', $byDayStrings);
         }
 
         return implode(';', $parts);
