@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a PHP library called `ephemeral-todos/rruler` that implements an RFC 5545 compliant Recurrence Rule (RRULE) parser and occurrence calculator. It's focused on being lightweight and handles parsing RRULE strings from iCalendar (RFC 5545) format into structured PHP objects and generating occurrence dates.
+Rruler is a standalone RFC 5545 Recurrence Rule (RRULE) Parser and Occurrence Dates Calculator that helps developers building TODO applications and calendar systems by providing comprehensive support for complex recurring patterns with strict validation and error handling.
+
+Rruler serves PHP developers building calendar and scheduling applications who need reliable RRULE parsing without the complexity of full WebDAV/CalDAV ecosystems. Unlike heavy libraries like sabre/dav, Rruler provides a focused, modern PHP 8.3+ solution with AST-based parsing for better maintainability and extensibility while ensuring strict RFC 5545 compliance.
 
 ## Development Commands
 
@@ -42,10 +44,12 @@ The project uses both Composer and Just for task management:
   - `CountNode` - COUNT parameter
   - `UntilNode` - UNTIL parameter
   - `ByDayNode` - BYDAY parameter with weekday specifications
+  - `ByMonthDayNode` - BYMONTHDAY parameter for days of month selection
 
 ### Occurrence Generation
 - `OccurrenceGenerator` interface with `DefaultOccurrenceGenerator` implementation
 - `OccurrenceValidator` interface with `DefaultOccurrenceValidator` implementation
+- `DateValidationUtils` - Utility class for date validation, leap year handling, and month length calculations
 
 ### Testing Structure
 - Unit tests in `tests/Unit/` - Test individual classes in isolation
@@ -53,8 +57,19 @@ The project uses both Composer and Just for task management:
 - PHPUnit configuration supports separate test suites
 
 ### Supported RRULE Features
-Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY
-The parser validates mutually exclusive parameters (COUNT vs UNTIL) and required parameters (FREQ).
+Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY
+
+**Core Parameters:**
+- `FREQ` - Frequency (DAILY, WEEKLY, MONTHLY, YEARLY) - Required
+- `INTERVAL` - Recurrence interval (every N periods)
+- `COUNT` - Maximum number of occurrences (mutually exclusive with UNTIL)
+- `UNTIL` - End date for recurrence (mutually exclusive with COUNT)
+
+**Advanced Parameters:**
+- `BYDAY` - Weekday specifications with optional positional prefixes (e.g., MO, 1MO, -1FR)
+- `BYMONTHDAY` - Days of month selection with positive (1-31) and negative (-1 to -31) values
+
+The parser validates mutually exclusive parameters (COUNT vs UNTIL), required parameters (FREQ), and handles complex date validation including leap years and varying month lengths.
 
 ### Writing Tests
 - Write tests according to rules defined here: @~/.claude/instructions/phpunit.md
