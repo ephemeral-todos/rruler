@@ -6,6 +6,7 @@ namespace EphemeralTodos\Rruler\Parser;
 
 use EphemeralTodos\Rruler\Exception\ValidationException;
 use EphemeralTodos\Rruler\Parser\Ast\ByDayNode;
+use EphemeralTodos\Rruler\Parser\Ast\ByMonthDayNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
@@ -24,6 +25,7 @@ final class RruleParser
         CountNode::NAME => CountNode::class,
         UntilNode::NAME => UntilNode::class,
         ByDayNode::NAME => ByDayNode::class,
+        ByMonthDayNode::NAME => ByMonthDayNode::class,
     ];
 
     public function __construct(private Tokenizer $tokenizer = new Tokenizer())

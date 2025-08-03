@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Occurrence\Adapter;
 
 use DateTimeImmutable;
+use EphemeralTodos\Rruler\Occurrence\DateValidationUtils;
 use EphemeralTodos\Rruler\Occurrence\OccurrenceGenerator;
 use EphemeralTodos\Rruler\Rrule;
 use Generator;
@@ -16,8 +17,8 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         DateTimeImmutable $start,
         ?int $limit = null,
     ): Generator {
-        // For BYDAY rules, find the first valid occurrence from start date
-        $current = $rrule->hasByDay() ? $this->findFirstValidOccurrence($rrule, $start) : $start;
+        // For BYDAY or BYMONTHDAY rules, find the first valid occurrence from start date
+        $current = ($rrule->hasByDay() || $rrule->hasByMonthDay()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
         $count = 0;
         $maxCount = $limit ?? $rrule->getCount();
 
@@ -67,6 +68,10 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         if ($rrule->hasByDay()) {
             return $this->getNextOccurrenceWithByDay($rrule, $current);
+        }
+
+        if ($rrule->hasByMonthDay()) {
+            return $this->getNextOccurrenceWithByMonthDay($rrule, $current);
         }
 
         $interval = $rrule->getInterval();
@@ -332,25 +337,108 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     private function findFirstValidOccurrence(Rrule $rrule, DateTimeImmutable $start): DateTimeImmutable
     {
         $frequency = $rrule->getFrequency();
-        $byDay = $rrule->getByDay();
 
-        if ($byDay === null) {
-            throw new \LogicException('BYDAY data is null when hasByDay() returned true');
+        // Handle BYDAY rules
+        if ($rrule->hasByDay()) {
+            $byDay = $rrule->getByDay();
+
+            if ($byDay === null) {
+                throw new \LogicException('BYDAY data is null when hasByDay() returned true');
+            }
+
+            // Check if start date itself is valid
+            if ($this->isDateValidForByDay($start, $frequency, $byDay)) {
+                return $start;
+            }
+
+            // Find the first valid date after start
+            return match ($frequency) {
+                'DAILY' => $this->findNextDailyByDay($start, $byDay),
+                'WEEKLY' => $this->findNextWeeklyByDay($start, $byDay),
+                'MONTHLY' => $this->findNextMonthlyByDay($start, $byDay),
+                'YEARLY' => $this->findNextYearlyByDay($start, $byDay),
+                default => throw new \InvalidArgumentException("Unsupported frequency: {$frequency}"),
+            };
         }
 
-        // Check if start date itself is valid
-        if ($this->isDateValidForByDay($start, $frequency, $byDay)) {
-            return $start;
+        // Handle BYMONTHDAY rules
+        if ($rrule->hasByMonthDay()) {
+            $byMonthDay = $rrule->getByMonthDay();
+
+            if ($byMonthDay === null) {
+                throw new \LogicException('BYMONTHDAY data is null when hasByMonthDay() returned true');
+            }
+
+            // Check if start date itself is valid
+            if (DateValidationUtils::dateMatchesByMonthDay($start, $byMonthDay)) {
+                return $start;
+            }
+
+            // Find the first valid date after start
+            return match ($frequency) {
+                'MONTHLY' => $this->findNextMonthlyByMonthDay($start, $byMonthDay),
+                'YEARLY' => $this->findNextYearlyByMonthDay($start, $byMonthDay),
+                default => throw new \InvalidArgumentException("BYMONTHDAY is not supported for frequency: {$frequency}"),
+            };
         }
 
-        // Find the first valid date after start
-        return match ($frequency) {
-            'DAILY' => $this->findNextDailyByDay($start, $byDay),
-            'WEEKLY' => $this->findNextWeeklyByDay($start, $byDay),
-            'MONTHLY' => $this->findNextMonthlyByDay($start, $byDay),
-            'YEARLY' => $this->findNextYearlyByDay($start, $byDay),
-            default => throw new \InvalidArgumentException("Unsupported frequency: {$frequency}"),
-        };
+        return $start;
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     */
+    private function findNextMonthlyByMonthDay(DateTimeImmutable $start, array $byMonthDay): DateTimeImmutable
+    {
+        $candidate = $start->modify('+1 day');
+        $currentMonth = $start->format('Y-m');
+
+        // Look in same month first
+        while ($candidate->format('Y-m') === $currentMonth) {
+            if (DateValidationUtils::dateMatchesByMonthDay($candidate, $byMonthDay)) {
+                return $candidate;
+            }
+            $candidate = $candidate->modify('+1 day');
+        }
+
+        // Move to next month
+        $nextMonth = $start->modify('first day of next month');
+
+        return $this->findFirstMatchingByMonthDayInMonth($nextMonth, $byMonthDay);
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     */
+    private function findNextYearlyByMonthDay(DateTimeImmutable $start, array $byMonthDay): DateTimeImmutable
+    {
+        // For yearly frequency, BYMONTHDAY should apply to the same month each year
+        $currentMonth = (int) $start->format('n');
+        $currentDay = (int) $start->format('j');
+
+        // Find next occurrence in the same month of the same year
+        $year = (int) $start->format('Y');
+        $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $year, $currentMonth);
+
+        // Look for a valid day after the current day in the same month
+        foreach ($validDays as $validDay) {
+            if ($validDay > $currentDay) {
+                return $start->setDate($year, $currentMonth, $validDay);
+            }
+        }
+
+        // No valid days remaining in this month of this year, move to next year
+        $nextYear = $year + 1;
+        $nextYearValidDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $nextYear, $currentMonth);
+
+        if (empty($nextYearValidDays)) {
+            throw new \RuntimeException("No valid BYMONTHDAY values for {$nextYear}-{$currentMonth}");
+        }
+
+        // Return the first valid day in the same month of the next year
+        $firstDay = $nextYearValidDays[0];
+
+        return $start->setDate($nextYear, $currentMonth, $firstDay);
     }
 
     /**
@@ -460,5 +548,123 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $nextYear = $start->modify('first day of January next year');
 
         return $this->findFirstMatchingDayInYear($nextYear, $byDay);
+    }
+
+    private function getNextOccurrenceWithByMonthDay(Rrule $rrule, DateTimeImmutable $current): DateTimeImmutable
+    {
+        $frequency = $rrule->getFrequency();
+        $interval = $rrule->getInterval();
+        $byMonthDay = $rrule->getByMonthDay();
+
+        if ($byMonthDay === null) {
+            throw new \LogicException('BYMONTHDAY data is null when hasByMonthDay() returned true');
+        }
+
+        return match ($frequency) {
+            'MONTHLY' => $this->getNextMonthlyByMonthDay($current, $byMonthDay, $interval),
+            'YEARLY' => $this->getNextYearlyByMonthDay($current, $byMonthDay, $interval),
+            default => throw new \InvalidArgumentException("BYMONTHDAY is not supported for frequency: {$frequency}"),
+        };
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     */
+    private function getNextMonthlyByMonthDay(DateTimeImmutable $current, array $byMonthDay, int $interval): DateTimeImmutable
+    {
+        // Find next occurrence in the same month first
+        $candidate = $current->modify('+1 day');
+        $currentMonth = $current->format('Y-m');
+
+        while ($candidate->format('Y-m') === $currentMonth) {
+            if (DateValidationUtils::dateMatchesByMonthDay($candidate, $byMonthDay)) {
+                return $candidate;
+            }
+            $candidate = $candidate->modify('+1 day');
+        }
+
+        // Move to next interval month and find first matching day
+        $nextMonth = $current->modify("first day of +{$interval} month");
+
+        return $this->findFirstMatchingByMonthDayInMonthOrNext($nextMonth, $byMonthDay, $interval);
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     */
+    private function getNextYearlyByMonthDay(DateTimeImmutable $current, array $byMonthDay, int $interval): DateTimeImmutable
+    {
+        // For yearly frequency, BYMONTHDAY should apply to the same month each year
+        $currentMonth = (int) $current->format('n');
+        $currentDay = (int) $current->format('j');
+
+        // Find next occurrence in the same month of the same year
+        $year = (int) $current->format('Y');
+        $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $year, $currentMonth);
+
+        // Look for a valid day after the current day in the same month
+        foreach ($validDays as $validDay) {
+            if ($validDay > $currentDay) {
+                return $current->setDate($year, $currentMonth, $validDay);
+            }
+        }
+
+        // No valid days remaining in this month of this year, move to next interval year
+        $nextYear = $year + $interval;
+        $nextYearValidDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $nextYear, $currentMonth);
+
+        if (empty($nextYearValidDays)) {
+            throw new \RuntimeException("No valid BYMONTHDAY values for {$nextYear}-{$currentMonth}");
+        }
+
+        // Return the first valid day in the same month of the next interval year
+        $firstDay = $nextYearValidDays[0];
+
+        return $current->setDate($nextYear, $currentMonth, $firstDay);
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     */
+    private function findFirstMatchingByMonthDayInMonth(DateTimeImmutable $monthStart, array $byMonthDay): DateTimeImmutable
+    {
+        $year = (int) $monthStart->format('Y');
+        $month = (int) $monthStart->format('n');
+        $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $year, $month);
+
+        if (empty($validDays)) {
+            throw new \RuntimeException("No valid BYMONTHDAY values for {$year}-{$month}");
+        }
+
+        // Return the first valid day in the month
+        $firstDay = $validDays[0];
+
+        return $monthStart->setDate($year, $month, $firstDay);
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     */
+    private function findFirstMatchingByMonthDayInMonthOrNext(DateTimeImmutable $monthStart, array $byMonthDay, int $interval): DateTimeImmutable
+    {
+        $current = $monthStart;
+
+        // Try up to 12 months to avoid infinite loops
+        for ($attempts = 0; $attempts < 12; ++$attempts) {
+            $year = (int) $current->format('Y');
+            $month = (int) $current->format('n');
+            $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $year, $month);
+
+            if (!empty($validDays)) {
+                $firstDay = $validDays[0];
+
+                return $current->setDate($year, $month, $firstDay);
+            }
+
+            // No valid days in this month, move to next interval month
+            $current = $current->modify("first day of +{$interval} month");
+        }
+
+        throw new \RuntimeException('No valid BYMONTHDAY values found in any month');
     }
 }

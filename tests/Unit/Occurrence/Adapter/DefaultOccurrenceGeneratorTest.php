@@ -141,6 +141,24 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideByMonthDayOccurrenceData')]
+    public function testGenerateOccurrencesWithByMonthDay(string $rruleString, string $startDate, int $expectedCount, array $expectedDates): void
+    {
+        $rrule = $this->testRruler->parse($rruleString);
+        $start = new DateTimeImmutable($startDate);
+
+        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+
+        $this->assertInstanceOf(Generator::class, $occurrences);
+
+        $results = iterator_to_array($occurrences);
+        $this->assertCount($expectedCount, $results);
+
+        foreach ($expectedDates as $index => $expectedDate) {
+            $this->assertEquals(new DateTimeImmutable($expectedDate), $results[$index]);
+        }
+    }
+
     public static function provideWeeklyOccurrenceData(): array
     {
         return [
@@ -161,6 +179,91 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 '2025-01-01', // Wednesday
                 3,
                 ['2025-01-01', '2025-01-08', '2025-01-15'],
+            ],
+        ];
+    }
+
+    public static function provideByMonthDayOccurrenceData(): array
+    {
+        return [
+            // Monthly with single positive BYMONTHDAY
+            'monthly on 15th, count 3' => [
+                'FREQ=MONTHLY;BYMONTHDAY=15;COUNT=3',
+                '2025-01-10', // Start before the 15th
+                3,
+                ['2025-01-15', '2025-02-15', '2025-03-15'],
+            ],
+
+            // Monthly with single negative BYMONTHDAY
+            'monthly on last day, count 3' => [
+                'FREQ=MONTHLY;BYMONTHDAY=-1;COUNT=3',
+                '2025-01-10',
+                3,
+                ['2025-01-31', '2025-02-28', '2025-03-31'], // Different month lengths
+            ],
+
+            // Monthly with multiple BYMONTHDAY values
+            'monthly on 1st and 15th, count 4' => [
+                'FREQ=MONTHLY;BYMONTHDAY=1,15;COUNT=4',
+                '2025-01-10', // Start between 1st and 15th
+                4,
+                ['2025-01-15', '2025-02-01', '2025-02-15', '2025-03-01'],
+            ],
+
+            // Monthly with mixed positive and negative BYMONTHDAY
+            'monthly on 1st and last day, count 4' => [
+                'FREQ=MONTHLY;BYMONTHDAY=1,-1;COUNT=4',
+                '2025-01-10',
+                4,
+                ['2025-01-31', '2025-02-01', '2025-02-28', '2025-03-01'],
+            ],
+
+            // Yearly with BYMONTHDAY (should apply to all months)
+            'yearly on 15th, count 3' => [
+                'FREQ=YEARLY;BYMONTHDAY=15;COUNT=3',
+                '2025-01-10',
+                3,
+                ['2025-01-15', '2026-01-15', '2027-01-15'],
+            ],
+
+            // Edge case: February 29th in non-leap year (should be skipped)
+            'monthly on 29th, crossing non-leap February' => [
+                'FREQ=MONTHLY;BYMONTHDAY=29;COUNT=3',
+                '2025-01-10',
+                3,
+                ['2025-01-29', '2025-03-29', '2025-04-29'], // Feb skipped (only 28 days)
+            ],
+
+            // Edge case: February 29th in leap year
+            'monthly on 29th, crossing leap February' => [
+                'FREQ=MONTHLY;BYMONTHDAY=29;COUNT=3',
+                '2024-01-10',
+                3,
+                ['2024-01-29', '2024-02-29', '2024-03-29'], // Feb included (29 days)
+            ],
+
+            // Edge case: April 31st (should be skipped)
+            'monthly on 31st, crossing 30-day months' => [
+                'FREQ=MONTHLY;BYMONTHDAY=31;COUNT=4',
+                '2025-01-10',
+                4,
+                ['2025-01-31', '2025-03-31', '2025-05-31', '2025-07-31'], // April/June skipped
+            ],
+
+            // BYMONTHDAY starting exactly on a matching day
+            'monthly on 15th, starting on 15th' => [
+                'FREQ=MONTHLY;BYMONTHDAY=15;COUNT=3',
+                '2025-01-15',
+                3,
+                ['2025-01-15', '2025-02-15', '2025-03-15'],
+            ],
+
+            // BYMONTHDAY with INTERVAL
+            'monthly on 15th, every 2 months' => [
+                'FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=15;COUNT=3',
+                '2025-01-10',
+                3,
+                ['2025-01-15', '2025-03-15', '2025-05-15'],
             ],
         ];
     }

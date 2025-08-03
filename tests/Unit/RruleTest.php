@@ -127,6 +127,47 @@ final class RruleTest extends TestCase
             'count' => 5,
             'until' => null,
             'byDay' => null,
+            'byMonthDay' => null,
+        ];
+
+        $this->assertEquals($expectedArray, $array);
+    }
+
+    public function testByMonthDayFunctionality(): void
+    {
+        $rruleWithByMonthDay = $this->testRruler->parse('FREQ=MONTHLY;BYMONTHDAY=1,15,-1');
+        $rruleWithoutByMonthDay = $this->testRruler->parse('FREQ=MONTHLY');
+
+        // Test getter method
+        $this->assertEquals([1, 15, -1], $rruleWithByMonthDay->getByMonthDay());
+        $this->assertNull($rruleWithoutByMonthDay->getByMonthDay());
+
+        // Test has method
+        $this->assertTrue($rruleWithByMonthDay->hasByMonthDay());
+        $this->assertFalse($rruleWithoutByMonthDay->hasByMonthDay());
+    }
+
+    public function testByMonthDayToStringRepresentation(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=MONTHLY;BYMONTHDAY=1,15,-1');
+        $stringRepresentation = (string) $rrule;
+
+        $this->assertStringContainsString('FREQ=MONTHLY', $stringRepresentation);
+        $this->assertStringContainsString('BYMONTHDAY=1,15,-1', $stringRepresentation);
+    }
+
+    public function testByMonthDayToArrayRepresentation(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=MONTHLY;BYMONTHDAY=10,20,-5');
+        $array = $rrule->toArray();
+
+        $expectedArray = [
+            'freq' => 'MONTHLY',
+            'interval' => 1,
+            'count' => null,
+            'until' => null,
+            'byDay' => null,
+            'byMonthDay' => [10, 20, -5],
         ];
 
         $this->assertEquals($expectedArray, $array);

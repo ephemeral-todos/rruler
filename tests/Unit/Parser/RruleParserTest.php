@@ -7,6 +7,7 @@ namespace EphemeralTodos\Rruler\Tests\Unit\Parser;
 use DateTimeImmutable;
 use EphemeralTodos\Rruler\Exception\ParseException;
 use EphemeralTodos\Rruler\Exception\ValidationException;
+use EphemeralTodos\Rruler\Parser\Ast\ByMonthDayNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
@@ -75,6 +76,16 @@ final class RruleParserTest extends TestCase
         $this->assertEquals(10, $ast->getNode('COUNT')->getValue());
     }
 
+    public function testParseByMonthDayParameter(): void
+    {
+        $parser = new RruleParser();
+        $ast = $parser->parse('FREQ=MONTHLY;BYMONTHDAY=1,15,-1');
+
+        $this->assertTrue($ast->hasNode('BYMONTHDAY'));
+        $this->assertInstanceOf(ByMonthDayNode::class, $ast->getNode('BYMONTHDAY'));
+        $this->assertEquals([1, 15, -1], $ast->getNode('BYMONTHDAY')->getValue());
+    }
+
     public function testGetNonExistentNodeThrowsException(): void
     {
         $parser = new RruleParser();
@@ -116,6 +127,22 @@ final class RruleParserTest extends TestCase
             'parameter order independence' => [
                 ['INTERVAL' => 4, 'FREQ' => 'MONTHLY', 'COUNT' => 8],
                 'INTERVAL=4;FREQ=MONTHLY;COUNT=8',
+            ],
+            'monthly with bymonthday single value' => [
+                ['FREQ' => 'MONTHLY', 'BYMONTHDAY' => [15]],
+                'FREQ=MONTHLY;BYMONTHDAY=15',
+            ],
+            'monthly with bymonthday multiple values' => [
+                ['FREQ' => 'MONTHLY', 'BYMONTHDAY' => [1, 15, -1]],
+                'FREQ=MONTHLY;BYMONTHDAY=1,15,-1',
+            ],
+            'yearly with bymonthday negative values' => [
+                ['FREQ' => 'YEARLY', 'BYMONTHDAY' => [-1, -15, -31]],
+                'FREQ=YEARLY;BYMONTHDAY=-1,-15,-31',
+            ],
+            'bymonthday with spaces' => [
+                ['FREQ' => 'MONTHLY', 'BYMONTHDAY' => [1, 15, -1]],
+                'FREQ=MONTHLY;BYMONTHDAY=1, 15, -1',
             ],
         ];
     }
@@ -172,6 +199,31 @@ final class RruleParserTest extends TestCase
                 ParseException::class,
                 'Duplicate parameter: FREQ',
                 'FREQ=DAILY;FREQ=WEEKLY',
+            ],
+            'invalid bymonthday zero' => [
+                ValidationException::class,
+                'Day value cannot be zero',
+                'FREQ=MONTHLY;BYMONTHDAY=0',
+            ],
+            'invalid bymonthday out of range positive' => [
+                ValidationException::class,
+                'Day value must be between 1-31 or -1 to -31, got: 32',
+                'FREQ=MONTHLY;BYMONTHDAY=32',
+            ],
+            'invalid bymonthday out of range negative' => [
+                ValidationException::class,
+                'Day value must be between 1-31 or -1 to -31, got: -32',
+                'FREQ=MONTHLY;BYMONTHDAY=-32',
+            ],
+            'invalid bymonthday format' => [
+                ValidationException::class,
+                'Invalid day value format: abc',
+                'FREQ=MONTHLY;BYMONTHDAY=abc',
+            ],
+            'invalid bymonthday empty component' => [
+                ValidationException::class,
+                'BYMONTHDAY cannot contain empty day specifications',
+                'FREQ=MONTHLY;BYMONTHDAY=1,,15',
             ],
         ];
     }

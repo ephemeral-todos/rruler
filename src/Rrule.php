@@ -11,6 +11,7 @@ final readonly class Rrule implements Stringable
 {
     /**
      * @param array<array{position: int|null, weekday: string}>|null $byDay
+     * @param array<int>|null $byMonthDay
      */
     public function __construct(
         private string $frequency,
@@ -18,6 +19,7 @@ final readonly class Rrule implements Stringable
         private ?int $count,
         private ?DateTimeImmutable $until,
         private ?array $byDay = null,
+        private ?array $byMonthDay = null,
     ) {
     }
 
@@ -65,7 +67,20 @@ final readonly class Rrule implements Stringable
     }
 
     /**
-     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null}
+     * @return array<int>|null
+     */
+    public function getByMonthDay(): ?array
+    {
+        return $this->byMonthDay;
+    }
+
+    public function hasByMonthDay(): bool
+    {
+        return $this->byMonthDay !== null;
+    }
+
+    /**
+     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null, byMonthDay: array<int>|null}
      */
     public function toArray(): array
     {
@@ -75,6 +90,7 @@ final readonly class Rrule implements Stringable
             'count' => $this->count,
             'until' => $this->until,
             'byDay' => $this->byDay,
+            'byMonthDay' => $this->byMonthDay,
         ];
     }
 
@@ -103,6 +119,10 @@ final readonly class Rrule implements Stringable
                 $byDayStrings[] = ($daySpec['position'] !== null ? $daySpec['position'] : '').$daySpec['weekday'];
             }
             $parts[] = 'BYDAY='.implode(',', $byDayStrings);
+        }
+
+        if ($this->byMonthDay !== null) {
+            $parts[] = 'BYMONTHDAY='.implode(',', $this->byMonthDay);
         }
 
         return implode(';', $parts);
