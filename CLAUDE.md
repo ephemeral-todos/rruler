@@ -96,6 +96,7 @@ When asked to work on this codebase:
 
 ### Git
 - Generate git commits according to rules defined here: @~/.claude/instructions/git-commits.md
+- Use Conventional Commits format for the first line: `type(scope): description` (e.g., `feat: add BYMONTHDAY support`, `fix: handle leap year edge case`)
 
 ## Testing Guidelines
 
