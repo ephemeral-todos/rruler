@@ -17,8 +17,8 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         DateTimeImmutable $start,
         ?int $limit = null,
     ): Generator {
-        // For BYDAY or BYMONTHDAY rules, find the first valid occurrence from start date
-        $current = ($rrule->hasByDay() || $rrule->hasByMonthDay()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
+        // For BYDAY, BYMONTHDAY, or BYMONTH rules, find the first valid occurrence from start date
+        $current = ($rrule->hasByDay() || $rrule->hasByMonthDay() || $rrule->hasByMonth()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
         $count = 0;
         $maxCount = $limit ?? $rrule->getCount();
 
@@ -72,6 +72,10 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         if ($rrule->hasByMonthDay()) {
             return $this->getNextOccurrenceWithByMonthDay($rrule, $current);
+        }
+
+        if ($rrule->hasByMonth()) {
+            return $this->getNextOccurrenceWithByMonth($rrule, $current);
         }
 
         $interval = $rrule->getInterval();
@@ -382,6 +386,26 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             };
         }
 
+        // Handle BYMONTH rules
+        if ($rrule->hasByMonth()) {
+            $byMonth = $rrule->getByMonth();
+
+            if ($byMonth === null) {
+                throw new \LogicException('BYMONTH data is null when hasByMonth() returned true');
+            }
+
+            // Check if start date itself is valid
+            if ($this->dateMatchesByMonth($start, $byMonth)) {
+                return $start;
+            }
+
+            // Find the first valid date after start
+            return match ($frequency) {
+                'YEARLY' => $this->findNextYearlyByMonth($start, $byMonth),
+                default => throw new \InvalidArgumentException("BYMONTH is not supported for frequency: {$frequency}"),
+            };
+        }
+
         return $start;
     }
 
@@ -666,5 +690,83 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         }
 
         throw new \RuntimeException('No valid BYMONTHDAY values found in any month');
+    }
+
+    private function getNextOccurrenceWithByMonth(Rrule $rrule, DateTimeImmutable $current): DateTimeImmutable
+    {
+        $frequency = $rrule->getFrequency();
+        $interval = $rrule->getInterval();
+        $byMonth = $rrule->getByMonth();
+
+        if ($byMonth === null) {
+            throw new \LogicException('BYMONTH data is null when hasByMonth() returned true');
+        }
+
+        return match ($frequency) {
+            'YEARLY' => $this->getNextYearlyByMonth($current, $byMonth, $interval),
+            default => throw new \InvalidArgumentException("BYMONTH is not supported for frequency: {$frequency}"),
+        };
+    }
+
+    /**
+     * @param array<int> $byMonth
+     */
+    private function getNextYearlyByMonth(DateTimeImmutable $current, array $byMonth, int $interval): DateTimeImmutable
+    {
+        $currentMonth = (int) $current->format('n');
+        $currentDay = (int) $current->format('j');
+        $currentYear = (int) $current->format('Y');
+
+        // Sort months to find next valid month
+        $sortedMonths = $byMonth;
+        sort($sortedMonths);
+
+        // Look for a valid month after the current month in the same year
+        foreach ($sortedMonths as $month) {
+            if ($month > $currentMonth) {
+                // Found a valid month later in the year
+                return $current->setDate($currentYear, $month, $currentDay);
+            }
+        }
+
+        // No valid months remaining in this year, move to next interval year
+        $nextYear = $currentYear + $interval;
+        $firstMonth = $sortedMonths[0]; // Use first month from sorted BYMONTH list
+
+        return $current->setDate($nextYear, $firstMonth, $currentDay);
+    }
+
+    /**
+     * @param array<int> $byMonth
+     */
+    private function dateMatchesByMonth(DateTimeImmutable $date, array $byMonth): bool
+    {
+        $month = (int) $date->format('n');
+
+        return in_array($month, $byMonth, true);
+    }
+
+    /**
+     * @param array<int> $byMonth
+     */
+    private function findNextYearlyByMonth(DateTimeImmutable $start, array $byMonth): DateTimeImmutable
+    {
+        $currentMonth = (int) $start->format('n');
+        $currentDay = (int) $start->format('j');
+        $currentYear = (int) $start->format('Y');
+
+        // Look for a valid month after the current month in the same year
+        foreach ($byMonth as $month) {
+            if ($month > $currentMonth) {
+                // Found a valid month later in the year
+                return $start->setDate($currentYear, $month, $currentDay);
+            }
+        }
+
+        // No valid months remaining in this year, move to next year
+        $nextYear = $currentYear + 1;
+        $firstMonth = $byMonth[0]; // Use first month from BYMONTH list
+
+        return $start->setDate($nextYear, $firstMonth, $currentDay);
     }
 }

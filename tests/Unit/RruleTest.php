@@ -128,6 +128,7 @@ final class RruleTest extends TestCase
             'until' => null,
             'byDay' => null,
             'byMonthDay' => null,
+            'byMonth' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -168,6 +169,37 @@ final class RruleTest extends TestCase
             'until' => null,
             'byDay' => null,
             'byMonthDay' => [10, 20, -5],
+            'byMonth' => null,
+        ];
+
+        $this->assertEquals($expectedArray, $array);
+    }
+
+    public function testByMonthFunctionality(): void
+    {
+        $rruleWithByMonth = $this->testRruler->parse('FREQ=YEARLY;BYMONTH=3,6,9,12');
+        $rruleWithoutByMonth = $this->testRruler->parse('FREQ=YEARLY');
+
+        $this->assertTrue($rruleWithByMonth->hasByMonth());
+        $this->assertFalse($rruleWithoutByMonth->hasByMonth());
+
+        $this->assertEquals([3, 6, 9, 12], $rruleWithByMonth->getByMonth());
+        $this->assertNull($rruleWithoutByMonth->getByMonth());
+    }
+
+    public function testByMonthToArrayRepresentation(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=YEARLY;BYMONTH=1,6,12');
+        $array = $rrule->toArray();
+
+        $expectedArray = [
+            'freq' => 'YEARLY',
+            'interval' => 1,
+            'count' => null,
+            'until' => null,
+            'byDay' => null,
+            'byMonthDay' => null,
+            'byMonth' => [1, 6, 12],
         ];
 
         $this->assertEquals($expectedArray, $array);

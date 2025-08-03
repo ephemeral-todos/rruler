@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use EphemeralTodos\Rruler\Exception\ParseException;
 use EphemeralTodos\Rruler\Exception\ValidationException;
 use EphemeralTodos\Rruler\Parser\Ast\ByMonthDayNode;
+use EphemeralTodos\Rruler\Parser\Ast\ByMonthNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
@@ -86,6 +87,16 @@ final class RruleParserTest extends TestCase
         $this->assertEquals([1, 15, -1], $ast->getNode('BYMONTHDAY')->getValue());
     }
 
+    public function testParseByMonthParameter(): void
+    {
+        $parser = new RruleParser();
+        $ast = $parser->parse('FREQ=YEARLY;BYMONTH=3,6,9,12');
+
+        $this->assertTrue($ast->hasNode('BYMONTH'));
+        $this->assertInstanceOf(ByMonthNode::class, $ast->getNode('BYMONTH'));
+        $this->assertEquals([3, 6, 9, 12], $ast->getNode('BYMONTH')->getValue());
+    }
+
     public function testGetNonExistentNodeThrowsException(): void
     {
         $parser = new RruleParser();
@@ -143,6 +154,22 @@ final class RruleParserTest extends TestCase
             'bymonthday with spaces' => [
                 ['FREQ' => 'MONTHLY', 'BYMONTHDAY' => [1, 15, -1]],
                 'FREQ=MONTHLY;BYMONTHDAY=1, 15, -1',
+            ],
+            'yearly with bymonth single value' => [
+                ['FREQ' => 'YEARLY', 'BYMONTH' => [6]],
+                'FREQ=YEARLY;BYMONTH=6',
+            ],
+            'yearly with bymonth multiple values' => [
+                ['FREQ' => 'YEARLY', 'BYMONTH' => [3, 6, 9, 12]],
+                'FREQ=YEARLY;BYMONTH=3,6,9,12',
+            ],
+            'yearly with bymonth all months' => [
+                ['FREQ' => 'YEARLY', 'BYMONTH' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]],
+                'FREQ=YEARLY;BYMONTH=1,2,3,4,5,6,7,8,9,10,11,12',
+            ],
+            'bymonth with spaces' => [
+                ['FREQ' => 'YEARLY', 'BYMONTH' => [1, 6, 12]],
+                'FREQ=YEARLY;BYMONTH=1, 6, 12',
             ],
         ];
     }
@@ -224,6 +251,31 @@ final class RruleParserTest extends TestCase
                 ValidationException::class,
                 'BYMONTHDAY cannot contain empty day specifications',
                 'FREQ=MONTHLY;BYMONTHDAY=1,,15',
+            ],
+            'invalid bymonth zero' => [
+                ValidationException::class,
+                'Month value cannot be zero',
+                'FREQ=YEARLY;BYMONTH=0',
+            ],
+            'invalid bymonth out of range positive' => [
+                ValidationException::class,
+                'Month value must be between 1-12, got: 13',
+                'FREQ=YEARLY;BYMONTH=13',
+            ],
+            'invalid bymonth out of range negative' => [
+                ValidationException::class,
+                'Month value must be between 1-12, got: -1',
+                'FREQ=YEARLY;BYMONTH=-1',
+            ],
+            'invalid bymonth format' => [
+                ValidationException::class,
+                'Invalid month value format: abc',
+                'FREQ=YEARLY;BYMONTH=abc',
+            ],
+            'invalid bymonth empty component' => [
+                ValidationException::class,
+                'BYMONTH cannot contain empty month specifications',
+                'FREQ=YEARLY;BYMONTH=1,,6',
             ],
         ];
     }

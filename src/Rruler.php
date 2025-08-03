@@ -6,6 +6,7 @@ namespace EphemeralTodos\Rruler;
 
 use EphemeralTodos\Rruler\Parser\Ast\ByDayNode;
 use EphemeralTodos\Rruler\Parser\Ast\ByMonthDayNode;
+use EphemeralTodos\Rruler\Parser\Ast\ByMonthNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
@@ -55,6 +56,12 @@ final class Rruler
             $byMonthDay = $byMonthDayNode->getValue();
         }
 
-        return new Rrule($frequency, $interval, $count, $until, $byDay, $byMonthDay);
+        $byMonth = null;
+        if ($ast->hasNode(ByMonthNode::class)) {
+            $byMonthNode = $ast->getNode(ByMonthNode::class);
+            $byMonth = $byMonthNode->getValue();
+        }
+
+        return new Rrule($frequency, $interval, $count, $until, $byDay, $byMonthDay, $byMonth);
     }
 }

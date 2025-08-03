@@ -45,6 +45,7 @@ The project uses both Composer and Just for task management:
   - `UntilNode` - UNTIL parameter
   - `ByDayNode` - BYDAY parameter with weekday specifications
   - `ByMonthDayNode` - BYMONTHDAY parameter for days of month selection
+  - `ByMonthNode` - BYMONTH parameter for month selection in yearly patterns
 
 ### Occurrence Generation
 - `OccurrenceGenerator` interface with `DefaultOccurrenceGenerator` implementation
@@ -57,7 +58,7 @@ The project uses both Composer and Just for task management:
 - PHPUnit configuration supports separate test suites
 
 ### Supported RRULE Features
-Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY
+Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH
 
 **Core Parameters:**
 - `FREQ` - Frequency (DAILY, WEEKLY, MONTHLY, YEARLY) - Required
@@ -68,6 +69,7 @@ Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY
 **Advanced Parameters:**
 - `BYDAY` - Weekday specifications with optional positional prefixes (e.g., MO, 1MO, -1FR)
 - `BYMONTHDAY` - Days of month selection with positive (1-31) and negative (-1 to -31) values
+- `BYMONTH` - Month selection for yearly patterns with values 1-12 (e.g., 3,6,9,12 for quarterly)
 
 The parser validates mutually exclusive parameters (COUNT vs UNTIL), required parameters (FREQ), and handles complex date validation including leap years and varying month lengths.
 
