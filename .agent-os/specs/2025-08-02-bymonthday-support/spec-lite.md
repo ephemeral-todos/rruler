@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Implement comprehensive BYMONTHDAY parameter support for RRULE parsing and occurrence generation, enabling developers to specify exact days of the month for monthly and yearly recurrence patterns with full RFC 5545 compliance. The feature supports positive day values (1-31), negative values (-1 = last day of month), multiple comma-separated values, and robust validation for month length variations including leap years.
