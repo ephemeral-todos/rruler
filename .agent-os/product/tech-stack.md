@@ -1,6 +1,6 @@
 # Technical Stack
 
-> Last Updated: 2025-07-26
+> Last Updated: 2025-08-02
 > Version: 1.0.0
 
 ## Core Technologies
@@ -78,6 +78,7 @@
 - **Optimization:** Generator patterns for large occurrence sets
 
 ### Execution Speed
-- **Priority:** Accurate parsing over speed
+- **Priority:** Developer experience (readability) over performance optimizations
+- **Focus:** Accurate parsing and maintainable code
 - **Caching:** In-memory caching of parsed RRULE objects
 - **Benchmarking:** Performance tests against sabre/dav

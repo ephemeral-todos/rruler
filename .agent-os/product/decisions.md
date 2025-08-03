@@ -1,6 +1,6 @@
 # Product Decisions Log
 
-> Last Updated: 2025-07-26
+> Last Updated: 2025-08-02
 > Version: 1.0.0
 > Override Priority: Highest
 
@@ -121,3 +121,75 @@ Minimal dependencies improve library adoption, reduce security surface area, and
 **Negative:**
 - More custom implementation required
 - Cannot leverage existing validation or utility libraries
+
+## 2025-08-02: Behavioral Testing Strategy
+
+**ID:** DEC-004
+**Status:** Accepted
+**Category:** Technical
+**Stakeholders:** Tech Lead, Development Team
+
+### Decision
+
+Focus on behavioral testing that validates what the code does rather than structural/reflection-based tests that verify class architecture or method existence.
+
+### Context
+
+Testing approaches can focus on behavior (functional outcomes) or structure (class design, method existence). Structural tests provide no functional validation and create maintenance overhead.
+
+### Alternatives Considered
+
+1. **Structural/Reflection-based testing**
+   - Pros: Ensures architectural compliance
+   - Cons: No behavioral validation, maintenance overhead, breaks during refactoring
+
+2. **Behavioral testing (Selected)**
+   - Pros: Validates actual functionality, meaningful test failures, refactoring-safe
+   - Cons: Requires more thoughtful test design
+
+### Rationale
+
+Behavioral tests provide real value by ensuring the library works correctly for users, while structural tests only verify implementation details that may change during legitimate refactoring.
+
+### Consequences
+
+**Positive:**
+- Tests validate actual user-facing functionality
+- Refactoring doesn't break meaningful tests
+- Test failures indicate real problems
+- Focus on "what" rather than "how"
+
+**Negative:**
+- Requires more careful test design
+- May miss some architectural issues
+- Less obvious which components to test
+
+## 2025-08-02: Interface Testing in Concrete Classes
+
+**ID:** DEC-005
+**Status:** Accepted
+**Category:** Technical
+**Stakeholders:** Tech Lead, Development Team
+
+### Decision
+
+Test interface functionality within concrete class tests rather than creating separate interface test files.
+
+### Context
+
+Interfaces define contracts but have no meaningful functionality without concrete implementations. Testing interface behavior separately from implementations creates duplication and provides no additional value.
+
+### Rationale
+
+Interface functionality is only meaningful in the context of concrete implementations. Testing in concrete classes provides real-world usage scenarios and reduces test maintenance overhead.
+
+### Consequences
+
+**Positive:**
+- Interface behavior tested in realistic usage contexts
+- Reduced test duplication and maintenance
+- Focus on actual behavior rather than abstract contracts
+
+**Negative:**
+- Interface contracts not explicitly validated in isolation
+- Potential for missing edge cases in interface definitions

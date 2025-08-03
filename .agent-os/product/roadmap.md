@@ -1,47 +1,40 @@
 # Product Roadmap
 
-> Last Updated: 2025-07-26
+> Last Updated: 2025-08-02
 > Version: 1.0.0
-> Status: Planning
+> Status: In Progress
 
-## Phase 1: Foundation & Core Parser (2-3 weeks)
+## Phase 1: Foundation & Core Parser (COMPLETE)
 
 **Goal:** Establish project foundation with basic RRULE parsing capability
 **Success Criteria:** Can parse simple DAILY, WEEKLY, MONTHLY, YEARLY patterns
 
-### Must-Have Features
+### Features
 
 - [x] Project Setup - Composer package, PHPUnit, PHPStan, PHP-CS-Fixer configuration `M`
 - [x] AST Parser Foundation - Basic tokenizer and AST node structure for RRULE parsing `L`
 - [x] Core RRULE Parser - Parse FREQ, INTERVAL, COUNT, UNTIL basic parameters `L`
 - [x] Basic Validation - Input validation and error handling for malformed RRULE strings `M`
 - [x] Unit Test Foundation - Test framework setup with initial parser tests `M`
-
-### Should-Have Features
-
 - [x] Development Tools - Justfile/Makefile with common tasks (test, lint, fix) `S`
-- [ ] CI Pipeline - GitHub Actions for testing across PHP versions `M`
 
 ### Dependencies
 
 - Composer package structure
 - PHPUnit testing framework
 
-## Phase 2: Basic Occurrence Generation (2 weeks)
+## Phase 2: Basic Occurrence Generation (COMPLETE)
 
 **Goal:** Generate occurrence dates for simple recurrence patterns
 **Success Criteria:** Calculate occurrences for basic FREQ patterns with COUNT/UNTIL
 
-### Must-Have Features
+### Features
 
 - [x] DateTime Handling - Robust DateTime/DateTimeImmutable integration `M`
 - [x] Basic Occurrence Calculator - Generate occurrences for DAILY, WEEKLY patterns `L`
 - [x] Count/Until Logic - Implement COUNT and UNTIL termination conditions `M`
 - [x] Date Range Filtering - Generate occurrences between specified date ranges `M`
 - [x] Occurrence Validation - Check if specific DateTime is a valid occurrence `M`
-
-### Should-Have Features
-
 - [x] Performance Optimization - Generator patterns for large occurrence sets `S`
 - [x] Memory Efficiency - Lazy evaluation implementation `S`
 
@@ -50,15 +43,18 @@
 - Phase 1 RRULE parser
 - Basic validation framework
 
-## Phase 3: Advanced RRULE Features (3-4 weeks)
+## Phase 3: Advanced RRULE Features (IN PROGRESS)
 
 **Goal:** Support complex RRULE patterns and advanced RFC 5545 features
 **Success Criteria:** Handle BYSETPOS, BYWEEKNO, BYMONTHDAY, and other BY* rules
 
-### Must-Have Features
+### Features
 
-- [ ] MONTHLY/YEARLY Patterns - Complete support for monthly and yearly recurrence `L`
-- [ ] BY* Rules Implementation - BYMONTHDAY, BYDAY, BYMONTH, BYWEEKNO support `XL`
+- [x] BYDAY Implementation - Complete support for weekday patterns including positional prefixes `L`
+- [x] MONTHLY/YEARLY Patterns - Complete support for monthly and yearly recurrence `L`
+- [ ] BYMONTHDAY Support - Days of month selection for monthly/yearly patterns `M`
+- [ ] BYMONTH Implementation - Month selection for yearly patterns `M`
+- [ ] BYWEEKNO Support - Week number selection for yearly patterns `L`
 - [ ] BYSETPOS Logic - Advanced occurrence selection with BYSETPOS `L`
 - [ ] Complex Pattern Testing - Comprehensive test suite for advanced patterns `L`
 
@@ -72,12 +68,12 @@
 - Phase 2 basic occurrence generation
 - Comprehensive test coverage
 
-## Phase 4: RFC 5545 Context & Integration (2 weeks)
+## Phase 4: RFC 5545 Context & Integration (PLANNED)
 
 **Goal:** Parse related RFC 5545 data and provide comprehensive integration features
 **Success Criteria:** Handle VTODO, VEVENT, VCALENDAR context parsing
 
-### Must-Have Features
+### Features
 
 - [ ] RFC 5545 Context Parser - Parse VTODO, VEVENT, VCALENDAR, DTSTART `M`
 - [ ] Flexible Input Handling - Ignore irrelevant RFC 5545 fields gracefully `M`
@@ -94,13 +90,14 @@
 - Phase 3 advanced RRULE features
 - sabre/dav integration for testing
 
-## Phase 5: Polish & Production Ready (1-2 weeks)
+## Phase 5: Polish & Production Ready (PLANNED)
 
 **Goal:** Production-ready library with comprehensive documentation and testing
 **Success Criteria:** Ready for public release with full documentation
 
-### Must-Have Features
+### Features
 
+- [ ] CI Pipeline - GitHub Actions for testing across PHP versions `M`
 - [ ] API Documentation - Complete PHPDoc coverage and generated docs `M`
 - [ ] Usage Examples - README with comprehensive code samples `M`
 - [ ] Error Message Improvement - Clear, actionable error messages `S`
@@ -115,3 +112,9 @@
 
 - Phase 4 completion
 - Documentation review
+
+## Current Status
+
+**Active Phase:** Phase 3 (Advanced RRULE Features)
+**Next Priority:** BYMONTHDAY implementation for monthly/yearly patterns
+**Completion:** ~65% of planned features implemented

@@ -1,7 +1,68 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+This is a PHP library called `ephemeral-todos/rruler` that implements an RFC 5545 compliant Recurrence Rule (RRULE) parser and occurrence calculator. It's focused on being lightweight and handles parsing RRULE strings from iCalendar (RFC 5545) format into structured PHP objects and generating occurrence dates.
+
+## Development Commands
+
+The project uses both Composer and Just for task management:
+
+### Core Commands (via Composer)
+- `composer test` - Run all tests
+- `composer test:unit` - Run unit tests only
+- `composer test:integration` - Run integration tests only
+- `composer test:coverage` - Run tests with coverage report (requires XDEBUG_MODE=coverage)
+- `composer analyse` - Run PHPStan static analysis
+- `composer format` - Format code with PHP-CS-Fixer
+- `composer format:check` - Check code formatting without fixing
+
+### Just Commands (alternative interface)
+- `just test` - Run all tests
+- `just analyse` - Run static analysis
+- `just format` - Format code
+- `just format-check` - Check formatting
+- `just check` - Run all quality checks (analyse + format:check + test)
+- `just build` - Set up project dependencies
+
+## Architecture
+
+### Core Classes
+- `Rruler` - Main entry point that parses RRULE strings using `RruleParser`
+- `Rrule` - Immutable value object representing a parsed recurrence rule
+- `RruleParser` - Parses RRULE strings into AST nodes then builds `Rrule` objects
+
+### Parser System  
+- `Tokenizer` - Breaks RRULE strings into parameter/value pairs
+- AST Nodes in `Parser/Ast/` - Each RRULE parameter has its own node class:
+  - `FrequencyNode` - Required FREQ parameter (DAILY, WEEKLY, etc.)
+  - `IntervalNode` - INTERVAL parameter  
+  - `CountNode` - COUNT parameter
+  - `UntilNode` - UNTIL parameter
+  - `ByDayNode` - BYDAY parameter with weekday specifications
+
+### Occurrence Generation
+- `OccurrenceGenerator` interface with `DefaultOccurrenceGenerator` implementation
+- `OccurrenceValidator` interface with `DefaultOccurrenceValidator` implementation
+
+### Testing Structure
+- Unit tests in `tests/Unit/` - Test individual classes in isolation
+- Integration tests in `tests/Integration/` - Test complete parsing and occurrence generation workflows
+- PHPUnit configuration supports separate test suites
+
+### Supported RRULE Features
+Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY
+The parser validates mutually exclusive parameters (COUNT vs UNTIL) and required parameters (FREQ).
+
+### Writing Tests
+- Write tests according to rules defined here: @~/.claude/instructions/phpunit.md
 ## Agent OS Documentation
 
 ### Product Context
 - **Mission & Vision:** @.agent-os/product/mission.md
+- **Mission (Lite):** @.agent-os/product/mission-lite.md
 - **Technical Architecture:** @.agent-os/product/tech-stack.md
 - **Development Roadmap:** @.agent-os/product/roadmap.md
 - **Decision History:** @.agent-os/product/decisions.md
@@ -12,8 +73,8 @@
 
 ### Project Management
 - **Active Specs:** @.agent-os/specs/
-- **Spec Planning:** Use `@~/.agent-os/instructions/create-spec.md`
-- **Tasks Execution:** Use `@~/.agent-os/instructions/execute-tasks.md`
+- **Spec Planning:** Use `@~/.agent-os/instructions/core/create-spec.md`
+- **Tasks Execution:** Use `@~/.agent-os/instructions/core/execute-tasks.md`
 
 ## Workflow Instructions
 
@@ -21,8 +82,8 @@ When asked to work on this codebase:
 
 1. **First**, check @.agent-os/product/roadmap.md for current priorities
 2. **Then**, follow the appropriate instruction file:
-   - For new features: @~/.agent-os/instructions/create-spec.md
-   - For tasks execution: @~/.agent-os/instructions/execute-tasks.md
+   - For new features: @~/.agent-os/instructions/core/create-spec.md
+   - For tasks execution: @~/.agent-os/instructions/core/execute-tasks.md
 3. **Always**, adhere to the standards in the files listed above
 
 ## Important Notes
@@ -30,6 +91,11 @@ When asked to work on this codebase:
 - Product-specific files in `.agent-os/product/` override any global standards
 - User's specific instructions override (or amend) instructions found in `.agent-os/specs/...`
 - Always adhere to established patterns, code style, and best practices documented above.
+
+## Project-Specific Workflows and Preferences
+
+### Git
+- Generate git commits according to rules defined here: @~/.claude/instructions/git-commits.md
 
 ## Testing Guidelines
 
