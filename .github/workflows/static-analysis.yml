@@ -1,0 +1,15 @@
+name: Static Analysis
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  phpstan:
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.3', '8.4', '8.5']
+    uses: ./.github/workflows/reusable/phpstan.yml
+    with:
+      php-version: ${{ matrix.php-version }}

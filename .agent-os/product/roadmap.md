@@ -97,7 +97,7 @@
 
 ### Features
 
-- [ ] CI Pipeline - GitHub Actions for testing across PHP versions `M`
+- [x] CI Pipeline - GitHub Actions for testing across PHP versions `M`
 - [ ] API Documentation - Complete PHPDoc coverage and generated docs `M`
 - [ ] Usage Examples - README with comprehensive code samples `M`
 - [ ] Error Message Improvement - Clear, actionable error messages `S`

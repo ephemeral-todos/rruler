@@ -1,0 +1,9 @@
+name: Code Style
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  php-cs-fixer:
+    uses: ./.github/workflows/reusable/php-cs-fixer.yml
