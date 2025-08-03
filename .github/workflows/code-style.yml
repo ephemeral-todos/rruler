@@ -6,4 +6,4 @@ on:
 
 jobs:
   php-cs-fixer:
-    uses: ./.github/workflows/reusable/php-cs-fixer.yml
+    uses: ./.github/workflows/php-cs-fixer.yml

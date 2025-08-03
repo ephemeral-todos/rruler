@@ -6,4 +6,4 @@ on:
 
 jobs:
   coverage:
-    uses: ./.github/workflows/reusable/coverage.yml
+    uses: ./.github/workflows/phpunit-coverage.yml
