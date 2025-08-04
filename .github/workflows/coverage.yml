@@ -6,4 +6,7 @@ on:
 
 jobs:
   coverage:
-    uses: ./.github/workflows/phpunit-coverage.yml
+    uses: ./.github/workflows/phpunit.yml
+    with:
+      php-version: '8.4'
+      report-code-coverage: true
