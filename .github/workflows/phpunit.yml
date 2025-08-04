@@ -7,7 +7,10 @@ on:
         description: 'PHP version to use'
         required: true
         type: string
-
+      report-code-coverage:
+        required: false
+        default: false
+        type: boolean
 jobs:
   phpunit:
     runs-on: ubuntu-latest
@@ -45,3 +48,14 @@ jobs:
 
       - name: Execute tests
         run: composer test
+        if: ${{ inputs.report-code-coverage == false }}
+
+      - name: Execute tests with coverage
+        run: composer test:coverage -- --coverage-clover=coverage.clover || true
+        if: ${{ inputs.report-code-coverage }}
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ inputs.report-code-coverage }}
