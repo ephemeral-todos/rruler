@@ -47,12 +47,12 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 5.5 Ensure integration with existing BYMONTHDAY, BYDAY, and BYMONTH logic
   - [x] 5.6 Verify all occurrence generation tests pass
 
-- [ ] 6. Integration Testing and Validation
-  - [ ] 6.1 Write comprehensive integration tests for BYWEEKNO scenarios
-  - [ ] 6.2 Test quarterly patterns (BYWEEKNO=13,26,39,52)
-  - [ ] 6.3 Test bi-annual patterns (BYWEEKNO=1,26)
-  - [ ] 6.4 Test BYWEEKNO with INTERVAL support
-  - [ ] 6.5 Test leap week scenarios (week 53)
-  - [ ] 6.6 Test error handling for invalid week values
-  - [ ] 6.7 Test year boundary edge cases
-  - [ ] 6.8 Verify all existing tests still pass with BYWEEKNO integration
+- [x] 6. Integration Testing and Validation
+  - [x] 6.1 Write comprehensive integration tests for BYWEEKNO scenarios
+  - [x] 6.2 Test quarterly patterns (BYWEEKNO=13,26,39,52)
+  - [x] 6.3 Test bi-annual patterns (BYWEEKNO=1,26)
+  - [x] 6.4 Test BYWEEKNO with INTERVAL support
+  - [x] 6.5 Test leap week scenarios (week 53)
+  - [x] 6.6 Test error handling for invalid week values
+  - [x] 6.7 Test year boundary edge cases
+  - [x] 6.8 Verify all existing tests still pass with BYWEEKNO integration
