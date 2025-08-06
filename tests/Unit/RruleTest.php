@@ -130,6 +130,7 @@ final class RruleTest extends TestCase
             'byMonthDay' => null,
             'byMonth' => null,
             'byWeekNo' => null,
+            'bySetPos' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -172,6 +173,7 @@ final class RruleTest extends TestCase
             'byMonthDay' => [10, 20, -5],
             'byMonth' => null,
             'byWeekNo' => null,
+            'bySetPos' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -203,6 +205,7 @@ final class RruleTest extends TestCase
             'byMonthDay' => null,
             'byMonth' => [1, 6, 12],
             'byWeekNo' => null,
+            'bySetPos' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -222,6 +225,38 @@ final class RruleTest extends TestCase
         $this->assertFalse($rruleWithoutByWeekNo->hasByWeekNo());
     }
 
+    public function testBySetPosAccessors(): void
+    {
+        // Test with BYSETPOS
+        $rruleWithBySetPos = $this->testRruler->parse('FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,-1');
+        $rruleWithoutBySetPos = $this->testRruler->parse('FREQ=MONTHLY');
+
+        // Test getter method
+        $this->assertEquals([1, -1], $rruleWithBySetPos->getBySetPos());
+        $this->assertNull($rruleWithoutBySetPos->getBySetPos());
+
+        // Test has method
+        $this->assertTrue($rruleWithBySetPos->hasBySetPos());
+        $this->assertFalse($rruleWithoutBySetPos->hasBySetPos());
+    }
+
+    public function testBySetPosToStringRepresentation(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=YEARLY;BYMONTH=3;BYDAY=SU;BYSETPOS=-1');
+        $this->assertEquals('FREQ=YEARLY;BYDAY=SU;BYMONTH=3;BYSETPOS=-1', (string) $rrule);
+
+        $rruleMultiple = $this->testRruler->parse('FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,2,-2,-1');
+        $this->assertEquals('FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,2,-2,-1', (string) $rruleMultiple);
+    }
+
+    public function testBySetPosToArrayRepresentation(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,-1');
+        $array = $rrule->toArray();
+
+        $this->assertEquals([1, -1], $array['bySetPos']);
+    }
+
     public function testByWeekNoToArrayRepresentation(): void
     {
         $rrule = $this->testRruler->parse('FREQ=YEARLY;BYWEEKNO=1,26,53');
@@ -236,6 +271,7 @@ final class RruleTest extends TestCase
             'byMonthDay' => null,
             'byMonth' => null,
             'byWeekNo' => [1, 26, 53],
+            'bySetPos' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);

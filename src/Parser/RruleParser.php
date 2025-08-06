@@ -8,6 +8,7 @@ use EphemeralTodos\Rruler\Exception\ValidationException;
 use EphemeralTodos\Rruler\Parser\Ast\ByDayNode;
 use EphemeralTodos\Rruler\Parser\Ast\ByMonthDayNode;
 use EphemeralTodos\Rruler\Parser\Ast\ByMonthNode;
+use EphemeralTodos\Rruler\Parser\Ast\BySetPosNode;
 use EphemeralTodos\Rruler\Parser\Ast\ByWeekNoNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
@@ -29,6 +30,7 @@ final class RruleParser
         ByDayNode::NAME => ByDayNode::class,
         ByMonthDayNode::NAME => ByMonthDayNode::class,
         ByMonthNode::NAME => ByMonthNode::class,
+        BySetPosNode::NAME => BySetPosNode::class,
         ByWeekNoNode::NAME => ByWeekNoNode::class,
     ];
 
@@ -42,6 +44,7 @@ final class RruleParser
 
         $this->validateRequiredParameters($tokens);
         $this->validateMutuallyExclusiveParameters($tokens);
+        $this->validateBySetPosRequirements($tokens);
 
         $ast = new RruleAst();
 
@@ -106,6 +109,42 @@ final class RruleParser
                 },
                 'COUNT and UNTIL are mutually exclusive'
             );
+        }
+    }
+
+    /**
+     * @param array<string, string> $tokens
+     */
+    private function validateBySetPosRequirements(array $tokens): void
+    {
+        if (isset($tokens['BYSETPOS'])) {
+            // BYSETPOS requires at least one expandable BY* rule
+            $hasExpandableByRule = isset($tokens['BYDAY'])
+                || isset($tokens['BYMONTHDAY'])
+                || isset($tokens['BYMONTH'])
+                || isset($tokens['BYWEEKNO']);
+
+            if (!$hasExpandableByRule) {
+                throw new ValidationException(
+                    new class implements Node {
+                        public function getName(): string
+                        {
+                            return 'BYSETPOS';
+                        }
+
+                        public function getValue(): mixed
+                        {
+                            return null;
+                        }
+
+                        public function getRawValue(): mixed
+                        {
+                            return null;
+                        }
+                    },
+                    'BYSETPOS requires at least one of BYDAY, BYMONTHDAY, BYMONTH, or BYWEEKNO to be specified'
+                );
+            }
         }
     }
 

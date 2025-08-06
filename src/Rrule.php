@@ -14,6 +14,7 @@ final readonly class Rrule implements Stringable
      * @param array<int>|null $byMonthDay
      * @param array<int>|null $byMonth
      * @param array<int>|null $byWeekNo
+     * @param array<int>|null $bySetPos
      */
     public function __construct(
         private string $frequency,
@@ -24,6 +25,7 @@ final readonly class Rrule implements Stringable
         private ?array $byMonthDay = null,
         private ?array $byMonth = null,
         private ?array $byWeekNo = null,
+        private ?array $bySetPos = null,
     ) {
     }
 
@@ -110,7 +112,20 @@ final readonly class Rrule implements Stringable
     }
 
     /**
-     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null, byMonthDay: array<int>|null, byMonth: array<int>|null, byWeekNo: array<int>|null}
+     * @return array<int>|null
+     */
+    public function getBySetPos(): ?array
+    {
+        return $this->bySetPos;
+    }
+
+    public function hasBySetPos(): bool
+    {
+        return $this->bySetPos !== null;
+    }
+
+    /**
+     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null, byMonthDay: array<int>|null, byMonth: array<int>|null, byWeekNo: array<int>|null, bySetPos: array<int>|null}
      */
     public function toArray(): array
     {
@@ -123,6 +138,7 @@ final readonly class Rrule implements Stringable
             'byMonthDay' => $this->byMonthDay,
             'byMonth' => $this->byMonth,
             'byWeekNo' => $this->byWeekNo,
+            'bySetPos' => $this->bySetPos,
         ];
     }
 
@@ -163,6 +179,10 @@ final readonly class Rrule implements Stringable
 
         if ($this->byWeekNo !== null) {
             $parts[] = 'BYWEEKNO='.implode(',', $this->byWeekNo);
+        }
+
+        if ($this->bySetPos !== null) {
+            $parts[] = 'BYSETPOS='.implode(',', $this->bySetPos);
         }
 
         return implode(';', $parts);

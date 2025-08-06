@@ -12,11 +12,21 @@ use Generator;
 
 final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 {
+    /**
+     * @return Generator<DateTimeImmutable>
+     */
     public function generateOccurrences(
         Rrule $rrule,
         DateTimeImmutable $start,
         ?int $limit = null,
     ): Generator {
+        // BYSETPOS requires a different approach - expand periods then select positions
+        if ($rrule->hasBySetPos()) {
+            yield from $this->generateOccurrencesWithBySetPos($rrule, $start, $limit);
+
+            return;
+        }
+
         // For BYDAY, BYMONTHDAY, BYMONTH, or BYWEEKNO rules, find the first valid occurrence from start date
         $current = ($rrule->hasByDay() || $rrule->hasByMonthDay() || $rrule->hasByMonth() || $rrule->hasByWeekNo()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
         $count = 0;
@@ -906,5 +916,522 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         // Preserve the day of week from start date
         return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
+    }
+
+    /**
+     * Generate occurrences when BYSETPOS is present.
+     * Uses two-phase approach: expand all potential occurrences in a period, then select by position.
+     *
+     * @return Generator<DateTimeImmutable>
+     */
+    private function generateOccurrencesWithBySetPos(
+        Rrule $rrule,
+        DateTimeImmutable $start,
+        ?int $limit = null,
+    ): Generator {
+        $count = 0;
+        $maxCount = $limit ?? $rrule->getCount();
+
+        // Early termination for COUNT=0
+        if ($maxCount === 0) {
+            return;
+        }
+
+        // BYSETPOS requires other BY* rules to work with
+        if (!$this->hasExpandableByRules($rrule)) {
+            // If no expandable BY* rules, BYSETPOS has no effect - fall back to normal generation
+            $tempRrule = $this->createRruleWithoutBySetPos($rrule);
+            yield from $this->generateOccurrencesWithoutBySetPos($tempRrule, $start, $limit);
+
+            return;
+        }
+
+        $currentPeriod = $this->findStartingPeriod($rrule, $start);
+        $periodsWithoutOccurrences = 0;
+        $maxEmptyPeriods = 50; // Safety limit to prevent infinite loops
+
+        while (true) {
+            // For BYMONTH patterns, we need to process each month as a separate sub-period for BYSETPOS
+            if ($rrule->hasByMonth() && $rrule->getFrequency() === 'YEARLY') {
+                $monthlyPeriodResults = $this->processYearlyByMonthPeriods($rrule, $currentPeriod, $start, $maxCount, $count);
+
+                foreach ($monthlyPeriodResults as $occurrence) {
+                    // Check UNTIL condition
+                    if ($rrule->hasUntil() && $occurrence > $rrule->getUntil()) {
+                        return;
+                    }
+
+                    yield $occurrence;
+                    ++$count;
+
+                    // Check COUNT condition
+                    if ($maxCount !== null && $count >= $maxCount) {
+                        return;
+                    }
+                }
+            } else {
+                // Standard period processing
+                // For the first period, handle start date filtering differently
+                $isFirstPeriod = $currentPeriod->format('Y-m-d H:i:s') === $this->findStartingPeriod($rrule, $start)->format('Y-m-d H:i:s');
+
+                // Expand all occurrences within this period
+                $expandedOccurrences = $this->expandOccurrencesInPeriod($rrule, $currentPeriod);
+
+                // For first period, pre-filter by start date before BYSETPOS to avoid missing valid selections
+                if ($isFirstPeriod) {
+                    $expandedOccurrences = array_filter($expandedOccurrences, fn ($occ) => $occ >= $start);
+                }
+
+                // Apply BYSETPOS to select specific positions (unless already applied in expansion)
+                if ($rrule->hasByWeekNo()) {
+                    // BYSETPOS already applied in expandByWeekNoWithBySetPos
+                    $selectedOccurrences = $expandedOccurrences;
+                } else {
+                    $selectedOccurrences = $this->applyBySetPosSelection($expandedOccurrences, $rrule->getBySetPos() ?? []);
+                }
+
+                // Track whether any occurrences were yielded in this period
+                $periodHadOccurrences = false;
+
+                // Yield selected occurrences
+                foreach ($selectedOccurrences as $occurrence) {
+                    // For non-first periods, still apply start date filter
+                    if (!$isFirstPeriod && $occurrence < $start) {
+                        continue;
+                    }
+
+                    // Check UNTIL condition
+                    if ($rrule->hasUntil() && $occurrence > $rrule->getUntil()) {
+                        return;
+                    }
+
+                    yield $occurrence;
+                    ++$count;
+                    $periodHadOccurrences = true;
+
+                    // Check COUNT condition
+                    if ($maxCount !== null && $count >= $maxCount) {
+                        return;
+                    }
+                }
+
+                // Safety check: if no occurrences for many consecutive periods, break to prevent infinite loops
+                if (!$periodHadOccurrences) {
+                    ++$periodsWithoutOccurrences;
+                    if ($periodsWithoutOccurrences >= $maxEmptyPeriods) {
+                        // This BYSETPOS configuration never produces occurrences - terminate
+                        return;
+                    }
+                } else {
+                    $periodsWithoutOccurrences = 0; // Reset counter when occurrences are found
+                }
+            }
+
+            // Move to next period
+            $currentPeriod = $this->getNextPeriod($rrule, $currentPeriod);
+        }
+    }
+
+    /**
+     * Check if the RRULE has BY* rules that can be expanded for BYSETPOS.
+     */
+    private function hasExpandableByRules(Rrule $rrule): bool
+    {
+        return $rrule->hasByDay() || $rrule->hasByMonthDay() || $rrule->hasByMonth() || $rrule->hasByWeekNo();
+    }
+
+    /**
+     * Create a copy of the RRULE without BYSETPOS for fallback generation.
+     */
+    private function createRruleWithoutBySetPos(Rrule $rrule): Rrule
+    {
+        return new Rrule(
+            $rrule->getFrequency(),
+            $rrule->getInterval(),
+            $rrule->getCount(),
+            $rrule->getUntil(),
+            $rrule->getByDay(),
+            $rrule->getByMonthDay(),
+            $rrule->getByMonth(),
+            $rrule->getByWeekNo(),
+            null // Remove BYSETPOS
+        );
+    }
+
+    /**
+     * Find the starting period for BYSETPOS expansion.
+     */
+    private function findStartingPeriod(Rrule $rrule, DateTimeImmutable $start): DateTimeImmutable
+    {
+        // The period start depends on the frequency
+        // For BYSETPOS, we need to ensure the period includes the start date
+        return match ($rrule->getFrequency()) {
+            'YEARLY' => $start->modify('first day of January')->setTime(0, 0, 0),
+            'MONTHLY' => $start->modify('first day of this month')->setTime(0, 0, 0),
+            'WEEKLY' => $this->findWeeklyStartingPeriod($start),
+            'DAILY' => $start->setTime(0, 0, 0), // For daily, each day is its own period
+            default => throw new \InvalidArgumentException("Unsupported frequency for BYSETPOS: {$rrule->getFrequency()}"),
+        };
+    }
+
+    /**
+     * Find the appropriate starting period for weekly BYSETPOS patterns.
+     * This ensures we don't miss occurrences in the week containing the start date.
+     */
+    private function findWeeklyStartingPeriod(DateTimeImmutable $start): DateTimeImmutable
+    {
+        $weekStart = $start->modify('Monday this week')->setTime(0, 0, 0);
+
+        // If the start date is at the beginning of the week (Monday-Tuesday),
+        // use this week. Otherwise, check if we should include this week or start from next week.
+        $dayOfWeek = (int) $start->format('N'); // 1=Monday, 7=Sunday
+
+        // Always start from the week containing the start date to ensure we don't miss occurrences
+        return $weekStart;
+    }
+
+    /**
+     * Expand all potential occurrences within a given period.
+     *
+     * @return array<DateTimeImmutable>
+     */
+    private function expandOccurrencesInPeriod(Rrule $rrule, DateTimeImmutable $periodStart): array
+    {
+        $occurrences = [];
+        $periodEnd = $this->getPeriodEnd($rrule, $periodStart);
+
+        // Create a temporary RRULE without BYSETPOS to expand occurrences within the period
+        $tempRrule = $this->createRruleWithoutBySetPos($rrule);
+
+        // For BYSETPOS expansion, we need to find ALL matching dates in the period
+        // Use specialized expansion based on the BY* rules present
+        if ($rrule->hasByWeekNo()) {
+            // For BYWEEKNO with BYSETPOS, each week should be treated as a separate sub-period
+            $occurrences = $this->expandByWeekNoWithBySetPos($rrule, $periodStart, $periodEnd);
+        } elseif ($rrule->hasByMonth()) {
+            // For BYMONTH, expand by checking each specified month in the period
+            $occurrences = $this->expandByMonthInPeriod($rrule, $periodStart, $periodEnd);
+        } else {
+            // For other BY* rules, use day-by-day expansion
+            $current = $periodStart;
+            while ($current <= $periodEnd) {
+                if ($this->dateMatchesRrule($tempRrule, $current)) {
+                    $occurrences[] = $current;
+                }
+                $current = $current->modify('+1 day');
+            }
+        }
+
+        return $occurrences;
+    }
+
+    /**
+     * Get the end date of the current period.
+     */
+    private function getPeriodEnd(Rrule $rrule, DateTimeImmutable $periodStart): DateTimeImmutable
+    {
+        return match ($rrule->getFrequency()) {
+            'YEARLY' => $periodStart->modify('last day of December 23:59:59'),
+            'MONTHLY' => $periodStart->modify('last day of this month 23:59:59'),
+            'WEEKLY' => $periodStart->modify('Sunday this week 23:59:59'),
+            'DAILY' => $periodStart->setTime(23, 59, 59), // End of the same day
+            default => throw new \InvalidArgumentException("Unsupported frequency for BYSETPOS: {$rrule->getFrequency()}"),
+        };
+    }
+
+    /**
+     * Check if a date matches the RRULE criteria (without BYSETPOS).
+     */
+    private function dateMatchesRrule(Rrule $rrule, DateTimeImmutable $date): bool
+    {
+        // Check BY* rules with null safety
+        $byDay = $rrule->getByDay();
+        if ($rrule->hasByDay() && $byDay !== null && !$this->dateMatchesByDayGeneric($rrule, $date, $byDay)) {
+            return false;
+        }
+
+        $byMonthDay = $rrule->getByMonthDay();
+        if ($rrule->hasByMonthDay() && $byMonthDay !== null && !DateValidationUtils::dateMatchesByMonthDay($date, $byMonthDay)) {
+            return false;
+        }
+
+        $byMonth = $rrule->getByMonth();
+        if ($rrule->hasByMonth() && $byMonth !== null && !$this->dateMatchesByMonth($date, $byMonth)) {
+            return false;
+        }
+
+        $byWeekNo = $rrule->getByWeekNo();
+        if ($rrule->hasByWeekNo() && $byWeekNo !== null && !$this->dateMatchesByWeekNo($date, $byWeekNo)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Generic BYDAY matching that delegates to frequency-specific method.
+     *
+     * @param array<array{position: int|null, weekday: string}> $byDay
+     */
+    private function dateMatchesByDayGeneric(Rrule $rrule, DateTimeImmutable $date, array $byDay): bool
+    {
+        return match ($rrule->getFrequency()) {
+            'DAILY', 'WEEKLY' => $this->dateMatchesWeekdayList($date, $byDay),
+            'MONTHLY' => $this->dateMatchesMonthlyByDay($date, $byDay),
+            'YEARLY' => $this->dateMatchesYearlyByDay($date, $byDay),
+            default => throw new \InvalidArgumentException("Unsupported frequency: {$rrule->getFrequency()}"),
+        };
+    }
+
+    /**
+     * Apply BYSETPOS selection to expanded occurrences.
+     *
+     * @param array<DateTimeImmutable> $occurrences
+     * @param array<int> $bySetPos
+     * @return array<DateTimeImmutable>
+     */
+    private function applyBySetPosSelection(array $occurrences, array $bySetPos): array
+    {
+        if (empty($occurrences)) {
+            return [];
+        }
+
+        sort($occurrences);
+        $selected = [];
+        $count = count($occurrences);
+
+        foreach ($bySetPos as $position) {
+            if ($position > 0) {
+                // Positive index: 1-based from start
+                $index = $position - 1;
+                if ($index < $count) {
+                    $selected[] = $occurrences[$index];
+                }
+            } elseif ($position < 0) {
+                // Negative index: 1-based from end
+                $index = $count + $position;
+                if ($index >= 0) {
+                    $selected[] = $occurrences[$index];
+                }
+            }
+            // position === 0 is not allowed per RFC 5545 and should be caught by validation
+        }
+
+        // Sort selected occurrences and remove duplicates
+        sort($selected);
+
+        // Remove duplicates by comparing timestamps
+        $uniqueSelected = [];
+        $lastTimestamp = null;
+
+        foreach ($selected as $occurrence) {
+            $timestamp = $occurrence->getTimestamp();
+            if ($timestamp !== $lastTimestamp) {
+                $uniqueSelected[] = $occurrence;
+                $lastTimestamp = $timestamp;
+            }
+        }
+
+        $selected = $uniqueSelected;
+
+        return $selected;
+    }
+
+    /**
+     * Process yearly BYMONTH patterns by treating each month as a separate period for BYSETPOS.
+     *
+     * @return array<DateTimeImmutable>
+     */
+    private function processYearlyByMonthPeriods(Rrule $rrule, DateTimeImmutable $yearStart, DateTimeImmutable $start, ?int $maxCount, int $currentCount): array
+    {
+        $results = [];
+        $byMonth = $rrule->getByMonth();
+
+        if ($byMonth === null) {
+            return $results;
+        }
+
+        $year = (int) $yearStart->format('Y');
+
+        foreach ($byMonth as $monthNumber) {
+            // Create month period
+            $monthStart = $yearStart->setDate($year, $monthNumber, 1)->setTime(0, 0, 0);
+            $monthEnd = $monthStart->modify('last day of this month 23:59:59');
+
+            // Expand occurrences in this month
+            $monthOccurrences = [];
+            $current = $monthStart;
+            $tempRrule = $this->createRruleWithoutBySetPos($rrule);
+
+            while ($current <= $monthEnd) {
+                if ($this->dateMatchesRrule($tempRrule, $current)) {
+                    $monthOccurrences[] = $current;
+                }
+                $current = $current->modify('+1 day');
+            }
+
+            // Apply BYSETPOS to this month's occurrences
+            $selectedOccurrences = $this->applyBySetPosSelection($monthOccurrences, $rrule->getBySetPos() ?? []);
+
+            // Add valid occurrences (>= start date) to results
+            foreach ($selectedOccurrences as $occurrence) {
+                if ($occurrence >= $start) {
+                    $results[] = $occurrence;
+                }
+            }
+
+            // Early termination check for COUNT
+            if ($maxCount !== null && (count($results) + $currentCount) >= $maxCount) {
+                break;
+            }
+        }
+
+        sort($results); // Ensure chronological order
+
+        return $results;
+    }
+
+    /**
+     * Expand BYWEEKNO occurrences with BYSETPOS, treating each week as a sub-period.
+     *
+     * @return array<DateTimeImmutable>
+     */
+    private function expandByWeekNoWithBySetPos(Rrule $rrule, DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd): array
+    {
+        $allOccurrences = [];
+        $byWeekNo = $rrule->getByWeekNo();
+        $bySetPos = $rrule->getBySetPos();
+
+        if ($byWeekNo === null || $bySetPos === null) {
+            return $allOccurrences;
+        }
+
+        $year = (int) $periodStart->format('o'); // ISO week year
+
+        foreach ($byWeekNo as $weekNumber) {
+            // Skip week 53 if it doesn't exist in this year
+            if ($weekNumber === 53 && !DateValidationUtils::yearHasWeek53($year)) {
+                continue;
+            }
+
+            // Get all dates in this week that match other BY* rules
+            $weekOccurrences = [];
+            $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($year, $weekNumber);
+
+            for ($dayOffset = 0; $dayOffset < 7; ++$dayOffset) {
+                $weekDate = $mondayOfWeek->modify("+{$dayOffset} days");
+
+                // Only include dates within the period
+                if ($weekDate >= $periodStart && $weekDate <= $periodEnd) {
+                    // Check if this date matches other BY* rules (like BYDAY if present)
+                    $tempRrule = $this->createRruleWithoutBySetPos($rrule);
+                    if ($this->dateMatchesRrule($tempRrule, $weekDate)) {
+                        $weekOccurrences[] = $weekDate;
+                    }
+                }
+            }
+
+            // Apply BYSETPOS to this week's occurrences
+            $selectedFromWeek = $this->applyBySetPosSelection($weekOccurrences, $bySetPos);
+            $allOccurrences = array_merge($allOccurrences, $selectedFromWeek);
+        }
+
+        return $allOccurrences;
+    }
+
+    /**
+     * Expand BYMONTH occurrences within a period.
+     *
+     * @return array<DateTimeImmutable>
+     */
+    private function expandByMonthInPeriod(Rrule $rrule, DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd): array
+    {
+        $occurrences = [];
+        $byMonth = $rrule->getByMonth();
+
+        if ($byMonth === null) {
+            return $occurrences;
+        }
+
+        $year = (int) $periodStart->format('Y');
+
+        foreach ($byMonth as $monthNumber) {
+            // Create first day of this month in the year
+            $monthStart = $periodStart->setDate($year, $monthNumber, 1)->setTime(0, 0, 0);
+            $monthEnd = $monthStart->modify('last day of this month 23:59:59');
+
+            // Only process if month overlaps with the period
+            if ($monthEnd >= $periodStart && $monthStart <= $periodEnd) {
+                // Find all matching dates in this month
+                $current = $monthStart;
+                while ($current <= $monthEnd) {
+                    // Check if this date matches other BY* rules
+                    $tempRrule = $this->createRruleWithoutBySetPos($rrule);
+                    if ($this->dateMatchesRrule($tempRrule, $current)) {
+                        // Only include dates within the period
+                        if ($current >= $periodStart && $current <= $periodEnd) {
+                            $occurrences[] = $current;
+                        }
+                    }
+                    $current = $current->modify('+1 day');
+                }
+            }
+        }
+
+        return $occurrences;
+    }
+
+    /**
+     * Get the next period for iteration.
+     */
+    private function getNextPeriod(Rrule $rrule, DateTimeImmutable $currentPeriod): DateTimeImmutable
+    {
+        $interval = $rrule->getInterval();
+
+        return match ($rrule->getFrequency()) {
+            'YEARLY' => $currentPeriod->modify("+{$interval} years"),
+            'MONTHLY' => $currentPeriod->modify("+{$interval} months"),
+            'WEEKLY' => $currentPeriod->modify("+{$interval} weeks"),
+            'DAILY' => $currentPeriod->modify("+{$interval} days"),
+            default => throw new \InvalidArgumentException("Unsupported frequency for BYSETPOS: {$rrule->getFrequency()}"),
+        };
+    }
+
+    /**
+     * Generate occurrences without BYSETPOS (original logic).
+     *
+     * @return Generator<DateTimeImmutable>
+     */
+    private function generateOccurrencesWithoutBySetPos(
+        Rrule $rrule,
+        DateTimeImmutable $start,
+        ?int $limit = null,
+    ): Generator {
+        // For BYDAY, BYMONTHDAY, BYMONTH, or BYWEEKNO rules, find the first valid occurrence from start date
+        $current = ($rrule->hasByDay() || $rrule->hasByMonthDay() || $rrule->hasByMonth() || $rrule->hasByWeekNo()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
+        $count = 0;
+        $maxCount = $limit ?? $rrule->getCount();
+
+        // Early termination for COUNT=0
+        if ($maxCount === 0) {
+            return;
+        }
+
+        while (true) {
+            // Check UNTIL condition
+            if ($rrule->hasUntil() && $current > $rrule->getUntil()) {
+                break;
+            }
+
+            yield $current;
+            ++$count;
+
+            // Check COUNT condition
+            if ($maxCount !== null && $count >= $maxCount) {
+                break;
+            }
+
+            $current = $this->getNextOccurrence($rrule, $current);
+        }
     }
 }

@@ -281,6 +281,36 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         }
     }
 
+    #[DataProvider('provideBySetPosOccurrenceData')]
+    public function testGenerateOccurrencesWithBySetPos(string $rruleString, string $startDate, int $expectedCount, array $expectedDates): void
+    {
+        $rrule = $this->testRruler->parse($rruleString);
+        $start = new DateTimeImmutable($startDate);
+
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
+
+        $this->assertInstanceOf(Generator::class, $occurrences);
+
+        // Convert to array with safety limit to prevent infinite loops during testing
+        $results = [];
+        $count = 0;
+        $maxIterations = max($expectedCount + 10, 100); // Safety limit
+
+        foreach ($occurrences as $occurrence) {
+            $results[] = $occurrence;
+            ++$count;
+            if ($count >= $maxIterations) {
+                break; // Safety limit reached
+            }
+        }
+
+        $this->assertCount($expectedCount, $results);
+
+        foreach ($expectedDates as $index => $expectedDate) {
+            $this->assertEquals(new DateTimeImmutable($expectedDate), $results[$index]);
+        }
+    }
+
     public static function provideByWeekNoOccurrenceData(): array
     {
         return [
@@ -362,6 +392,115 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 '2025-12-01', // Monday, late in year (week 1 already passed)
                 3,
                 ['2025-12-29', '2027-01-04', '2028-01-03'], // Monday of week 1 in subsequent years
+            ],
+        ];
+    }
+
+    public static function provideBySetPosOccurrenceData(): array
+    {
+        return [
+            // First Monday of each month - simple case
+            'first Monday monthly, count 3' => [
+                'FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1;COUNT=3',
+                '2025-01-01',
+                3,
+                ['2025-01-06', '2025-02-03', '2025-03-03'], // First Monday each month
+            ],
+
+            // Last Friday of each month - simple case
+            'last Friday monthly, count 3' => [
+                'FREQ=MONTHLY;BYDAY=FR;BYSETPOS=-1;COUNT=3',
+                '2025-01-01',
+                3,
+                ['2025-01-31', '2025-02-28', '2025-03-28'], // Last Friday each month
+            ],
+
+            // Real-world pattern: Last Sunday of March (daylight saving time transition)
+            'last Sunday of March yearly, count 3' => [
+                'FREQ=YEARLY;BYMONTH=3;BYDAY=SU;BYSETPOS=-1;COUNT=3',
+                '2025-01-01',
+                3,
+                ['2025-03-30', '2026-03-29', '2027-03-28'], // Last Sunday of March each year
+            ],
+
+            // First and last workday of each month
+            'first and last weekday monthly, count 4' => [
+                'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,-1;COUNT=4',
+                '2025-01-01', // Wednesday
+                4,
+                ['2025-01-01', '2025-01-31', '2025-02-03', '2025-02-28'], // First and last weekday alternating
+            ],
+
+            // Second and third Tuesday of each month (complex selection)
+            'second and third Tuesday monthly, count 4' => [
+                'FREQ=MONTHLY;BYDAY=TU;BYSETPOS=2,3;COUNT=4',
+                '2025-01-01',
+                4,
+                ['2025-01-14', '2025-01-21', '2025-02-11', '2025-02-18'], // 2nd and 3rd Tuesday alternating
+            ],
+
+            // 15th or last day of month (BYMONTHDAY with BYSETPOS)
+            '15th or last day monthly, count 3' => [
+                'FREQ=MONTHLY;BYMONTHDAY=15,-1;BYSETPOS=-1;COUNT=3',
+                '2025-01-01',
+                3,
+                ['2025-01-31', '2025-02-28', '2025-03-31'], // Always the last day (since -1 comes after 15th position)
+            ],
+
+            // First three weekdays of each month
+            'first three weekdays monthly, count 6' => [
+                'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,2,3;COUNT=6',
+                '2025-01-01', // Wednesday
+                6,
+                ['2025-01-01', '2025-01-02', '2025-01-03', '2025-02-03', '2025-02-04', '2025-02-05'], // First 3 weekdays Jan and Feb
+            ],
+
+            // Last two weekdays of each month
+            'last two weekdays monthly, count 4' => [
+                'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-2,-1;COUNT=4',
+                '2025-01-01',
+                4,
+                ['2025-01-30', '2025-01-31', '2025-02-27', '2025-02-28'], // Last 2 weekdays Jan and Feb
+            ],
+
+            // 2nd Sunday of every other month (bi-monthly with interval)
+            '2nd Sunday bi-monthly, count 3' => [
+                'FREQ=MONTHLY;INTERVAL=2;BYDAY=SU;BYSETPOS=2;COUNT=3',
+                '2025-01-01',
+                3,
+                ['2025-01-12', '2025-03-09', '2025-05-11'], // 2nd Sunday every 2 months
+            ],
+
+            // Quarterly: last Thursday of March, June, September, December
+            'last Thursday quarterly, count 4' => [
+                'FREQ=YEARLY;BYMONTH=3,6,9,12;BYDAY=TH;BYSETPOS=-1;COUNT=4',
+                '2025-01-01',
+                4,
+                ['2025-03-27', '2025-06-26', '2025-09-25', '2025-12-25'], // Last Thursday quarterly
+            ],
+
+            // Weekly pattern with BYSETPOS (every Tuesday and Thursday, take first one)
+            'weekly TU,TH take first, count 4' => [
+                'FREQ=WEEKLY;BYDAY=TU,TH;BYSETPOS=1;COUNT=4',
+                '2025-01-01', // Wednesday
+                4,
+                ['2025-01-02', '2025-01-07', '2025-01-14', '2025-01-21'], // Tuesday only (first of TU,TH each week)
+            ],
+
+            // BYSETPOS with BYWEEKNO - first day of specific weeks
+            'first day of weeks 13,26, count 4' => [
+                'FREQ=YEARLY;BYWEEKNO=13,26;BYSETPOS=1;COUNT=4',
+                '2025-01-01',
+                4,
+                ['2025-03-24', '2025-06-23', '2026-03-23', '2026-06-22'], // Monday (first day) of weeks 13,26 each year
+            ],
+
+            // Complex multi-position selection
+            'first, second, second-to-last, and last workday monthly, count 8' => [
+                'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,2,-2,-1;COUNT=8',
+                '2025-01-01', // Wednesday
+                8,
+                ['2025-01-01', '2025-01-02', '2025-01-30', '2025-01-31', '2025-02-03', '2025-02-04', '2025-02-27', '2025-02-28'], // First 2 and last 2 weekdays for Jan and Feb
             ],
         ];
     }
