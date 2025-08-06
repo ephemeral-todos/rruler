@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace EphemeralTodos\Rruler\Tests\Integration;
 
-use EphemeralTodos\Rruler\Rruler;
+use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ByDayParsingTest extends TestCase
 {
-    private Rruler $rruler;
-
-    protected function setUp(): void
-    {
-        $this->rruler = new Rruler();
-    }
+    use TestRrulerBehavior;
 
     #[DataProvider('provideByDayRrules')]
     public function testByDayParsing(string $rruleString, array $expectedByDay): void
     {
-        $rrule = $this->rruler->parse($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
 
         $this->assertTrue($rrule->hasByDay());
         $this->assertEquals($expectedByDay, $rrule->getByDay());
@@ -29,11 +24,11 @@ final class ByDayParsingTest extends TestCase
     #[DataProvider('provideByDayToStringRrules')]
     public function testByDayToString(string $rruleString): void
     {
-        $rrule = $this->rruler->parse($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $reconstructed = (string) $rrule;
 
         // Parse the reconstructed string to verify it's valid
-        $rruleReconstructed = $this->rruler->parse($reconstructed);
+        $rruleReconstructed = $this->testRruler->parse($reconstructed);
 
         $this->assertEquals($rrule->getFrequency(), $rruleReconstructed->getFrequency());
         $this->assertEquals($rrule->getByDay(), $rruleReconstructed->getByDay());
@@ -107,7 +102,7 @@ final class ByDayParsingTest extends TestCase
 
     public function testRruleWithoutByDay(): void
     {
-        $rrule = $this->rruler->parse('FREQ=DAILY;INTERVAL=2');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;INTERVAL=2');
 
         $this->assertFalse($rrule->hasByDay());
         $this->assertNull($rrule->getByDay());
@@ -115,7 +110,7 @@ final class ByDayParsingTest extends TestCase
 
     public function testByDayToArray(): void
     {
-        $rrule = $this->rruler->parse('FREQ=WEEKLY;BYDAY=MO,FR');
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;BYDAY=MO,FR');
         $array = $rrule->toArray();
 
         $expectedByDay = [

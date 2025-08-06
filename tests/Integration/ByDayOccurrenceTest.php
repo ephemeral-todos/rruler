@@ -6,25 +6,25 @@ namespace EphemeralTodos\Rruler\Tests\Integration;
 
 use DateTimeImmutable;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
-use EphemeralTodos\Rruler\Rruler;
+use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ByDayOccurrenceTest extends TestCase
 {
-    private Rruler $rruler;
+    use TestRrulerBehavior;
+
     private DefaultOccurrenceGenerator $generator;
 
     protected function setUp(): void
     {
-        $this->rruler = new Rruler();
         $this->generator = new DefaultOccurrenceGenerator();
     }
 
     #[DataProvider('provideWeeklyByDayScenarios')]
     public function testWeeklyByDayOccurrences(string $rruleString, string $startDate, array $expectedDates): void
     {
-        $rrule = $this->rruler->parse($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
         $occurrences = [];
@@ -43,7 +43,7 @@ final class ByDayOccurrenceTest extends TestCase
     #[DataProvider('provideMonthlyByDayScenarios')]
     public function testMonthlyByDayOccurrences(string $rruleString, string $startDate, array $expectedDates): void
     {
-        $rrule = $this->rruler->parse($rruleString);
+        $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
         $occurrences = [];
@@ -135,7 +135,7 @@ final class ByDayOccurrenceTest extends TestCase
     public function testDailyByDayFiltering(): void
     {
         // DAILY but only on weekdays (MO-FR)
-        $rrule = $this->rruler->parse('FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR');
+        $rrule = $this->testRruler->parse('FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR');
         $start = new DateTimeImmutable('2024-01-01'); // Monday
 
         $occurrences = [];
@@ -163,7 +163,7 @@ final class ByDayOccurrenceTest extends TestCase
 
     public function testByDayWithCount(): void
     {
-        $rrule = $this->rruler->parse('FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=5');
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=5');
         $start = new DateTimeImmutable('2024-01-01'); // Monday
 
         $occurrences = [];
@@ -185,7 +185,7 @@ final class ByDayOccurrenceTest extends TestCase
 
     public function testByDayWithUntil(): void
     {
-        $rrule = $this->rruler->parse('FREQ=WEEKLY;BYDAY=MO;UNTIL=20240115T000000Z');
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;BYDAY=MO;UNTIL=20240115T000000Z');
         $start = new DateTimeImmutable('2024-01-01'); // Monday
 
         $occurrences = [];

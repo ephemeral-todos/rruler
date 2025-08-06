@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Integration;
 
 use DateTimeImmutable;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceValidator;
+use EphemeralTodos\Rruler\Testing\Behavior\TestOccurrenceGenerationBehavior;
 use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -14,15 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class ByMonthIntegrationTest extends TestCase
 {
     use TestRrulerBehavior;
-
-    private DefaultOccurrenceGenerator $generator;
-    private DefaultOccurrenceValidator $validator;
-
-    protected function setUp(): void
-    {
-        $this->generator = new DefaultOccurrenceGenerator();
-        $this->validator = new DefaultOccurrenceValidator($this->generator);
-    }
+    use TestOccurrenceGenerationBehavior;
 
     #[DataProvider('provideByMonthScenarios')]
     public function testByMonthEndToEndWorkflows(
@@ -37,7 +28,7 @@ final class ByMonthIntegrationTest extends TestCase
         $start = new DateTimeImmutable($startDate);
 
         // Generate occurrences
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
         $results = iterator_to_array($occurrences);
 
         // Verify expected occurrences
@@ -53,7 +44,7 @@ final class ByMonthIntegrationTest extends TestCase
         // Validate each generated occurrence using validator
         foreach ($results as $occurrence) {
             $this->assertTrue(
-                $this->validator->isValidOccurrence($rrule, $start, $occurrence),
+                $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $occurrence),
                 'Generated occurrence should be valid: '.$occurrence->format('Y-m-d')
             );
         }
@@ -62,7 +53,7 @@ final class ByMonthIntegrationTest extends TestCase
         foreach ($validCandidates as $candidateDate) {
             $candidate = new DateTimeImmutable($candidateDate);
             $this->assertTrue(
-                $this->validator->isValidOccurrence($rrule, $start, $candidate),
+                $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate),
                 "Candidate should be valid: {$candidateDate} for RRULE: {$rruleString}"
             );
         }
@@ -71,7 +62,7 @@ final class ByMonthIntegrationTest extends TestCase
         foreach ($invalidCandidates as $candidateDate) {
             $candidate = new DateTimeImmutable($candidateDate);
             $this->assertFalse(
-                $this->validator->isValidOccurrence($rrule, $start, $candidate),
+                $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate),
                 "Candidate should be invalid: {$candidateDate} for RRULE: {$rruleString}"
             );
         }
@@ -85,7 +76,7 @@ final class ByMonthIntegrationTest extends TestCase
         $rangeStart = new DateTimeImmutable('2025-05-01');
         $rangeEnd = new DateTimeImmutable('2026-08-31');
 
-        $occurrences = $this->generator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd);
         $results = iterator_to_array($occurrences);
 
         $expected = [
@@ -115,7 +106,7 @@ final class ByMonthIntegrationTest extends TestCase
 
         // Start in 2023 (non-leap) and go through 2026
         $start = new DateTimeImmutable('2023-02-01');
-        $occurrences = iterator_to_array($this->generator->generateOccurrences($rrule, $start));
+        $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rrule, $start));
 
         $expected = [
             '2023-02-01', // Feb 2023 (non-leap)
@@ -135,7 +126,7 @@ final class ByMonthIntegrationTest extends TestCase
         // Test multiple BYMONTH values in correct chronological order
         $rrule = $this->testRruler->parse('FREQ=YEARLY;BYMONTH=1,4,7,10;COUNT=8');
         $start = new DateTimeImmutable('2025-03-15'); // Start after January but before April
-        $occurrences = iterator_to_array($this->generator->generateOccurrences($rrule, $start));
+        $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rrule, $start));
 
         $expected = [
             '2025-04-15', // April 2025 (next occurrence after start)
@@ -159,7 +150,7 @@ final class ByMonthIntegrationTest extends TestCase
         // Every 2 years in June
         $rrule = $this->testRruler->parse('FREQ=YEARLY;INTERVAL=2;BYMONTH=6;COUNT=4');
         $start = new DateTimeImmutable('2025-01-01');
-        $occurrences = iterator_to_array($this->generator->generateOccurrences($rrule, $start));
+        $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rrule, $start));
 
         $expected = [
             '2025-06-01', // June 2025
@@ -179,7 +170,7 @@ final class ByMonthIntegrationTest extends TestCase
         // Test that DTSTART month is preserved when BYMONTH includes it
         $rrule = $this->testRruler->parse('FREQ=YEARLY;BYMONTH=6,9,12;COUNT=6');
         $start = new DateTimeImmutable('2025-09-15'); // Start in September (included in BYMONTH)
-        $occurrences = iterator_to_array($this->generator->generateOccurrences($rrule, $start));
+        $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rrule, $start));
 
         $expected = [
             '2025-09-15', // September 2025 (DTSTART included)

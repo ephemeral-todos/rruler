@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Unit\Occurrence\Adapter;
 
 use DateTimeImmutable;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceValidator;
 use EphemeralTodos\Rruler\Occurrence\OccurrenceValidator;
+use EphemeralTodos\Rruler\Testing\Behavior\TestOccurrenceGenerationBehavior;
 use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -15,17 +14,11 @@ use PHPUnit\Framework\TestCase;
 final class DefaultOccurrenceValidatorTest extends TestCase
 {
     use TestRrulerBehavior;
-    private OccurrenceValidator $validator;
-
-    protected function setUp(): void
-    {
-        $generator = new DefaultOccurrenceGenerator();
-        $this->validator = new DefaultOccurrenceValidator($generator);
-    }
+    use TestOccurrenceGenerationBehavior;
 
     public function testImplementsOccurrenceValidatorInterface(): void
     {
-        $this->assertInstanceOf(OccurrenceValidator::class, $this->validator);
+        $this->assertInstanceOf(OccurrenceValidator::class, $this->testOccurrenceValidator);
     }
 
     #[DataProvider('provideValidOccurrenceData')]
@@ -35,7 +28,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
         $start = new DateTimeImmutable($startDate);
         $candidate = new DateTimeImmutable($candidateDate);
 
-        $result = $this->validator->isValidOccurrence($rrule, $start, $candidate);
+        $result = $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate);
 
         $this->assertTrue($result);
     }
@@ -47,7 +40,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
         $start = new DateTimeImmutable($startDate);
         $candidate = new DateTimeImmutable($candidateDate);
 
-        $result = $this->validator->isValidOccurrence($rrule, $start, $candidate);
+        $result = $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate);
 
         $this->assertFalse($result);
     }
@@ -57,7 +50,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
         $rrule = $this->testRruler->parse('FREQ=DAILY;COUNT=5');
         $start = new DateTimeImmutable('2025-01-01');
 
-        $result = $this->validator->isValidOccurrence($rrule, $start, $start);
+        $result = $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $start);
 
         $this->assertTrue($result);
     }
@@ -68,7 +61,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
         $start = new DateTimeImmutable('2025-01-01');
         $candidate = new DateTimeImmutable('2025-01-04'); // 4th occurrence, but COUNT=3
 
-        $result = $this->validator->isValidOccurrence($rrule, $start, $candidate);
+        $result = $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate);
 
         $this->assertFalse($result);
     }
@@ -79,7 +72,7 @@ final class DefaultOccurrenceValidatorTest extends TestCase
         $start = new DateTimeImmutable('2025-01-01');
         $candidate = new DateTimeImmutable('2025-01-04'); // Beyond UNTIL date
 
-        $result = $this->validator->isValidOccurrence($rrule, $start, $candidate);
+        $result = $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate);
 
         $this->assertFalse($result);
     }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Unit\Occurrence\Adapter;
 
 use DateTimeImmutable;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
 use EphemeralTodos\Rruler\Occurrence\OccurrenceGenerator;
+use EphemeralTodos\Rruler\Testing\Behavior\TestOccurrenceGenerationBehavior;
 use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -15,16 +15,11 @@ use PHPUnit\Framework\TestCase;
 final class DefaultOccurrenceGeneratorTest extends TestCase
 {
     use TestRrulerBehavior;
-    private OccurrenceGenerator $generator;
-
-    protected function setUp(): void
-    {
-        $this->generator = new DefaultOccurrenceGenerator();
-    }
+    use TestOccurrenceGenerationBehavior;
 
     public function testImplementsOccurrenceGeneratorInterface(): void
     {
-        $this->assertInstanceOf(OccurrenceGenerator::class, $this->generator);
+        $this->assertInstanceOf(OccurrenceGenerator::class, $this->testOccurrenceGenerator);
     }
 
     #[DataProvider('provideDailyOccurrenceData')]
@@ -33,7 +28,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
 
         $this->assertInstanceOf(Generator::class, $occurrences);
 
@@ -51,7 +46,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
 
         $this->assertInstanceOf(Generator::class, $occurrences);
 
@@ -68,7 +63,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rrule = $this->testRruler->parse('FREQ=DAILY');
         $start = new DateTimeImmutable('2025-01-01');
 
-        $occurrences = $this->generator->generateOccurrences($rrule, $start, 3);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start, 3);
 
         $results = iterator_to_array($occurrences);
         $this->assertCount(3, $results);
@@ -84,7 +79,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rangeStart = new DateTimeImmutable('2025-01-03');
         $rangeEnd = new DateTimeImmutable('2025-01-05');
 
-        $occurrences = $this->generator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd);
 
         $this->assertInstanceOf(Generator::class, $occurrences);
 
@@ -100,7 +95,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rrule = $this->testRruler->parse('FREQ=DAILY;COUNT=0');
         $start = new DateTimeImmutable('2025-01-01');
 
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
 
         $results = iterator_to_array($occurrences);
         $this->assertCount(0, $results);
@@ -111,7 +106,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rrule = $this->testRruler->parse('FREQ=DAILY;UNTIL=20241231T235959Z');
         $start = new DateTimeImmutable('2025-01-01');
 
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
 
         $results = iterator_to_array($occurrences);
         $this->assertCount(0, $results);
@@ -147,7 +142,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
         $rrule = $this->testRruler->parse($rruleString);
         $start = new DateTimeImmutable($startDate);
 
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
 
         $this->assertInstanceOf(Generator::class, $occurrences);
 

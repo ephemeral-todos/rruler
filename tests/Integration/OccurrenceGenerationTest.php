@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Integration;
 
 use DateTimeImmutable;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
-use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceValidator;
 use EphemeralTodos\Rruler\Rrule;
+use EphemeralTodos\Rruler\Testing\Behavior\TestOccurrenceGenerationBehavior;
 use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -15,14 +14,7 @@ use PHPUnit\Framework\TestCase;
 final class OccurrenceGenerationTest extends TestCase
 {
     use TestRrulerBehavior;
-    private DefaultOccurrenceGenerator $generator;
-    private DefaultOccurrenceValidator $validator;
-
-    protected function setUp(): void
-    {
-        $this->generator = new DefaultOccurrenceGenerator();
-        $this->validator = new DefaultOccurrenceValidator($this->generator);
-    }
+    use TestOccurrenceGenerationBehavior;
 
     #[DataProvider('provideEndToEndScenarios')]
     public function testEndToEndOccurrenceGeneration(
@@ -37,7 +29,7 @@ final class OccurrenceGenerationTest extends TestCase
         $start = new DateTimeImmutable($startDate);
 
         // Generate occurrences
-        $occurrences = $this->generator->generateOccurrences($rrule, $start);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrences($rrule, $start);
         $results = iterator_to_array($occurrences);
 
         // Verify expected occurrences
@@ -53,7 +45,7 @@ final class OccurrenceGenerationTest extends TestCase
         // Validate each generated occurrence using validator
         foreach ($results as $occurrence) {
             $this->assertTrue(
-                $this->validator->isValidOccurrence($rrule, $start, $occurrence),
+                $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $occurrence),
                 'Generated occurrence should be valid: '.$occurrence->format('Y-m-d')
             );
         }
@@ -62,7 +54,7 @@ final class OccurrenceGenerationTest extends TestCase
         foreach ($validCandidates as $candidateDate) {
             $candidate = new DateTimeImmutable($candidateDate);
             $this->assertTrue(
-                $this->validator->isValidOccurrence($rrule, $start, $candidate),
+                $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate),
                 "Candidate should be valid: {$candidateDate}"
             );
         }
@@ -71,7 +63,7 @@ final class OccurrenceGenerationTest extends TestCase
         foreach ($invalidCandidates as $candidateDate) {
             $candidate = new DateTimeImmutable($candidateDate);
             $this->assertFalse(
-                $this->validator->isValidOccurrence($rrule, $start, $candidate),
+                $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $candidate),
                 "Candidate should be invalid: {$candidateDate}"
             );
         }
@@ -92,11 +84,11 @@ final class OccurrenceGenerationTest extends TestCase
             $rrule = $this->testRruler->parse($rruleString);
             $start = new DateTimeImmutable($startDate);
 
-            $occurrences = iterator_to_array($this->generator->generateOccurrences($rrule, $start));
+            $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rrule, $start));
 
             foreach ($occurrences as $occurrence) {
                 $this->assertTrue(
-                    $this->validator->isValidOccurrence($rrule, $start, $occurrence),
+                    $this->testOccurrenceValidator->isValidOccurrence($rrule, $start, $occurrence),
                     "All generated occurrences should validate as true for: {$rruleString}"
                 );
             }
@@ -110,7 +102,7 @@ final class OccurrenceGenerationTest extends TestCase
         $rangeStart = new DateTimeImmutable('2025-01-05');
         $rangeEnd = new DateTimeImmutable('2025-01-10');
 
-        $occurrences = $this->generator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd);
+        $occurrences = $this->testOccurrenceGenerator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd);
         $results = iterator_to_array($occurrences);
 
         $this->assertCount(6, $results); // 2025-01-05 through 2025-01-10
@@ -130,7 +122,7 @@ final class OccurrenceGenerationTest extends TestCase
         $rruleWithCount = $this->testRruler->parse('FREQ=DAILY;COUNT=3');
         $start = new DateTimeImmutable('2025-01-01');
 
-        $occurrences = iterator_to_array($this->generator->generateOccurrences($rruleWithCount, $start));
+        $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rruleWithCount, $start));
 
         $this->assertCount(3, $occurrences); // COUNT=3 should limit
         $this->assertEquals(new DateTimeImmutable('2025-01-01'), $occurrences[0]);
@@ -139,7 +131,7 @@ final class OccurrenceGenerationTest extends TestCase
 
         // Test UNTIL limiting occurrences
         $rruleWithUntil = $this->testRruler->parse('FREQ=DAILY;UNTIL=20250103T235959Z');
-        $occurrences = iterator_to_array($this->generator->generateOccurrences($rruleWithUntil, $start));
+        $occurrences = iterator_to_array($this->testOccurrenceGenerator->generateOccurrences($rruleWithUntil, $start));
 
         $this->assertCount(3, $occurrences); // UNTIL should limit to 3 days
         $this->assertEquals(new DateTimeImmutable('2025-01-01'), $occurrences[0]);
@@ -155,7 +147,7 @@ final class OccurrenceGenerationTest extends TestCase
         $startTime = microtime(true);
 
         $count = 0;
-        foreach ($this->generator->generateOccurrences($rrule, $start) as $occurrence) {
+        foreach ($this->testOccurrenceGenerator->generateOccurrences($rrule, $start) as $occurrence) {
             ++$count;
             // Just iterate, don't collect all in memory
         }
