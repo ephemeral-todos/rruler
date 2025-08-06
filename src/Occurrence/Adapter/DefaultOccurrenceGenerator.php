@@ -830,11 +830,12 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                 if ($week === 53 && !DateValidationUtils::yearHasWeek53($currentYear)) {
                     continue; // Skip week 53 if it doesn't exist in current year
                 }
-                
+
                 // Found a valid week later in the year
                 $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
+
                 // Preserve the day of week from current date
-                return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+                return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
             }
         }
 
@@ -848,8 +849,9 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         }
 
         $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($nextYear, $firstWeek);
+
         // Preserve the day of week from current date
-        return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+        return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
     }
 
     /**
@@ -882,11 +884,12 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                 if ($week === 53 && !DateValidationUtils::yearHasWeek53($currentYear)) {
                     continue; // Skip week 53 if it doesn't exist in current year
                 }
-                
+
                 // Found a valid week later in the year
                 $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
+
                 // Preserve the day of week from start date
-                return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+                return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
             }
         }
 
@@ -896,11 +899,12 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         // Handle leap weeks - if week 53 doesn't exist in target year, find next year that has it
         while ($firstWeek === 53 && !DateValidationUtils::yearHasWeek53($nextYear)) {
-            $nextYear += 1;
+            ++$nextYear;
         }
 
         $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($nextYear, $firstWeek);
+
         // Preserve the day of week from start date
-        return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+        return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
     }
 }

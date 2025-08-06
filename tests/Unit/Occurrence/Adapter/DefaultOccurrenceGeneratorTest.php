@@ -365,5 +365,4 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
             ],
         ];
     }
-
 }

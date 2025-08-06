@@ -145,7 +145,7 @@ final class DateValidationUtils
 
     /**
      * Get the ISO 8601 week number for a given date.
-     * 
+     *
      * ISO 8601 defines that:
      * - Week 1 is the first week of the year that contains at least 4 days of January
      * - Monday is the first day of the week
@@ -174,20 +174,20 @@ final class DateValidationUtils
 
         // Create January 4th of the given year - this is always in week 1
         $jan4 = new DateTimeImmutable("{$year}-01-04");
-        
+
         // Find the Monday of week 1 (may be in previous year)
         $jan4DayOfWeek = (int) $jan4->format('N'); // 1=Monday, 7=Sunday
-        $mondayOfWeek1 = $jan4->modify('-' . ($jan4DayOfWeek - 1) . ' days');
+        $mondayOfWeek1 = $jan4->modify('-'.($jan4DayOfWeek - 1).' days');
 
         // Calculate the Monday of the requested week
         $weeksToAdd = $weekNumber - 1;
-        
+
         return $mondayOfWeek1->modify("+{$weeksToAdd} weeks");
     }
 
     /**
      * Check if a given year has 53 weeks according to ISO 8601.
-     * 
+     *
      * A year has 53 weeks if:
      * - It's a leap year and January 1st is a Wednesday, OR
      * - January 1st is a Thursday (leap or non-leap year)

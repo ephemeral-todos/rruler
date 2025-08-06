@@ -130,7 +130,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         $expected = [
             '2025-03-29', // Week 13 of 2025 (next occurrence after start) - Saturday
             '2025-06-28', // Week 26 of 2025 - Saturday
-            '2025-09-27', // Week 39 of 2025 - Saturday  
+            '2025-09-27', // Week 39 of 2025 - Saturday
             '2026-01-03', // Week 1 of 2026 - Saturday
             '2026-03-28', // Week 13 of 2026 - Saturday
             '2026-06-27', // Week 26 of 2026 - Saturday
@@ -191,7 +191,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         // Test that invalid week values are properly handled during parsing
         $this->expectException(\EphemeralTodos\Rruler\Exception\ValidationException::class);
         $this->expectExceptionMessage('Week number cannot be zero');
-        
+
         $this->testRruler->parse('FREQ=YEARLY;BYWEEKNO=0');
     }
 
