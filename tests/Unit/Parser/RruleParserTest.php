@@ -9,6 +9,7 @@ use EphemeralTodos\Rruler\Exception\ParseException;
 use EphemeralTodos\Rruler\Exception\ValidationException;
 use EphemeralTodos\Rruler\Parser\Ast\ByMonthDayNode;
 use EphemeralTodos\Rruler\Parser\Ast\ByMonthNode;
+use EphemeralTodos\Rruler\Parser\Ast\ByWeekNoNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
@@ -97,6 +98,16 @@ final class RruleParserTest extends TestCase
         $this->assertEquals([3, 6, 9, 12], $ast->getNode('BYMONTH')->getValue());
     }
 
+    public function testParseByWeekNoParameter(): void
+    {
+        $parser = new RruleParser();
+        $ast = $parser->parse('FREQ=YEARLY;BYWEEKNO=13,26,39,52');
+
+        $this->assertTrue($ast->hasNode('BYWEEKNO'));
+        $this->assertInstanceOf(ByWeekNoNode::class, $ast->getNode('BYWEEKNO'));
+        $this->assertEquals([13, 26, 39, 52], $ast->getNode('BYWEEKNO')->getValue());
+    }
+
     public function testGetNonExistentNodeThrowsException(): void
     {
         $parser = new RruleParser();
@@ -170,6 +181,22 @@ final class RruleParserTest extends TestCase
             'bymonth with spaces' => [
                 ['FREQ' => 'YEARLY', 'BYMONTH' => [1, 6, 12]],
                 'FREQ=YEARLY;BYMONTH=1, 6, 12',
+            ],
+            'yearly with byweekno single value' => [
+                ['FREQ' => 'YEARLY', 'BYWEEKNO' => [26]],
+                'FREQ=YEARLY;BYWEEKNO=26',
+            ],
+            'yearly with byweekno multiple values' => [
+                ['FREQ' => 'YEARLY', 'BYWEEKNO' => [13, 26, 39, 52]],
+                'FREQ=YEARLY;BYWEEKNO=13,26,39,52',
+            ],
+            'yearly with byweekno quarterly pattern' => [
+                ['FREQ' => 'YEARLY', 'BYWEEKNO' => [1, 13, 26, 39, 52]],
+                'FREQ=YEARLY;BYWEEKNO=1,13,26,39,52',
+            ],
+            'byweekno with spaces' => [
+                ['FREQ' => 'YEARLY', 'BYWEEKNO' => [1, 26, 53]],
+                'FREQ=YEARLY;BYWEEKNO=1, 26, 53',
             ],
         ];
     }
@@ -276,6 +303,31 @@ final class RruleParserTest extends TestCase
                 ValidationException::class,
                 'BYMONTH cannot contain empty month specifications',
                 'FREQ=YEARLY;BYMONTH=1,,6',
+            ],
+            'invalid byweekno zero' => [
+                ValidationException::class,
+                'Week number cannot be zero',
+                'FREQ=YEARLY;BYWEEKNO=0',
+            ],
+            'invalid byweekno out of range positive' => [
+                ValidationException::class,
+                'Week number must be between 1-53, got: 54',
+                'FREQ=YEARLY;BYWEEKNO=54',
+            ],
+            'invalid byweekno out of range negative' => [
+                ValidationException::class,
+                'Week number must be between 1-53, got: -1',
+                'FREQ=YEARLY;BYWEEKNO=-1',
+            ],
+            'invalid byweekno format' => [
+                ValidationException::class,
+                'Invalid week number format: abc',
+                'FREQ=YEARLY;BYWEEKNO=abc',
+            ],
+            'invalid byweekno empty component' => [
+                ValidationException::class,
+                'BYWEEKNO cannot contain empty week specifications',
+                'FREQ=YEARLY;BYWEEKNO=1,,26',
             ],
         ];
     }

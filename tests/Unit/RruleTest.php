@@ -129,6 +129,7 @@ final class RruleTest extends TestCase
             'byDay' => null,
             'byMonthDay' => null,
             'byMonth' => null,
+            'byWeekNo' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -170,6 +171,7 @@ final class RruleTest extends TestCase
             'byDay' => null,
             'byMonthDay' => [10, 20, -5],
             'byMonth' => null,
+            'byWeekNo' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -200,6 +202,40 @@ final class RruleTest extends TestCase
             'byDay' => null,
             'byMonthDay' => null,
             'byMonth' => [1, 6, 12],
+            'byWeekNo' => null,
+        ];
+
+        $this->assertEquals($expectedArray, $array);
+    }
+
+    public function testByWeekNoAccessors(): void
+    {
+        $rruleWithByWeekNo = $this->testRruler->parse('FREQ=YEARLY;BYWEEKNO=13,26,39,52');
+        $rruleWithoutByWeekNo = $this->testRruler->parse('FREQ=YEARLY');
+
+        // Test getter method
+        $this->assertEquals([13, 26, 39, 52], $rruleWithByWeekNo->getByWeekNo());
+        $this->assertNull($rruleWithoutByWeekNo->getByWeekNo());
+
+        // Test has method
+        $this->assertTrue($rruleWithByWeekNo->hasByWeekNo());
+        $this->assertFalse($rruleWithoutByWeekNo->hasByWeekNo());
+    }
+
+    public function testByWeekNoToArrayRepresentation(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=YEARLY;BYWEEKNO=1,26,53');
+        $array = $rrule->toArray();
+
+        $expectedArray = [
+            'freq' => 'YEARLY',
+            'interval' => 1,
+            'count' => null,
+            'until' => null,
+            'byDay' => null,
+            'byMonthDay' => null,
+            'byMonth' => null,
+            'byWeekNo' => [1, 26, 53],
         ];
 
         $this->assertEquals($expectedArray, $array);

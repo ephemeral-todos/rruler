@@ -13,6 +13,7 @@ final readonly class Rrule implements Stringable
      * @param array<array{position: int|null, weekday: string}>|null $byDay
      * @param array<int>|null $byMonthDay
      * @param array<int>|null $byMonth
+     * @param array<int>|null $byWeekNo
      */
     public function __construct(
         private string $frequency,
@@ -22,6 +23,7 @@ final readonly class Rrule implements Stringable
         private ?array $byDay = null,
         private ?array $byMonthDay = null,
         private ?array $byMonth = null,
+        private ?array $byWeekNo = null,
     ) {
     }
 
@@ -95,7 +97,20 @@ final readonly class Rrule implements Stringable
     }
 
     /**
-     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null, byMonthDay: array<int>|null, byMonth: array<int>|null}
+     * @return array<int>|null
+     */
+    public function getByWeekNo(): ?array
+    {
+        return $this->byWeekNo;
+    }
+
+    public function hasByWeekNo(): bool
+    {
+        return $this->byWeekNo !== null;
+    }
+
+    /**
+     * @return array{freq: string, interval: int, count: int|null, until: DateTimeImmutable|null, byDay: array<array{position: int|null, weekday: string}>|null, byMonthDay: array<int>|null, byMonth: array<int>|null, byWeekNo: array<int>|null}
      */
     public function toArray(): array
     {
@@ -107,6 +122,7 @@ final readonly class Rrule implements Stringable
             'byDay' => $this->byDay,
             'byMonthDay' => $this->byMonthDay,
             'byMonth' => $this->byMonth,
+            'byWeekNo' => $this->byWeekNo,
         ];
     }
 
@@ -143,6 +159,10 @@ final readonly class Rrule implements Stringable
 
         if ($this->byMonth !== null) {
             $parts[] = 'BYMONTH='.implode(',', $this->byMonth);
+        }
+
+        if ($this->byWeekNo !== null) {
+            $parts[] = 'BYWEEKNO='.implode(',', $this->byWeekNo);
         }
 
         return implode(';', $parts);

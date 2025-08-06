@@ -17,8 +17,8 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         DateTimeImmutable $start,
         ?int $limit = null,
     ): Generator {
-        // For BYDAY, BYMONTHDAY, or BYMONTH rules, find the first valid occurrence from start date
-        $current = ($rrule->hasByDay() || $rrule->hasByMonthDay() || $rrule->hasByMonth()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
+        // For BYDAY, BYMONTHDAY, BYMONTH, or BYWEEKNO rules, find the first valid occurrence from start date
+        $current = ($rrule->hasByDay() || $rrule->hasByMonthDay() || $rrule->hasByMonth() || $rrule->hasByWeekNo()) ? $this->findFirstValidOccurrence($rrule, $start) : $start;
         $count = 0;
         $maxCount = $limit ?? $rrule->getCount();
 
@@ -76,6 +76,10 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         if ($rrule->hasByMonth()) {
             return $this->getNextOccurrenceWithByMonth($rrule, $current);
+        }
+
+        if ($rrule->hasByWeekNo()) {
+            return $this->getNextOccurrenceWithByWeekNo($rrule, $current);
         }
 
         $interval = $rrule->getInterval();
@@ -403,6 +407,26 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             return match ($frequency) {
                 'YEARLY' => $this->findNextYearlyByMonth($start, $byMonth),
                 default => throw new \InvalidArgumentException("BYMONTH is not supported for frequency: {$frequency}"),
+            };
+        }
+
+        // Handle BYWEEKNO rules
+        if ($rrule->hasByWeekNo()) {
+            $byWeekNo = $rrule->getByWeekNo();
+
+            if ($byWeekNo === null) {
+                throw new \LogicException('BYWEEKNO data is null when hasByWeekNo() returned true');
+            }
+
+            // Check if start date itself is valid
+            if ($this->dateMatchesByWeekNo($start, $byWeekNo)) {
+                return $start;
+            }
+
+            // Find the first valid date after start
+            return match ($frequency) {
+                'YEARLY' => $this->findNextYearlyByWeekNo($start, $byWeekNo),
+                default => throw new \InvalidArgumentException("BYWEEKNO is not supported for frequency: {$frequency}"),
             };
         }
 
@@ -768,5 +792,105 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $firstMonth = $byMonth[0]; // Use first month from BYMONTH list
 
         return $start->setDate($nextYear, $firstMonth, $currentDay);
+    }
+
+    private function getNextOccurrenceWithByWeekNo(Rrule $rrule, DateTimeImmutable $current): DateTimeImmutable
+    {
+        $frequency = $rrule->getFrequency();
+        $interval = $rrule->getInterval();
+        $byWeekNo = $rrule->getByWeekNo();
+
+        if ($byWeekNo === null) {
+            throw new \LogicException('BYWEEKNO data is null when hasByWeekNo() returned true');
+        }
+
+        return match ($frequency) {
+            'YEARLY' => $this->getNextYearlyByWeekNo($current, $byWeekNo, $interval),
+            default => throw new \InvalidArgumentException("BYWEEKNO is not supported for frequency: {$frequency}"),
+        };
+    }
+
+    /**
+     * @param array<int> $byWeekNo
+     */
+    private function getNextYearlyByWeekNo(DateTimeImmutable $current, array $byWeekNo, int $interval): DateTimeImmutable
+    {
+        $currentYear = (int) $current->format('Y');
+        $currentWeek = DateValidationUtils::getIsoWeekNumber($current);
+        $currentDayOfWeek = (int) $current->format('N'); // 1=Monday, 7=Sunday
+
+        // Sort week numbers to find next valid week
+        $sortedWeeks = $byWeekNo;
+        sort($sortedWeeks);
+
+        // Look for a valid week after the current week in the same year
+        foreach ($sortedWeeks as $week) {
+            if ($week > $currentWeek) {
+                // Found a valid week later in the year
+                $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
+                // Preserve the day of week from current date
+                return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+            }
+        }
+
+        // No valid weeks remaining in this year, move to next interval year
+        $nextYear = $currentYear + $interval;
+        $firstWeek = $sortedWeeks[0]; // Use first week from sorted BYWEEKNO list
+
+        // Handle leap weeks - if week 53 doesn't exist in target year, find next year that has it
+        while ($firstWeek === 53 && !DateValidationUtils::yearHasWeek53($nextYear)) {
+            $nextYear += $interval;
+        }
+
+        $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($nextYear, $firstWeek);
+        // Preserve the day of week from current date
+        return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+    }
+
+    /**
+     * @param array<int> $byWeekNo
+     */
+    private function dateMatchesByWeekNo(DateTimeImmutable $date, array $byWeekNo): bool
+    {
+        $weekNumber = DateValidationUtils::getIsoWeekNumber($date);
+
+        return in_array($weekNumber, $byWeekNo, true);
+    }
+
+    /**
+     * @param array<int> $byWeekNo
+     */
+    private function findNextYearlyByWeekNo(DateTimeImmutable $start, array $byWeekNo): DateTimeImmutable
+    {
+        $currentYear = (int) $start->format('Y');
+        $currentWeek = DateValidationUtils::getIsoWeekNumber($start);
+        $currentDayOfWeek = (int) $start->format('N');
+
+        // Sort week numbers to find next valid week
+        $sortedWeeks = $byWeekNo;
+        sort($sortedWeeks);
+
+        // Look for a valid week after the current week in the same year
+        foreach ($sortedWeeks as $week) {
+            if ($week > $currentWeek) {
+                // Found a valid week later in the year
+                $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
+                // Preserve the day of week from start date
+                return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
+            }
+        }
+
+        // No valid weeks remaining in this year, move to next year
+        $nextYear = $currentYear + 1;
+        $firstWeek = $sortedWeeks[0]; // Use first week from BYWEEKNO list
+
+        // Handle leap weeks - if week 53 doesn't exist in target year, find next year that has it
+        while ($firstWeek === 53 && !DateValidationUtils::yearHasWeek53($nextYear)) {
+            $nextYear += 1;
+        }
+
+        $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($nextYear, $firstWeek);
+        // Preserve the day of week from start date
+        return $mondayOfWeek->modify('+' . ($currentDayOfWeek - 1) . ' days');
     }
 }

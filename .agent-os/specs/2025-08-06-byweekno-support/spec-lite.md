@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Implement BYWEEKNO parameter support for yearly RRULE patterns to enable ISO week number selection in recurring events like quarterly business meetings (BYWEEKNO=13,26,39,52). The feature includes AST parsing, validation of week values 1-53, ISO 8601 week number calculations, Rrule integration, and occurrence generation logic for yearly patterns while maintaining RFC 5545 compliance.

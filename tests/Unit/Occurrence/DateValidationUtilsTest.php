@@ -170,4 +170,122 @@ final class DateValidationUtilsTest extends TestCase
             [false, [15, -15], new DateTimeImmutable('2023-01-16')],
         ];
     }
+
+    #[DataProvider('provideIsoWeekNumberData')]
+    public function testGetIsoWeekNumber(int $expected, string $dateString): void
+    {
+        $date = new DateTimeImmutable($dateString);
+        $result = DateValidationUtils::getIsoWeekNumber($date);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    #[DataProvider('provideFirstDateOfWeekData')]
+    public function testGetFirstDateOfWeek(string $expectedDateString, int $year, int $weekNumber): void
+    {
+        $result = DateValidationUtils::getFirstDateOfWeek($year, $weekNumber);
+        $expected = new DateTimeImmutable($expectedDateString);
+
+        $this->assertEquals($expected->format('Y-m-d'), $result->format('Y-m-d'));
+    }
+
+    #[DataProvider('provideYearHasWeek53Data')]
+    public function testYearHasWeek53(bool $expected, int $year): void
+    {
+        $result = DateValidationUtils::yearHasWeek53($year);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public static function provideIsoWeekNumberData(): array
+    {
+        return [
+            // Week 1 scenarios - week containing January 4th
+            [1, '2023-01-02'], // Monday of week 1
+            [1, '2023-01-03'], // Tuesday of week 1
+            [1, '2023-01-04'], // Wednesday of week 1 (Jan 4th)
+            [1, '2023-01-05'], // Thursday of week 1
+            [1, '2023-01-08'], // Sunday of week 1
+
+            // Week 2
+            [2, '2023-01-09'], // Monday of week 2
+            [2, '2023-01-15'], // Sunday of week 2
+
+            // Mid-year weeks
+            [26, '2023-06-26'], // Monday of week 26
+            [26, '2023-07-02'], // Sunday of week 26
+            [52, '2023-12-25'], // Monday of week 52
+            [52, '2023-12-31'], // Sunday of week 52 (last day of 2023)
+
+            // Year boundary edge cases
+            [52, '2022-12-26'], // Monday of week 52, 2022
+            [52, '2022-12-27'], // Tuesday of week 52, 2022
+            [52, '2023-01-01'], // Sunday of week 52, 2022 (belongs to 2022!)
+
+            // Leap week scenarios (years with 53 weeks)
+            [53, '2020-12-28'], // Monday of week 53 in 2020
+            [53, '2020-12-29'], // Tuesday of week 53 in 2020
+            [53, '2020-12-30'], // Wednesday of week 53 in 2020
+            [53, '2020-12-31'], // Thursday of week 53 in 2020
+            [53, '2021-01-01'], // Friday belongs to week 53 of 2020
+            [53, '2021-01-03'], // Sunday of week 53 in 2020
+
+            // More edge cases
+            [1, '2024-01-01'], // Monday, Jan 1st is week 1
+            [2, '2025-01-06'], // Monday of week 2 (week 1 started Dec 30, 2024)
+            [2, '2026-01-05'], // Monday of week 2 (week 1 started Dec 29, 2025)
+
+            // Historical known values
+            [1, '2018-01-01'], // Monday, Jan 1st 2018
+            [1, '2018-01-07'], // Sunday, end of week 1 2018
+            [2, '2018-01-08'], // Monday, start of week 2 2018
+        ];
+    }
+
+    public static function provideFirstDateOfWeekData(): array
+    {
+        return [
+            // Week 1 scenarios
+            ['2023-01-02', 2023, 1], // Monday of week 1, 2023
+            ['2024-01-01', 2024, 1], // Monday of week 1, 2024 (Jan 1st is Monday)
+            ['2024-12-30', 2025, 1], // Monday of week 1, 2025 (starts in Dec 2024)
+
+            // Mid-year weeks
+            ['2023-06-26', 2023, 26], // Monday of week 26, 2023
+            ['2023-12-25', 2023, 52], // Monday of week 52, 2023
+
+            // Leap weeks (week 53)
+            ['2020-12-28', 2020, 53], // Monday of week 53, 2020
+            ['2026-12-28', 2026, 53], // Monday of week 53, 2026
+
+            // Edge cases where week 1 starts in previous year
+            ['2024-12-30', 2025, 1], // Week 1 of 2025 starts in 2024
+        ];
+    }
+
+    public static function provideYearHasWeek53Data(): array
+    {
+        return [
+            // Years with 53 weeks (long years)
+            [true, 2020],  // Leap year, Jan 1st is Wednesday
+            [true, 2026],  // Regular year, Jan 1st is Thursday
+            [true, 2032],  // Leap year, Jan 1st is Thursday
+            [true, 2037],  // Regular year, Jan 1st is Thursday
+            [true, 2043],  // Regular year, Jan 1st is Thursday
+
+            // Years with 52 weeks
+            [false, 2021], // Regular year, Jan 1st is Friday
+            [false, 2022], // Regular year, Jan 1st is Saturday
+            [false, 2023], // Regular year, Jan 1st is Sunday
+            [false, 2024], // Leap year, Jan 1st is Monday
+            [false, 2025], // Regular year, Jan 1st is Wednesday
+
+            // Historical test cases
+            [true, 2004],  // Leap year with 53 weeks
+            [true, 2009],  // Regular year with 53 weeks
+            [true, 2015],  // Regular year with 53 weeks
+            [false, 2018], // Regular year with 52 weeks
+            [false, 2019], // Regular year with 52 weeks
+        ];
+    }
 }
