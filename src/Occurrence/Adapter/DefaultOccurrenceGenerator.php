@@ -815,7 +815,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
      */
     private function getNextYearlyByWeekNo(DateTimeImmutable $current, array $byWeekNo, int $interval): DateTimeImmutable
     {
-        $currentYear = (int) $current->format('Y');
+        $currentYear = (int) $current->format('o'); // Use ISO week year, not calendar year
         $currentWeek = DateValidationUtils::getIsoWeekNumber($current);
         $currentDayOfWeek = (int) $current->format('N'); // 1=Monday, 7=Sunday
 
@@ -826,6 +826,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         // Look for a valid week after the current week in the same year
         foreach ($sortedWeeks as $week) {
             if ($week > $currentWeek) {
+                // Check if this week exists in the current year (important for week 53)
+                if ($week === 53 && !DateValidationUtils::yearHasWeek53($currentYear)) {
+                    continue; // Skip week 53 if it doesn't exist in current year
+                }
+                
                 // Found a valid week later in the year
                 $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
                 // Preserve the day of week from current date
@@ -862,7 +867,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
      */
     private function findNextYearlyByWeekNo(DateTimeImmutable $start, array $byWeekNo): DateTimeImmutable
     {
-        $currentYear = (int) $start->format('Y');
+        $currentYear = (int) $start->format('o'); // Use ISO week year, not calendar year
         $currentWeek = DateValidationUtils::getIsoWeekNumber($start);
         $currentDayOfWeek = (int) $start->format('N');
 
@@ -873,6 +878,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         // Look for a valid week after the current week in the same year
         foreach ($sortedWeeks as $week) {
             if ($week > $currentWeek) {
+                // Check if this week exists in the current year (important for week 53)
+                if ($week === 53 && !DateValidationUtils::yearHasWeek53($currentYear)) {
+                    continue; // Skip week 53 if it doesn't exist in current year
+                }
+                
                 // Found a valid week later in the year
                 $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
                 // Preserve the day of week from start date

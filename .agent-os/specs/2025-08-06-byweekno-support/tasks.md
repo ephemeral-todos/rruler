@@ -39,13 +39,13 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
   - [x] 4.6 Update toString() method to include BYWEEKNO parameter
   - [x] 4.7 Verify all Rrule integration tests pass
 
-- [ ] 5. Implement Occurrence Generation for BYWEEKNO
-  - [ ] 5.1 Write tests for BYWEEKNO occurrence filtering in yearly patterns
-  - [ ] 5.2 Add BYWEEKNO filtering logic to DefaultOccurrenceGenerator
-  - [ ] 5.3 Implement week filtering for yearly frequency patterns
-  - [ ] 5.4 Handle year boundaries and leap week scenarios
-  - [ ] 5.5 Ensure integration with existing BYMONTHDAY, BYDAY, and BYMONTH logic
-  - [ ] 5.6 Verify all occurrence generation tests pass
+- [x] 5. Implement Occurrence Generation for BYWEEKNO
+  - [x] 5.1 Write tests for BYWEEKNO occurrence filtering in yearly patterns
+  - [x] 5.2 Add BYWEEKNO filtering logic to DefaultOccurrenceGenerator
+  - [x] 5.3 Implement week filtering for yearly frequency patterns
+  - [x] 5.4 Handle year boundaries and leap week scenarios
+  - [x] 5.5 Ensure integration with existing BYMONTHDAY, BYDAY, and BYMONTH logic
+  - [x] 5.6 Verify all occurrence generation tests pass
 
 - [ ] 6. Integration Testing and Validation
   - [ ] 6.1 Write comprehensive integration tests for BYWEEKNO scenarios
