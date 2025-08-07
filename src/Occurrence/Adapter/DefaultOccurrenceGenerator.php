@@ -295,7 +295,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         // Find the next valid month that has the target day
         while (true) {
-            $daysInTargetMonth = (int) date('t', mktime(0, 0, 0, $targetMonth, 1, $targetYear));
+            $timestamp = mktime(0, 0, 0, $targetMonth, 1, $targetYear);
+            if ($timestamp === false) {
+                throw new \RuntimeException("Invalid date parameters: month={$targetMonth}, year={$targetYear}");
+            }
+            $daysInTargetMonth = (int) date('t', $timestamp);
 
             if ($day <= $daysInTargetMonth) {
                 // This month has the target day, create the date
@@ -349,7 +353,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         }
 
         // For other dates, check if the day exists in the month
-        $daysInMonth = (int) date('t', mktime(0, 0, 0, $month, 1, $year));
+        $timestamp = mktime(0, 0, 0, $month, 1, $year);
+        if ($timestamp === false) {
+            return false; // Invalid date parameters means the date doesn't exist
+        }
+        $daysInMonth = (int) date('t', $timestamp);
 
         return $day <= $daysInMonth;
     }
