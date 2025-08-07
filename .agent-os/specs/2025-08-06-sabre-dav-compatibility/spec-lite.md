@@ -1,0 +1,3 @@
+# sabre/dav Compatibility Testing - Lite Summary
+
+Implement comprehensive compatibility testing against the sabre/dav library to validate RFC 5545 compliance and ensure interoperability with the industry-standard WebDAV/CalDAV implementation. This testing framework will provide confidence that Rruler produces identical RRULE parsing and occurrence generation results as sabre/dav for all supported parameters including FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH, BYWEEKNO, and BYSETPOS.
