@@ -1,0 +1,3 @@
+# iCalendar Context Parsing - Lite Summary
+
+Implement comprehensive iCalendar (RFC 5545) context parsing to extract RRULE patterns from VEVENT and VTODO components, enabling real-world calendar integration and testing against established CalDAV/iCalendar data sources. This feature allows developers to parse complete iCalendar data and extract recurrence rules with essential context like DTSTART for proper occurrence calculation, while providing compatibility validation against sabre/dav for RFC 5545 compliance assurance.
