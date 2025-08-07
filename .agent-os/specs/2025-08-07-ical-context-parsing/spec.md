@@ -2,7 +2,7 @@
 
 > Spec: iCalendar Context Parsing
 > Created: 2025-08-07
-> Status: Planning
+> Status: Complete
 
 ## Overview
 
