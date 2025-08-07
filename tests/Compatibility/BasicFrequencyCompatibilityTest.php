@@ -8,7 +8,7 @@ use DateTimeImmutable;
 
 /**
  * Basic frequency pattern compatibility tests between Rruler and sabre/vobject.
- * 
+ *
  * Tests FREQ parameters (DAILY, WEEKLY, MONTHLY, YEARLY) with various INTERVAL
  * values and termination conditions (COUNT, UNTIL).
  */
@@ -20,7 +20,7 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     public function testBasicFrequencyPatterns(array $pattern): void
     {
         $start = new DateTimeImmutable($pattern['start']);
-        
+
         $this->assertRruleCompatibility(
             $pattern['rrule'],
             $start,
@@ -35,11 +35,11 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     public function testCountTermination(array $pattern): void
     {
         $start = new DateTimeImmutable($pattern['start']);
-        
+
         // For count patterns, use the count from the RRULE itself
         preg_match('/COUNT=(\d+)/', $pattern['rrule'], $matches);
         $count = isset($matches[1]) ? (int) $matches[1] : 10;
-        
+
         $this->assertRruleCompatibility(
             $pattern['rrule'],
             $start,
@@ -54,7 +54,7 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     public function testUntilTermination(array $pattern): void
     {
         $start = new DateTimeImmutable($pattern['start']);
-        
+
         $this->assertRruleCompatibility(
             $pattern['rrule'],
             $start,
@@ -109,11 +109,11 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
         foreach ($startDates as $startDate) {
             foreach ($rrules as $rrule) {
                 $start = new DateTimeImmutable($startDate);
-                
+
                 // Extract the count from the RRULE to use as limit
                 preg_match('/COUNT=(\d+)/', $rrule, $matches);
                 $count = isset($matches[1]) ? (int) $matches[1] : 10;
-                
+
                 $this->assertRruleCompatibility(
                     $rrule,
                     $start,
@@ -131,10 +131,10 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     {
         // Start on Feb 29th, 2024 (leap year)
         $start = new DateTimeImmutable('2024-02-29 10:00:00');
-        
+
         $patterns = [
             ['FREQ=DAILY;COUNT=5', 'Daily from leap day'],
-            ['FREQ=WEEKLY;COUNT=8', 'Weekly from leap day'], 
+            ['FREQ=WEEKLY;COUNT=8', 'Weekly from leap day'],
             ['FREQ=MONTHLY;COUNT=6', 'Monthly from leap day'],
             ['FREQ=YEARLY;COUNT=4', 'Yearly from leap day'],
         ];
@@ -143,7 +143,7 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
             // Extract the count from the RRULE to use as limit
             preg_match('/COUNT=(\d+)/', $rrule, $matches);
             $count = isset($matches[1]) ? (int) $matches[1] : 10;
-            
+
             $this->assertRruleCompatibility($rrule, $start, $count, $description);
         }
     }
@@ -151,7 +151,7 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     public static function basicFrequencyPatternProvider(): array
     {
         return array_map(
-            fn(array $pattern) => [$pattern],
+            fn (array $pattern) => [$pattern],
             RrulePatternGenerator::generateBasicFrequencyPatterns()
         );
     }
@@ -159,7 +159,7 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     public static function countPatternProvider(): array
     {
         return array_map(
-            fn(array $pattern) => [$pattern],
+            fn (array $pattern) => [$pattern],
             RrulePatternGenerator::generateCountPatterns()
         );
     }
@@ -167,7 +167,7 @@ final class BasicFrequencyCompatibilityTest extends CompatibilityTestCase
     public static function untilPatternProvider(): array
     {
         return array_map(
-            fn(array $pattern) => [$pattern],
+            fn (array $pattern) => [$pattern],
             RrulePatternGenerator::generateUntilPatterns()
         );
     }

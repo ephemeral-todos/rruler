@@ -252,7 +252,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         // Extract time components from the original occurrence
         $timeFormat = $timeSource->format('H:i:s');
-        
+
         $candidate = $weekStart;
         for ($i = 0; $i < 7; ++$i) {
             $weekday = $this->getWeekdayFromDate($candidate);
@@ -273,7 +273,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
     /**
      * Get next monthly occurrence handling date boundary issues properly.
-     * 
+     *
      * This method implements RFC 5545 compliant monthly recurrence by skipping months
      * where the target day doesn't exist (e.g., Feb 31st) and going to the next valid month.
      */
@@ -282,38 +282,38 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $day = (int) $current->format('d');
         $currentMonth = (int) $current->format('m');
         $currentYear = (int) $current->format('Y');
-        
+
         // Start searching from the next interval month
         $targetYear = $currentYear;
         $targetMonth = $currentMonth + $interval;
-        
+
         // Handle year rollover
         while ($targetMonth > 12) {
             $targetMonth -= 12;
-            $targetYear++;
+            ++$targetYear;
         }
-        
+
         // Find the next valid month that has the target day
         while (true) {
             $daysInTargetMonth = (int) date('t', mktime(0, 0, 0, $targetMonth, 1, $targetYear));
-            
+
             if ($day <= $daysInTargetMonth) {
                 // This month has the target day, create the date
                 return $current->setDate($targetYear, $targetMonth, $day);
             }
-            
+
             // This month doesn't have the target day, move to next month
-            $targetMonth++;
+            ++$targetMonth;
             if ($targetMonth > 12) {
                 $targetMonth = 1;
-                $targetYear++;
+                ++$targetYear;
             }
         }
     }
 
     /**
      * Get next yearly occurrence handling date boundary issues properly.
-     * 
+     *
      * This method implements RFC 5545 compliant yearly recurrence by skipping years
      * where the target date doesn't exist (e.g., Feb 29th in non-leap years).
      */
@@ -322,19 +322,19 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $day = (int) $current->format('d');
         $month = (int) $current->format('m');
         $currentYear = (int) $current->format('Y');
-        
+
         // Start searching from the next interval year
         $targetYear = $currentYear + $interval;
-        
+
         // Find the next valid year that has the target date
         while (true) {
             // Check if the target date exists in this year
             if ($this->dateExistsInYear($targetYear, $month, $day)) {
                 return $current->setDate($targetYear, $month, $day);
             }
-            
+
             // This year doesn't have the target date, move to next year
-            $targetYear++;
+            ++$targetYear;
         }
     }
 
@@ -347,9 +347,10 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         if ($month === 2 && $day === 29) {
             return $this->isLeapYear($year);
         }
-        
+
         // For other dates, check if the day exists in the month
         $daysInMonth = (int) date('t', mktime(0, 0, 0, $month, 1, $year));
+
         return $day <= $daysInMonth;
     }
 
