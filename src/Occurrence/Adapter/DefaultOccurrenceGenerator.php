@@ -10,6 +10,90 @@ use EphemeralTodos\Rruler\Occurrence\OccurrenceGenerator;
 use EphemeralTodos\Rruler\Rrule;
 use Generator;
 
+/**
+ * Default implementation of the OccurrenceGenerator interface.
+ *
+ * The DefaultOccurrenceGenerator provides a comprehensive, RFC 5545 compliant
+ * implementation for generating occurrence dates from recurrence rules. It handles
+ * all frequency types (DAILY, WEEKLY, MONTHLY, YEARLY) and advanced parameters
+ * including BYDAY, BYMONTHDAY, BYMONTH, BYWEEKNO, and BYSETPOS.
+ *
+ * Key features:
+ * - Full RFC 5545 compliance with strict validation
+ * - Memory-efficient generator-based iteration
+ * - Support for complex patterns with multiple BY* constraints
+ * - Advanced BYSETPOS handling with two-phase expansion
+ * - Proper handling of edge cases (leap years, month boundaries, etc.)
+ * - Optimized performance for large occurrence sets
+ * - Comprehensive date validation and boundary handling
+ *
+ * Algorithm overview:
+ * 1. Parse and validate the RRULE parameters
+ * 2. Find the first valid occurrence from the start date
+ * 3. Generate subsequent occurrences using frequency-specific logic
+ * 4. Apply BY* rule filtering and position selection
+ * 5. Respect COUNT/UNTIL termination conditions
+ * 6. Handle special cases (BYSETPOS, leap years, etc.)
+ *
+ * BYSETPOS implementation:
+ * The generator uses a sophisticated two-phase approach for BYSETPOS:
+ * - Phase 1: Expand all potential occurrences within each period
+ * - Phase 2: Select specific positions using BYSETPOS values
+ * This ensures accurate compliance with RFC 5545 BYSETPOS semantics.
+ *
+ * Performance considerations:
+ * - Uses generators to avoid loading all occurrences into memory
+ * - Implements intelligent first-occurrence finding to skip empty periods
+ * - Includes safety mechanisms to prevent infinite loops
+ * - Optimized date arithmetic for boundary conditions
+ *
+ * @example Basic usage
+ * ```php
+ * $generator = new DefaultOccurrenceGenerator();
+ * $rrule = $rruler->parse('FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=10');
+ * $start = new DateTimeImmutable('2024-01-01 09:00:00');
+ *
+ * foreach ($generator->generateOccurrences($rrule, $start) as $occurrence) {
+ *     echo $occurrence->format('Y-m-d l H:i:s') . "\n";
+ * }
+ * ```
+ * @example Complex BYSETPOS pattern
+ * ```php
+ * // Last Friday of each month for 6 months
+ * $rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=FR;BYSETPOS=-1;COUNT=6');
+ *
+ * foreach ($generator->generateOccurrences($rrule, $start) as $occurrence) {
+ *     echo "Last Friday: " . $occurrence->format('Y-m-d') . "\n";
+ * }
+ * ```
+ * @example Date range filtering
+ * ```php
+ * $rangeStart = new DateTimeImmutable('2024-06-01');
+ * $rangeEnd = new DateTimeImmutable('2024-08-31');
+ *
+ * foreach ($generator->generateOccurrencesInRange($rrule, $start, $rangeStart, $rangeEnd) as $occurrence) {
+ *     echo "Summer occurrence: " . $occurrence->format('Y-m-d') . "\n";
+ * }
+ * ```
+ * @example Edge case handling
+ * ```php
+ * // Monthly recurrence on 31st - automatically handles months without day 31
+ * $rrule = $rruler->parse('FREQ=MONTHLY;BYMONTHDAY=31');
+ * $start = new DateTimeImmutable('2024-01-31');
+ *
+ * // Will generate: Jan 31, Mar 31, May 31, Jul 31, Aug 31, Oct 31, Dec 31
+ * // (Skips Feb, Apr, Jun, Sep, Nov which don't have day 31)
+ * ```
+ *
+ * @see OccurrenceGenerator For the interface contract
+ * @see Rrule For recurrence rule structure
+ * @see DateValidationUtils For date validation utilities
+ * @see https://tools.ietf.org/html/rfc5545#section-3.3.10 RFC 5545 RRULE specification
+ *
+ * @author EphemeralTodos
+ *
+ * @since 1.0.0
+ */
 final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 {
     /**

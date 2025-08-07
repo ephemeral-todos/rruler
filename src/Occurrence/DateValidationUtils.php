@@ -6,6 +6,77 @@ namespace EphemeralTodos\Rruler\Occurrence;
 
 use DateTimeImmutable;
 
+/**
+ * Utility class for date validation and calendar calculations used in RRULE processing.
+ *
+ * The DateValidationUtils provides a comprehensive set of static utility methods
+ * for date validation, calendar calculations, and RFC 5545 compliant date handling.
+ * These utilities support the complex date arithmetic required for RRULE occurrence
+ * generation, including leap year handling, negative day resolution, and ISO week
+ * calculations.
+ *
+ * Key features:
+ * - Leap year detection and month length calculations
+ * - Negative day resolution (e.g., -1 = last day of month)
+ * - ISO 8601 week number calculations
+ * - BYMONTHDAY validation and filtering
+ * - Edge case handling for boundary dates
+ * - Support for all RFC 5545 date scenarios
+ *
+ * This class is designed to handle the complex date validation requirements
+ * of RFC 5545 recurrence rules, including:
+ * - Months with varying lengths (28, 29, 30, 31 days)
+ * - Leap year calculations following Gregorian calendar rules
+ * - Week numbering according to ISO 8601 standard
+ * - Negative position calculations for end-of-period references
+ * - Date boundary validation for occurrence generation
+ *
+ * @example Basic month length calculation
+ * ```php
+ * $days = DateValidationUtils::getDaysInMonth(2024, 2); // 29 (leap year)
+ * $days = DateValidationUtils::getDaysInMonth(2023, 2); // 28 (non-leap year)
+ * $days = DateValidationUtils::getDaysInMonth(2024, 4); // 30
+ * ```
+ * @example Negative day resolution
+ * ```php
+ * // Last day of January 2024
+ * $day = DateValidationUtils::resolveNegativeDayToPositive(-1, 2024, 1); // 31
+ *
+ * // Second-to-last day of February 2024 (leap year)
+ * $day = DateValidationUtils::resolveNegativeDayToPositive(-2, 2024, 2); // 28
+ * ```
+ * @example BYMONTHDAY filtering
+ * ```php
+ * $byMonthDay = [15, -1, -3]; // 15th, last day, third-to-last day
+ * $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, 2024, 1);
+ * // Returns: [15, 31, 29] for January 2024
+ * ```
+ * @example ISO week calculations
+ * ```php
+ * $date = new DateTimeImmutable('2024-01-01');
+ * $weekNumber = DateValidationUtils::getIsoWeekNumber($date); // 1
+ *
+ * $hasWeek53 = DateValidationUtils::yearHasWeek53(2024); // true/false
+ *
+ * $firstMonday = DateValidationUtils::getFirstDateOfWeek(2024, 1);
+ * // Returns DateTimeImmutable for Monday of week 1, 2024
+ * ```
+ * @example Date matching for RRULE validation
+ * ```php
+ * $date = new DateTimeImmutable('2024-01-31');
+ * $byMonthDay = [31, -1]; // 31st and last day
+ *
+ * $matches = DateValidationUtils::dateMatchesByMonthDay($date, $byMonthDay); // true
+ * ```
+ *
+ * @see DefaultOccurrenceGenerator For primary usage context
+ * @see https://tools.ietf.org/html/rfc5545#section-3.3.10 RFC 5545 RRULE specification
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Week_dates ISO 8601 week date specification
+ *
+ * @author EphemeralTodos
+ *
+ * @since 1.0.0
+ */
 final class DateValidationUtils
 {
     /**
