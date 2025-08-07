@@ -44,9 +44,48 @@ abstract class CompatibilityTestCase extends TestCase
         ?int $limit = null,
     ): array {
         $rrule = $this->rruler->parse($rruleString);
-        $occurrences = $this->occurrenceGenerator->generateOccurrences($rrule, $start, $limit);
 
-        return iterator_to_array($occurrences);
+        // For compatibility testing, we need to simulate iCalendar behavior
+        // where the start date (DTSTART) is always included as the first occurrence
+        // This matches sabre/vobject's EventIterator behavior
+
+        // Check if the start date would naturally be included by generating one occurrence
+        $testOccurrences = iterator_to_array($this->occurrenceGenerator->generateOccurrences($rrule, $start, 1));
+        $startDateMatches = !empty($testOccurrences) && $testOccurrences[0]->format('Y-m-d H:i:s') === $start->format('Y-m-d H:i:s');
+
+        if ($startDateMatches) {
+            // Start date naturally matches the RRULE, use normal generation
+            $occurrences = $this->occurrenceGenerator->generateOccurrences($rrule, $start, $limit);
+
+            return iterator_to_array($occurrences);
+        } else {
+            // Start date doesn't match RRULE, include it first then get subsequent matches
+            $occurrences = [];
+            $count = 0;
+
+            // Always include the start date first (RFC 5545 iCalendar behavior)
+            if ($limit === null || $count < $limit) {
+                $occurrences[] = $start;
+                ++$count;
+            }
+
+            // Generate subsequent occurrences
+            if ($limit === null || $count < $limit) {
+                $remainingLimit = ($limit !== null) ? $limit - $count : null;
+                $subsequentOccurrences = $this->occurrenceGenerator->generateOccurrences($rrule, $start, $remainingLimit);
+
+                foreach ($subsequentOccurrences as $occurrence) {
+                    if ($limit !== null && $count >= $limit) {
+                        break;
+                    }
+
+                    $occurrences[] = $occurrence;
+                    ++$count;
+                }
+            }
+
+            return $occurrences;
+        }
     }
 
     /**

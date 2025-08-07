@@ -1104,7 +1104,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                 $isFirstPeriod = $currentPeriod->format('Y-m-d H:i:s') === $this->findStartingPeriod($rrule, $start)->format('Y-m-d H:i:s');
 
                 // Expand all occurrences within this period
-                $expandedOccurrences = $this->expandOccurrencesInPeriod($rrule, $currentPeriod);
+                $expandedOccurrences = $this->expandOccurrencesInPeriod($rrule, $currentPeriod, $start);
 
                 // For first period, pre-filter by start date before BYSETPOS to avoid missing valid selections
                 if ($isFirstPeriod) {
@@ -1224,7 +1224,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
      *
      * @return array<DateTimeImmutable>
      */
-    private function expandOccurrencesInPeriod(Rrule $rrule, DateTimeImmutable $periodStart): array
+    private function expandOccurrencesInPeriod(Rrule $rrule, DateTimeImmutable $periodStart, ?DateTimeImmutable $timeSource = null): array
     {
         $occurrences = [];
         $periodEnd = $this->getPeriodEnd($rrule, $periodStart);
@@ -1245,7 +1245,18 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             $current = $periodStart;
             while ($current <= $periodEnd) {
                 if ($this->dateMatchesRrule($tempRrule, $current)) {
-                    $occurrences[] = $current;
+                    // Preserve time from the time source if provided
+                    if ($timeSource !== null) {
+                        $occurrenceWithTime = $current->setTime(
+                            (int) $timeSource->format('H'),
+                            (int) $timeSource->format('i'),
+                            (int) $timeSource->format('s'),
+                            (int) $timeSource->format('u')
+                        );
+                        $occurrences[] = $occurrenceWithTime;
+                    } else {
+                        $occurrences[] = $current;
+                    }
                 }
                 $current = $current->modify('+1 day');
             }
