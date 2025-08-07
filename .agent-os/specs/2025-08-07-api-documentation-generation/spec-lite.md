@@ -1,0 +1,3 @@
+# API Documentation Generation - Lite Summary
+
+Generate professional HTML API documentation from the comprehensive PHPDoc comments added to the Rruler library, providing developers with accessible reference documentation for integration. This includes setting up phpDocumentor, generating HTML docs, hosting the documentation online, and automating the process through CI/CD pipeline for seamless updates on code changes.
