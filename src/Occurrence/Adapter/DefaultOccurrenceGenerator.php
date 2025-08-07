@@ -97,8 +97,8 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         return match ($rrule->getFrequency()) {
             'DAILY' => $current->modify("+{$interval} days"),
             'WEEKLY' => $current->modify("+{$interval} weeks"),
-            'MONTHLY' => $current->modify("+{$interval} months"),
-            'YEARLY' => $current->modify("+{$interval} years"),
+            'MONTHLY' => $this->getNextMonthlyOccurrence($current, $interval),
+            'YEARLY' => $this->getNextYearlyOccurrence($current, $interval),
             default => throw new \InvalidArgumentException("Unsupported frequency: {$rrule->getFrequency()}"),
         };
     }
@@ -147,12 +147,13 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         $validWeekdays = array_column($byDay, 'weekday');
 
-        // Find next weekday in the same week
+        // First, check for remaining valid weekdays in the current week
         $candidate = $current->modify('+1 day');
-        $weekStart = $current->modify('monday this week');
-        $weekEnd = $weekStart->modify('+6 days');
+        $currentWeekStart = $current->modify('monday this week');
+        $currentWeekEnd = $currentWeekStart->modify('+6 days 23:59:59');
 
-        while ($candidate <= $weekEnd) {
+        // Look for next valid weekday in the current weekly interval
+        while ($candidate <= $currentWeekEnd) {
             $weekday = $this->getWeekdayFromDate($candidate);
             if (in_array($weekday, $validWeekdays, true)) {
                 return $candidate;
@@ -160,10 +161,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             $candidate = $candidate->modify('+1 day');
         }
 
-        // Move to next interval week and find first matching weekday
-        $nextWeekStart = $weekStart->modify("+{$interval} weeks");
+        // No more valid weekdays in current week, move to next interval week
+        // The next interval week is $interval weeks after the current week
+        $nextWeekStart = $currentWeekStart->modify("+{$interval} weeks");
 
-        return $this->findFirstMatchingWeekdayInWeek($nextWeekStart, $validWeekdays);
+        return $this->findFirstMatchingWeekdayInWeekPreservingTime($nextWeekStart, $validWeekdays, $current);
     }
 
     /**
@@ -239,6 +241,124 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         }
 
         throw new \RuntimeException('No matching weekday found in week');
+    }
+
+    /**
+     * Find first matching weekday in week while preserving time from original occurrence.
+     *
+     * @param array<string> $validWeekdays
+     */
+    private function findFirstMatchingWeekdayInWeekPreservingTime(DateTimeImmutable $weekStart, array $validWeekdays, DateTimeImmutable $timeSource): DateTimeImmutable
+    {
+        // Extract time components from the original occurrence
+        $timeFormat = $timeSource->format('H:i:s');
+        
+        $candidate = $weekStart;
+        for ($i = 0; $i < 7; ++$i) {
+            $weekday = $this->getWeekdayFromDate($candidate);
+            if (in_array($weekday, $validWeekdays, true)) {
+                // Preserve the time from the original occurrence
+                return $candidate->setTime(
+                    (int) $timeSource->format('H'),
+                    (int) $timeSource->format('i'),
+                    (int) $timeSource->format('s'),
+                    (int) $timeSource->format('u')
+                );
+            }
+            $candidate = $candidate->modify('+1 day');
+        }
+
+        throw new \RuntimeException('No matching weekday found in week');
+    }
+
+    /**
+     * Get next monthly occurrence handling date boundary issues properly.
+     * 
+     * This method implements RFC 5545 compliant monthly recurrence by skipping months
+     * where the target day doesn't exist (e.g., Feb 31st) and going to the next valid month.
+     */
+    private function getNextMonthlyOccurrence(DateTimeImmutable $current, int $interval): DateTimeImmutable
+    {
+        $day = (int) $current->format('d');
+        $currentMonth = (int) $current->format('m');
+        $currentYear = (int) $current->format('Y');
+        
+        // Start searching from the next interval month
+        $targetYear = $currentYear;
+        $targetMonth = $currentMonth + $interval;
+        
+        // Handle year rollover
+        while ($targetMonth > 12) {
+            $targetMonth -= 12;
+            $targetYear++;
+        }
+        
+        // Find the next valid month that has the target day
+        while (true) {
+            $daysInTargetMonth = (int) date('t', mktime(0, 0, 0, $targetMonth, 1, $targetYear));
+            
+            if ($day <= $daysInTargetMonth) {
+                // This month has the target day, create the date
+                return $current->setDate($targetYear, $targetMonth, $day);
+            }
+            
+            // This month doesn't have the target day, move to next month
+            $targetMonth++;
+            if ($targetMonth > 12) {
+                $targetMonth = 1;
+                $targetYear++;
+            }
+        }
+    }
+
+    /**
+     * Get next yearly occurrence handling date boundary issues properly.
+     * 
+     * This method implements RFC 5545 compliant yearly recurrence by skipping years
+     * where the target date doesn't exist (e.g., Feb 29th in non-leap years).
+     */
+    private function getNextYearlyOccurrence(DateTimeImmutable $current, int $interval): DateTimeImmutable
+    {
+        $day = (int) $current->format('d');
+        $month = (int) $current->format('m');
+        $currentYear = (int) $current->format('Y');
+        
+        // Start searching from the next interval year
+        $targetYear = $currentYear + $interval;
+        
+        // Find the next valid year that has the target date
+        while (true) {
+            // Check if the target date exists in this year
+            if ($this->dateExistsInYear($targetYear, $month, $day)) {
+                return $current->setDate($targetYear, $month, $day);
+            }
+            
+            // This year doesn't have the target date, move to next year
+            $targetYear++;
+        }
+    }
+
+    /**
+     * Check if a specific date (month/day) exists in a given year.
+     */
+    private function dateExistsInYear(int $year, int $month, int $day): bool
+    {
+        // Special case: February 29th only exists in leap years
+        if ($month === 2 && $day === 29) {
+            return $this->isLeapYear($year);
+        }
+        
+        // For other dates, check if the day exists in the month
+        $daysInMonth = (int) date('t', mktime(0, 0, 0, $month, 1, $year));
+        return $day <= $daysInMonth;
+    }
+
+    /**
+     * Check if a year is a leap year.
+     */
+    private function isLeapYear(int $year): bool
+    {
+        return ($year % 4 === 0 && $year % 100 !== 0) || ($year % 400 === 0);
     }
 
     /**
