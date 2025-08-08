@@ -22,7 +22,7 @@ Rruler is a standalone RFC 5545 RRULE parser that helps PHP developers building 
 ## Why Rruler?
 
 ### Focused Approach
-Unlike heavy WebDAV/CalDAV ecosystems like sabre/dav, Rruler provides a **focused solution** specifically for RRULE parsing and occurrence calculation. This results in:
+Unlike complete WebDAV/CalDAV libraries, Rruler provides a **focused solution** specifically for RRULE parsing and occurrence calculation. This results in:
 
 - 🎯 **Simple integration** - Just RRULE parsing, nothing more
 - 🚀 **Better performance** - No unnecessary WebDAV/CalDAV overhead  
