@@ -77,6 +77,9 @@ The parser validates mutually exclusive parameters (COUNT vs UNTIL), required pa
 - Write tests according to rules defined here: @~/.claude/instructions/phpunit.md
 ## Agent OS Documentation
 
+### Files Availability
+The @.agent-os and @~/.agent-os directories should definitely be available. If you never think this is not true based on doing a directory listing, ensure the directory listing is not excluding files and directories with a leading `.`. For bash using ls, you should always use `ls -a` or `ls -a <path-to-search>` to get a list of all files and directories, even those that are "hidden" by using a leading `.`.
+
 ### Product Context
 - **Mission & Vision:** @.agent-os/product/mission.md
 - **Mission (Lite):** @.agent-os/product/mission-lite.md
