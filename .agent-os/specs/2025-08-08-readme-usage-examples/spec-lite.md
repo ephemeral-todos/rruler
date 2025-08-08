@@ -1,0 +1,3 @@
+# README Usage Examples - Lite Summary
+
+Create a focused README.md that demonstrates Rruler's value proposition as a standalone RFC 5545 RRULE parser with practical examples showcasing positioning against sabre/dav. Enable quick library evaluation and basic usage through clear installation steps, 3-4 common use case examples, and positioning statement that highlights when to choose Rruler over heavier WebDAV/CalDAV solutions.
