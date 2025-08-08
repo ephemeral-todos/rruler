@@ -3,5 +3,6 @@
 /.phpunit.cache/
 /composer.lock
 /coverage/
+/docs/
 /tools/
 /vendor/

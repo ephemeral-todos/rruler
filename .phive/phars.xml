@@ -2,4 +2,5 @@
 <phive xmlns="https://phar.io/phive">
   <phar name="phpstan" version="^2.1.17" installed="2.1.17" location="./tools/phpstan" copy="true"/>
   <phar name="php-cs-fixer" version="^3.82.2" installed="3.82.2" location="./tools/php-cs-fixer" copy="true"/>
+  <phar name="phpdocumentor" version="^3.8.1" installed="3.8.1" location="./tools/phpDocumentor" copy="false"/>
 </phive>

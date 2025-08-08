@@ -57,3 +57,8 @@ check: vendor
     composer format:check
     composer test
 
+[group('development')]
+[doc('Generates API documentation')]
+docs: vendor
+    composer docs
+

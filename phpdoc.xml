@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+    configVersion="3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://www.phpdoc.org"
+    xsi:schemaLocation="https://www.phpdoc.org https://raw.githubusercontent.com/phpDocumentor/phpDocumentor/master/data/xsd/phpdoc.xsd"
+>
+    <title>Rruler API Documentation</title>
+    
+    <paths>
+        <output>docs/api</output>
+    </paths>
+    
+    <version number="latest">
+        <folder>latest</folder>
+        <api>
+            <source dsn=".">
+                <path>src</path>
+            </source>
+            <output>docs/api</output>
+            <ignore>
+                <path>src/Testing</path>
+            </ignore>
+        </api>
+    </version>
+    
+    <template name="default" />
+</phpdocumentor>
