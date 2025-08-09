@@ -42,7 +42,7 @@ final class ReadmeContentValidationTest extends TestCase
         }
 
         $content = file_get_contents($this->readmePath);
-        
+
         // Test for key value proposition elements
         $this->assertStringContainsString('RFC 5545', $content, 'README should mention RFC 5545 compliance');
         $this->assertStringContainsString('RRULE', $content, 'README should mention RRULE parsing capability');
@@ -56,7 +56,7 @@ final class ReadmeContentValidationTest extends TestCase
         }
 
         $content = file_get_contents($this->readmePath);
-        
+
         // Test for positioning elements
         $this->assertStringContainsString('sabre/dav', $content, 'README should mention sabre/dav for comparison');
         $this->assertStringContainsString('focused', $content, 'README should emphasize focused scope');
@@ -69,7 +69,7 @@ final class ReadmeContentValidationTest extends TestCase
         }
 
         $content = file_get_contents($this->readmePath);
-        
+
         // Test for code example structure
         $this->assertStringContainsString('```php', $content, 'README should have PHP code examples');
         $this->assertStringContainsString('composer require', $content, 'README should have composer installation command');
@@ -84,7 +84,7 @@ final class ReadmeContentValidationTest extends TestCase
 
         $content = file_get_contents($this->readmePath);
         $lineCount = count(explode("\n", $content));
-        
+
         $this->assertGreaterThan(50, $lineCount, 'README should be substantial (>50 lines)');
         $this->assertLessThan(300, $lineCount, 'README should be focused (<300 lines)');
     }

@@ -22,10 +22,10 @@ final class ReadmeCodeExampleTest extends TestCase
         $occurrences = $generator->generateOccurrences($rrule, $startDate);
 
         $results = iterator_to_array($occurrences);
-        
+
         // Verify we get exactly 5 occurrences
         $this->assertCount(5, $results);
-        
+
         // Verify the first and last occurrences match the expected output
         $this->assertEquals(
             new DateTimeImmutable('2024-01-01 09:00:00'),
@@ -45,18 +45,20 @@ final class ReadmeCodeExampleTest extends TestCase
         $start = new DateTimeImmutable('2024-01-02 14:00:00');
 
         $generator = new DefaultOccurrenceGenerator();
-        
+
         // Get next 8 weeks of meetings
         $meetings = [];
         $count = 0;
         foreach ($generator->generateOccurrences($rrule, $start, 8) as $meeting) {
             $meetings[] = $meeting;
-            $count++;
-            if ($count >= 8) break;
+            ++$count;
+            if ($count >= 8) {
+                break;
+            }
         }
 
         $this->assertCount(8, $meetings);
-        
+
         // All meetings should be on Tuesday
         foreach ($meetings as $meeting) {
             $this->assertEquals(2, (int) $meeting->format('N'), 'Meeting should be on Tuesday');
@@ -72,17 +74,19 @@ final class ReadmeCodeExampleTest extends TestCase
         $start = new DateTimeImmutable('2024-03-29 10:00:00');
 
         $generator = new DefaultOccurrenceGenerator();
-        
+
         $reviews = [];
         $count = 0;
         foreach ($generator->generateOccurrences($rrule, $start, 4) as $review) {
             $reviews[] = $review;
-            $count++;
-            if ($count >= 4) break;
+            ++$count;
+            if ($count >= 4) {
+                break;
+            }
         }
 
         $this->assertCount(4, $reviews);
-        
+
         // Should be the last Friday of March, June, September, December for year 2024
         // Note: The pattern starts from the start date year and continues
         $expectedMonthsInSequence = [6, 9, 12, 3]; // June 2024, Sep 2024, Dec 2024, March 2025
