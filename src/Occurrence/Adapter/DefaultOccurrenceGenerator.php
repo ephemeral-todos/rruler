@@ -483,10 +483,66 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
      */
     private function dateMatchesYearlyByDay(DateTimeImmutable $date, array $byDay): bool
     {
-        // For yearly, we need to check if date matches any of the BYDAY specifications within the year
-        // This is complex as it involves checking all possible interpretations
-        // For now, simplified version that treats it like monthly within each month
-        return $this->dateMatchesMonthlyByDay($date, $byDay);
+        // For yearly patterns, BYDAY specifications are applied across the entire year
+        $weekday = $this->getWeekdayFromDate($date);
+        
+        foreach ($byDay as $byDaySpec) {
+            if ($byDaySpec['weekday'] !== $weekday) {
+                continue;
+            }
+            
+            // If no position specified, any occurrence of this weekday matches
+            if ($byDaySpec['position'] === null) {
+                return true;
+            }
+            
+            // Check if this date matches the positional specification within the year
+            if ($this->dateMatchesYearlyPosition($date, $byDaySpec['position'])) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private function dateMatchesYearlyPosition(DateTimeImmutable $date, int $position): bool
+    {
+        $weekday = $this->getWeekdayFromDate($date);
+        $year = (int) $date->format('Y');
+        $yearStart = $date->setDate($year, 1, 1);
+        $yearEnd = $date->setDate($year, 12, 31);
+
+        if ($position > 0) {
+            // Positive position: count from beginning of year
+            $candidate = $yearStart;
+            $occurrenceCount = 0;
+
+            while ($candidate <= $yearEnd) {
+                if ($this->getWeekdayFromDate($candidate) === $weekday) {
+                    ++$occurrenceCount;
+                    if ($occurrenceCount === $position) {
+                        return $candidate->format('Y-m-d') === $date->format('Y-m-d');
+                    }
+                }
+                $candidate = $candidate->modify('+1 day');
+            }
+        } else {
+            // Negative position: count from end of year
+            $candidate = $yearEnd;
+            $occurrenceCount = 0;
+
+            while ($candidate >= $yearStart) {
+                if ($this->getWeekdayFromDate($candidate) === $weekday) {
+                    ++$occurrenceCount;
+                    if ($occurrenceCount === abs($position)) {
+                        return $candidate->format('Y-m-d') === $date->format('Y-m-d');
+                    }
+                }
+                $candidate = $candidate->modify('-1 day');
+            }
+        }
+
+        return false;
     }
 
     private function dateMatchesPosition(DateTimeImmutable $date, int $position): bool
@@ -554,10 +610,18 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         $yearEnd = $yearStart->modify('last day of December this year');
         $candidate = $yearStart;
+        
+        // Extract time components from yearStart to preserve in result
+        $timeComponents = $yearStart->format('H:i:s');
 
         while ($candidate <= $yearEnd) {
             if ($this->dateMatchesYearlyByDay($candidate, $byDay)) {
-                return $candidate;
+                // Preserve the time components from the original date
+                return $candidate->setTime(
+                    (int) $yearStart->format('H'),
+                    (int) $yearStart->format('i'),
+                    (int) $yearStart->format('s')
+                );
             }
             $candidate = $candidate->modify('+1 day');
         }
@@ -810,12 +874,13 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         while ($candidate->format('Y') === $currentYear) {
             if ($this->dateMatchesYearlyByDay($candidate, $byDay)) {
+                // Time components are already preserved in $candidate since we used modify('+1 day')
                 return $candidate;
             }
             $candidate = $candidate->modify('+1 day');
         }
 
-        // Move to next year
+        // Move to next year - preserve time components from original start
         $nextYear = $start->modify('first day of January next year');
 
         return $this->findFirstMatchingDayInYear($nextYear, $byDay);
@@ -1187,7 +1252,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                 // For the first period, handle start date filtering differently
                 $isFirstPeriod = $currentPeriod->format('Y-m-d H:i:s') === $this->findStartingPeriod($rrule, $start)->format('Y-m-d H:i:s');
 
-                // Expand all occurrences within this period
+                // Expand all occurrences within this period (pass start as timeSource to preserve time)
                 $expandedOccurrences = $this->expandOccurrencesInPeriod($rrule, $currentPeriod, $start);
 
                 // For first period, pre-filter by start date before BYSETPOS to avoid missing valid selections
@@ -1278,6 +1343,8 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         // The period start depends on the frequency
         // For BYSETPOS, we need to ensure the period includes the start date
+        // Note: We set time to 00:00:00 for period boundaries, but time will be preserved
+        // during occurrence expansion using the original start time as timeSource
         return match ($rrule->getFrequency()) {
             'YEARLY' => $start->modify('first day of January')->setTime(0, 0, 0),
             'MONTHLY' => $start->modify('first day of this month')->setTime(0, 0, 0),
@@ -1323,7 +1390,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             $occurrences = $this->expandByWeekNoWithBySetPos($rrule, $periodStart, $periodEnd);
         } elseif ($rrule->hasByMonth()) {
             // For BYMONTH, expand by checking each specified month in the period
-            $occurrences = $this->expandByMonthInPeriod($rrule, $periodStart, $periodEnd);
+            $occurrences = $this->expandByMonthInPeriod($rrule, $periodStart, $periodEnd, $timeSource);
         } else {
             // For other BY* rules, use day-by-day expansion
             $current = $periodStart;
@@ -1489,7 +1556,14 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
             while ($current <= $monthEnd) {
                 if ($this->dateMatchesRrule($tempRrule, $current)) {
-                    $monthOccurrences[] = $current;
+                    // Preserve time components from the original start date
+                    $occurrenceWithTime = $current->setTime(
+                        (int) $start->format('H'),
+                        (int) $start->format('i'),
+                        (int) $start->format('s'),
+                        (int) $start->format('u')
+                    );
+                    $monthOccurrences[] = $occurrenceWithTime;
                 }
                 $current = $current->modify('+1 day');
             }
@@ -1568,7 +1642,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
      *
      * @return array<DateTimeImmutable>
      */
-    private function expandByMonthInPeriod(Rrule $rrule, DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd): array
+    private function expandByMonthInPeriod(Rrule $rrule, DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd, ?DateTimeImmutable $timeSource = null): array
     {
         $occurrences = [];
         $byMonth = $rrule->getByMonth();
@@ -1594,7 +1668,18 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                     if ($this->dateMatchesRrule($tempRrule, $current)) {
                         // Only include dates within the period
                         if ($current >= $periodStart && $current <= $periodEnd) {
-                            $occurrences[] = $current;
+                            // Preserve time from the time source if provided
+                            if ($timeSource !== null) {
+                                $occurrenceWithTime = $current->setTime(
+                                    (int) $timeSource->format('H'),
+                                    (int) $timeSource->format('i'),
+                                    (int) $timeSource->format('s'),
+                                    (int) $timeSource->format('u')
+                                );
+                                $occurrences[] = $occurrenceWithTime;
+                            } else {
+                                $occurrences[] = $current;
+                            }
                         }
                     }
                     $current = $current->modify('+1 day');
