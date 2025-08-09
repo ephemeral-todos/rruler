@@ -64,6 +64,33 @@ This document tracks compatibility differences discovered between Rruler and sab
 
 **Result**: ✅ Leap day recurrence only occurs in valid leap years (2024, 2028, 2032, 2036...)
 
+## Intentional Differences (RFC 5545 Compliance)
+
+### 1. Weekly BYSETPOS Behavior
+
+**Status**: 🔴 **INTENTIONAL DIFFERENCE** - RFC 5545 Compliance Priority  
+**Pattern**: `FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1` and similar weekly BYSETPOS patterns
+
+**Issue**: sabre/vobject completely ignores BYSETPOS parameter for weekly frequencies
+- **sabre/vobject**: Treats `FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1` identically to `FREQ=WEEKLY;BYDAY=MO,WE,FR`
+- **Rruler**: Correctly implements RFC 5545 weekly BYSETPOS behavior
+
+**Examples** (starting 2025-01-01 Wednesday):
+
+`FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1`:
+- **sabre/vobject (incorrect)**: 2025-01-01, 2025-01-03, 2025-01-06, 2025-01-08... (all MO/WE/FR days)
+- **Rruler (RFC 5545 compliant)**: 2025-01-01, 2025-01-06, 2025-01-13, 2025-01-20... (first in each week)
+
+`FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=-1`:
+- **sabre/vobject (incorrect)**: Same as BYSETPOS=1 (ignores BYSETPOS)
+- **Rruler (RFC 5545 compliant)**: 2025-01-03, 2025-01-10, 2025-01-17, 2025-01-24... (last in each week)
+
+**Verification**: Validated against python-dateutil (gold standard for RFC 5545) - Rruler matches exactly
+
+**Decision**: Prioritize RFC 5545 compliance over bug compatibility with sabre/vobject
+
+**Impact**: Applications migrating from sabre/vobject may need to review weekly BYSETPOS patterns
+
 ## Remaining Issues
 
 ### 1. BYSETPOS Start Date Inclusion Logic

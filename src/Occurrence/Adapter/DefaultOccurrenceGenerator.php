@@ -1391,6 +1391,9 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         } elseif ($rrule->hasByMonth()) {
             // For BYMONTH, expand by checking each specified month in the period
             $occurrences = $this->expandByMonthInPeriod($rrule, $periodStart, $periodEnd, $timeSource);
+        } elseif ($rrule->hasByDay() && $rrule->getFrequency() === 'WEEKLY') {
+            // For weekly BYDAY with BYSETPOS, we need to respect BYDAY order, not chronological order
+            $occurrences = $this->expandWeeklyByDayInPeriod($rrule, $periodStart, $periodEnd, $timeSource);
         } else {
             // For other BY* rules, use day-by-day expansion
             $current = $periodStart;
@@ -1414,6 +1417,83 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         }
 
         return $occurrences;
+    }
+
+    /**
+     * Expand weekly BYDAY occurrences within a period, respecting BYDAY order for BYSETPOS.
+     * This ensures RFC 5545 compliance where BYSETPOS operates on BYDAY-ordered occurrences,
+     * not chronologically-ordered ones.
+     *
+     * @return array<DateTimeImmutable>
+     */
+    private function expandWeeklyByDayInPeriod(Rrule $rrule, DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd, ?DateTimeImmutable $timeSource = null): array
+    {
+        $occurrences = [];
+        $byDay = $rrule->getByDay();
+
+        if ($byDay === null) {
+            return $occurrences;
+        }
+
+        // For weekly BYSETPOS, we must preserve BYDAY order, not chronological order
+        // This is crucial for RFC 5545 compliance
+        foreach ($byDay as $byDaySpec) {
+            $weekday = $byDaySpec['weekday'];
+            
+            // Find the date for this weekday within the period
+            $weekdayDate = $this->findWeekdayInPeriod($weekday, $periodStart, $periodEnd);
+            
+            if ($weekdayDate !== null) {
+                // Preserve time components from the time source if provided
+                if ($timeSource !== null) {
+                    $occurrenceWithTime = $weekdayDate->setTime(
+                        (int) $timeSource->format('H'),
+                        (int) $timeSource->format('i'),
+                        (int) $timeSource->format('s'),
+                        (int) $timeSource->format('u')
+                    );
+                    $occurrences[] = $occurrenceWithTime;
+                } else {
+                    $occurrences[] = $weekdayDate;
+                }
+            }
+        }
+
+        return $occurrences;
+    }
+
+    /**
+     * Find a specific weekday within a given period.
+     */
+    private function findWeekdayInPeriod(string $weekday, DateTimeImmutable $periodStart, DateTimeImmutable $periodEnd): ?DateTimeImmutable
+    {
+        // Map weekday abbreviations to PHP day names
+        $dayNames = [
+            'SU' => 'Sunday',
+            'MO' => 'Monday', 
+            'TU' => 'Tuesday',
+            'WE' => 'Wednesday',
+            'TH' => 'Thursday',
+            'FR' => 'Friday',
+            'SA' => 'Saturday'
+        ];
+        
+        if (!isset($dayNames[$weekday])) {
+            return null;
+        }
+        
+        $dayName = $dayNames[$weekday];
+        
+        // Find the specific weekday within the period
+        $current = $periodStart;
+        while ($current <= $periodEnd) {
+            if ($current->format('l') === $dayName) {
+                return $current;
+            }
+            $current = $current->modify('+1 day');
+        }
+        
+        return null;
     }
 
     /**

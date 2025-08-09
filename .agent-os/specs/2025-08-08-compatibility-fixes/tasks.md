@@ -7,21 +7,21 @@ These are the tasks to be completed for the spec detailed in @.agent-os/specs/20
 
 ## Tasks
 
-- [ ] 1. Fix Time Portion Loss in Yearly/Complex Patterns (HIGH Priority)
-  - [ ] 1.1 Write regression tests for time portion preservation across all frequency types
-  - [ ] 1.2 Analyze DefaultOccurrenceGenerator to identify where time components are being stripped
-  - [ ] 1.3 Implement fix to preserve time portions in DateTime operations during occurrence generation
-  - [ ] 1.4 Update related classes (OccurrenceValidator, DateValidationUtils) to maintain time consistency
-  - [ ] 1.5 Run failing sabre/dav compatibility tests to validate fixes
-  - [ ] 1.6 Verify all existing tests still pass with time portion fixes
+- [x] 1. Fix Time Portion Loss in Yearly/Complex Patterns (HIGH Priority)
+  - [x] 1.1 Write regression tests for time portion preservation across all frequency types
+  - [x] 1.2 Analyze DefaultOccurrenceGenerator to identify where time components are being stripped
+  - [x] 1.3 Implement fix to preserve time portions in DateTime operations during occurrence generation
+  - [x] 1.4 Update related classes (OccurrenceValidator, DateValidationUtils) to maintain time consistency
+  - [x] 1.5 Run failing sabre/dav compatibility tests to validate fixes
+  - [x] 1.6 Verify all existing tests still pass with time portion fixes
 
-- [ ] 2. Investigate Weekly BYSETPOS Boundary Logic (MEDIUM Priority)
-  - [ ] 2.1 Write comprehensive tests documenting current weekly BYSETPOS behavior differences
-  - [ ] 2.2 Research RFC 5545 specification sections 3.3.10 and 3.8.5.3 for weekly BYSETPOS requirements
-  - [ ] 2.3 Compare Rruler implementation against RFC 5545 requirements and sabre/dav behavior
-  - [ ] 2.4 Document findings and create decision matrix for fix vs. acceptable difference
-  - [ ] 2.5 Implement solution based on decision (either fix code or update test suite with skips)
-  - [ ] 2.6 Verify decision implementation maintains existing functionality
+- [x] 2. Investigate Weekly BYSETPOS Boundary Logic (MEDIUM Priority)
+  - [x] 2.1 Write comprehensive tests documenting current weekly BYSETPOS behavior differences
+  - [x] 2.2 Research RFC 5545 specification sections 3.3.10 and 3.8.5.3 for weekly BYSETPOS requirements
+  - [x] 2.3 Compare Rruler implementation against RFC 5545 requirements and sabre/dav behavior
+  - [x] 2.4 Document findings and create decision matrix for fix vs. acceptable difference
+  - [x] 2.5 Implement solution based on decision (either fix code or update test suite with skips)
+  - [x] 2.6 Verify decision implementation maintains existing functionality
 
 - [ ] 3. Create Comprehensive Compatibility Documentation
   - [ ] 3.1 Write tests that validate documentation accuracy against actual implementation
