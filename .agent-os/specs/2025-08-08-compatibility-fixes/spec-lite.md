@@ -1,0 +1,3 @@
+# Compatibility Fixes Implementation - Lite Summary
+
+Fix critical sabre/dav compatibility issues to improve compatibility from 97.5% to 98%+ while documenting acceptable implementation differences. Focus on fixing time portion loss bug in yearly/complex patterns, investigating weekly BYSETPOS boundary logic, and creating comprehensive compatibility documentation that clearly explains intentional design choices versus bugs.

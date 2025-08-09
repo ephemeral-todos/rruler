@@ -1,0 +1,40 @@
+# Spec Tasks
+
+These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-08-08-compatibility-fixes/spec.md
+
+> Created: 2025-08-08
+> Status: Ready for Implementation
+
+## Tasks
+
+- [ ] 1. Fix Time Portion Loss in Yearly/Complex Patterns (HIGH Priority)
+  - [ ] 1.1 Write regression tests for time portion preservation across all frequency types
+  - [ ] 1.2 Analyze DefaultOccurrenceGenerator to identify where time components are being stripped
+  - [ ] 1.3 Implement fix to preserve time portions in DateTime operations during occurrence generation
+  - [ ] 1.4 Update related classes (OccurrenceValidator, DateValidationUtils) to maintain time consistency
+  - [ ] 1.5 Run failing sabre/dav compatibility tests to validate fixes
+  - [ ] 1.6 Verify all existing tests still pass with time portion fixes
+
+- [ ] 2. Investigate Weekly BYSETPOS Boundary Logic (MEDIUM Priority)
+  - [ ] 2.1 Write comprehensive tests documenting current weekly BYSETPOS behavior differences
+  - [ ] 2.2 Research RFC 5545 specification sections 3.3.10 and 3.8.5.3 for weekly BYSETPOS requirements
+  - [ ] 2.3 Compare Rruler implementation against RFC 5545 requirements and sabre/dav behavior
+  - [ ] 2.4 Document findings and create decision matrix for fix vs. acceptable difference
+  - [ ] 2.5 Implement solution based on decision (either fix code or update test suite with skips)
+  - [ ] 2.6 Verify decision implementation maintains existing functionality
+
+- [ ] 3. Create Comprehensive Compatibility Documentation
+  - [ ] 3.1 Write tests that validate documentation accuracy against actual implementation
+  - [ ] 3.2 Create COMPATIBILITY_ISSUES.md with detailed analysis of all known differences
+  - [ ] 3.3 Update test suite to skip tests for documented acceptable differences with clear reasoning
+  - [ ] 3.4 Add examples and explanations for each documented compatibility difference
+  - [ ] 3.5 Create maintenance guidelines for evaluating future compatibility differences
+  - [ ] 3.6 Verify final compatibility rate improvement from 97.5% to 98%+
+
+- [ ] 4. Validation and Quality Assurance
+  - [ ] 4.1 Write integration tests that verify end-to-end compatibility improvements
+  - [ ] 4.2 Run complete test suite to ensure no regressions introduced
+  - [ ] 4.3 Validate performance impact of fixes (should be neutral or positive)
+  - [ ] 4.4 Update existing documentation to reference new COMPATIBILITY_ISSUES.md file
+  - [ ] 4.5 Create examples demonstrating fixed behaviors in README or documentation
+  - [ ] 4.6 Verify all project quality gates pass (PHPStan, PHP-CS-Fixer, test coverage)
