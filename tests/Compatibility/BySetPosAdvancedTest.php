@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Advanced BYSETPOS scenario compatibility tests.
@@ -110,6 +111,7 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
      * ⚠️ WEEKLY BYSETPOS tests will fail due to intentional RFC 5545 compliance difference.
      * See COMPATIBILITY_ISSUES.md for details on weekly BYSETPOS behavior.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testFirstPositionBoundary(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
@@ -123,6 +125,7 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testLastPositionBoundary(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
@@ -167,6 +170,7 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
      *
      * Tests BYSETPOS behavior across different recurrence frequencies.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testBySetPosWithWeeklyFrequency(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');

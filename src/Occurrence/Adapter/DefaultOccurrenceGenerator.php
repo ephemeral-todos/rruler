@@ -192,6 +192,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $frequency = $rrule->getFrequency();
         $interval = $rrule->getInterval();
         $byDay = $rrule->getByDay();
+        $byMonth = $rrule->getByMonth();
 
         if ($byDay === null) {
             throw new \LogicException('BYDAY data is null when hasByDay() returned true');
@@ -201,7 +202,9 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             'DAILY' => $this->getNextDailyByDay($current, $byDay, $interval),
             'WEEKLY' => $this->getNextWeeklyByDay($current, $byDay, $interval),
             'MONTHLY' => $this->getNextMonthlyByDay($current, $byDay, $interval),
-            'YEARLY' => $this->getNextYearlyByDay($current, $byDay, $interval),
+            'YEARLY' => $byMonth !== null
+                ? $this->getNextYearlyByDayWithByMonth($current, $byDay, $byMonth, $interval)
+                : $this->getNextYearlyByDay($current, $byDay, $interval),
             default => throw new \InvalidArgumentException("Unsupported frequency: {$frequency}"),
         };
     }
@@ -295,6 +298,41 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $nextYear = $current->modify("first day of January +{$interval} year");
 
         return $this->findFirstMatchingDayInYear($nextYear, $byDay);
+    }
+
+    /**
+     * @param array<array{position: int|null, weekday: string}> $byDay
+     * @param array<int> $byMonth
+     */
+    private function getNextYearlyByDayWithByMonth(DateTimeImmutable $current, array $byDay, array $byMonth, int $interval): DateTimeImmutable
+    {
+        $currentMonth = (int) $current->format('n');
+        $currentYear = (int) $current->format('Y');
+
+        // Sort months to find next valid month
+        $sortedMonths = $byMonth;
+        sort($sortedMonths);
+
+        // Look for next valid occurrence in current year
+        $candidate = $current->modify('+1 day');
+
+        while ($candidate->format('Y') === (string) $currentYear) {
+            $candidateMonth = (int) $candidate->format('n');
+
+            // Only check dates in the specified months
+            if (in_array($candidateMonth, $byMonth, true)) {
+                if ($this->dateMatchesYearlyByDayForMonth($candidate, $byDay, $candidateMonth)) {
+                    return $candidate;
+                }
+            }
+            $candidate = $candidate->modify('+1 day');
+        }
+
+        // No valid occurrences in current year, move to next interval year
+        $nextYear = $currentYear + $interval;
+        $nextYearStart = $current->setDate($nextYear, 1, 1);
+
+        return $this->findFirstMatchingDayInYearForMonths($nextYearStart, $byDay, $byMonth);
     }
 
     private function getWeekdayFromDate(DateTimeImmutable $date): string
@@ -629,6 +667,64 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         throw new \RuntimeException('No matching day found in year');
     }
 
+    /**
+     * @param array<array{position: int|null, weekday: string}> $byDay
+     * @param array<int> $byMonth
+     */
+    private function findFirstMatchingDayInYearForMonths(DateTimeImmutable $yearStart, array $byDay, array $byMonth): DateTimeImmutable
+    {
+        $yearEnd = $yearStart->modify('last day of December this year');
+        $candidate = $yearStart;
+
+        while ($candidate <= $yearEnd) {
+            $candidateMonth = (int) $candidate->format('n');
+
+            // Only check dates in the specified months
+            if (in_array($candidateMonth, $byMonth, true)) {
+                if ($this->dateMatchesYearlyByDayForMonth($candidate, $byDay, $candidateMonth)) {
+                    // Preserve the time components from the original date
+                    return $candidate->setTime(
+                        (int) $yearStart->format('H'),
+                        (int) $yearStart->format('i'),
+                        (int) $yearStart->format('s')
+                    );
+                }
+            }
+            $candidate = $candidate->modify('+1 day');
+        }
+
+        throw new \RuntimeException('No matching day found in year for specified months');
+    }
+
+    /**
+     * Check if date matches BYDAY spec within a specific month context.
+     *
+     * @param array<array{position: int|null, weekday: string}> $byDay
+     */
+    private function dateMatchesYearlyByDayForMonth(DateTimeImmutable $date, array $byDay, int $month): bool
+    {
+        // For yearly patterns with BYMONTH, BYDAY positions are relative to the month, not the year
+        $weekday = $this->getWeekdayFromDate($date);
+
+        foreach ($byDay as $byDaySpec) {
+            if ($byDaySpec['weekday'] !== $weekday) {
+                continue;
+            }
+
+            // If no position specified, any occurrence of this weekday in this month matches
+            if ($byDaySpec['position'] === null) {
+                return true;
+            }
+
+            // Check if this date matches the positional specification within the month
+            if ($this->dateMatchesPosition($date, $byDaySpec['position'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function findFirstValidOccurrence(Rrule $rrule, DateTimeImmutable $start): DateTimeImmutable
     {
         $frequency = $rrule->getFrequency();
@@ -636,13 +732,14 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         // Handle BYDAY rules
         if ($rrule->hasByDay()) {
             $byDay = $rrule->getByDay();
+            $byMonth = $rrule->getByMonth();
 
             if ($byDay === null) {
                 throw new \LogicException('BYDAY data is null when hasByDay() returned true');
             }
 
             // Check if start date itself is valid
-            if ($this->isDateValidForByDay($start, $frequency, $byDay)) {
+            if ($this->isDateValidForByDayAndMonth($start, $frequency, $byDay, $byMonth)) {
                 return $start;
             }
 
@@ -651,7 +748,9 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                 'DAILY' => $this->findNextDailyByDay($start, $byDay),
                 'WEEKLY' => $this->findNextWeeklyByDay($start, $byDay),
                 'MONTHLY' => $this->findNextMonthlyByDay($start, $byDay),
-                'YEARLY' => $this->findNextYearlyByDay($start, $byDay),
+                'YEARLY' => $byMonth !== null
+                    ? $this->findFirstMatchingDayInYearForMonths($start, $byDay, $byMonth)
+                    : $this->findNextYearlyByDay($start, $byDay),
                 default => throw new \InvalidArgumentException("Unsupported frequency: {$frequency}"),
             };
         }
@@ -791,6 +890,32 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
     /**
      * @param array<array{position: int|null, weekday: string}> $byDay
+     * @param array<int>|null $byMonth
+     */
+    private function isDateValidForByDayAndMonth(DateTimeImmutable $date, string $frequency, array $byDay, ?array $byMonth): bool
+    {
+        // If no BYMONTH constraint, use the regular BYDAY validation
+        if ($byMonth === null) {
+            return $this->isDateValidForByDay($date, $frequency, $byDay);
+        }
+
+        // Check BYMONTH constraint first
+        $dateMonth = (int) $date->format('n');
+        if (!in_array($dateMonth, $byMonth, true)) {
+            return false;
+        }
+
+        // For yearly patterns with BYMONTH, use month-aware BYDAY matching
+        if ($frequency === 'YEARLY') {
+            return $this->dateMatchesYearlyByDayForMonth($date, $byDay, $dateMonth);
+        }
+
+        // For other frequencies, use regular BYDAY validation (BYMONTH doesn't apply)
+        return $this->isDateValidForByDay($date, $frequency, $byDay);
+    }
+
+    /**
+     * @param array<array{position: int|null, weekday: string}> $byDay
      */
     private function dateMatchesWeekdayList(DateTimeImmutable $date, array $byDay): bool
     {
@@ -891,6 +1016,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $frequency = $rrule->getFrequency();
         $interval = $rrule->getInterval();
         $byMonthDay = $rrule->getByMonthDay();
+        $byMonth = $rrule->getByMonth();
 
         if ($byMonthDay === null) {
             throw new \LogicException('BYMONTHDAY data is null when hasByMonthDay() returned true');
@@ -898,7 +1024,9 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         return match ($frequency) {
             'MONTHLY' => $this->getNextMonthlyByMonthDay($current, $byMonthDay, $interval),
-            'YEARLY' => $this->getNextYearlyByMonthDay($current, $byMonthDay, $interval),
+            'YEARLY' => $byMonth !== null
+                ? $this->getNextYearlyByMonthDayWithByMonth($current, $byMonthDay, $byMonth, $interval)
+                : $this->getNextYearlyByMonthDay($current, $byMonthDay, $interval),
             default => throw new \InvalidArgumentException("BYMONTHDAY is not supported for frequency: {$frequency}"),
         };
     }
@@ -957,6 +1085,51 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         $firstDay = $nextYearValidDays[0];
 
         return $current->setDate($nextYear, $currentMonth, $firstDay);
+    }
+
+    /**
+     * @param array<int> $byMonthDay
+     * @param array<int> $byMonth
+     */
+    private function getNextYearlyByMonthDayWithByMonth(DateTimeImmutable $current, array $byMonthDay, array $byMonth, int $interval): DateTimeImmutable
+    {
+        $currentMonth = (int) $current->format('n');
+        $currentDay = (int) $current->format('j');
+        $currentYear = (int) $current->format('Y');
+
+        // Sort months to find next valid month
+        $sortedMonths = $byMonth;
+        sort($sortedMonths);
+
+        // Look for a valid month+day combination after current date in same year
+        foreach ($sortedMonths as $month) {
+            if ($month > $currentMonth) {
+                // Found a valid month later in the year
+                $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $currentYear, $month);
+                if (!empty($validDays)) {
+                    return $current->setDate($currentYear, $month, $validDays[0]);
+                }
+            } elseif ($month === $currentMonth) {
+                // Same month - look for days after current day
+                $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $currentYear, $month);
+                foreach ($validDays as $day) {
+                    if ($day > $currentDay) {
+                        return $current->setDate($currentYear, $month, $day);
+                    }
+                }
+            }
+        }
+
+        // No valid months remaining in this year, move to next interval year
+        $nextYear = $currentYear + $interval;
+        $firstMonth = $sortedMonths[0];
+        $validDays = DateValidationUtils::getValidDaysForMonth($byMonthDay, $nextYear, $firstMonth);
+
+        if (empty($validDays)) {
+            throw new \RuntimeException("No valid BYMONTHDAY values for {$nextYear}-{$firstMonth}");
+        }
+
+        return $current->setDate($nextYear, $firstMonth, $validDays[0]);
     }
 
     /**
@@ -1104,30 +1277,29 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     private function getNextYearlyByWeekNo(DateTimeImmutable $current, array $byWeekNo, int $interval): DateTimeImmutable
     {
         $currentYear = (int) $current->format('o'); // Use ISO week year, not calendar year
-        $currentWeek = DateValidationUtils::getIsoWeekNumber($current);
-        $currentDayOfWeek = (int) $current->format('N'); // 1=Monday, 7=Sunday
+        $originalTime = [$current->format('H'), $current->format('i'), $current->format('s')];
 
-        // Sort week numbers to find next valid week
+        // Sort week numbers to process them in order
         $sortedWeeks = $byWeekNo;
         sort($sortedWeeks);
 
-        // Look for a valid week after the current week in the same year
-        foreach ($sortedWeeks as $week) {
-            if ($week > $currentWeek) {
-                // Check if this week exists in the current year (important for week 53)
-                if ($week === 53 && !DateValidationUtils::yearHasWeek53($currentYear)) {
-                    continue; // Skip week 53 if it doesn't exist in current year
-                }
+        // First, try to find the next day in the current or later weeks of the same year
+        $candidateDate = $current->modify('+1 day');
 
-                // Found a valid week later in the year
-                $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
+        // Continue searching within the current year
+        while ($candidateDate->format('o') === (string) $currentYear) {
+            $candidateWeek = DateValidationUtils::getIsoWeekNumber($candidateDate);
 
-                // Preserve the day of week from current date
-                return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
+            if (in_array($candidateWeek, $byWeekNo, true)) {
+                // Found a valid date in one of the specified weeks
+                // Preserve the original time components
+                return $candidateDate->setTime((int) $originalTime[0], (int) $originalTime[1], (int) $originalTime[2]);
             }
+
+            $candidateDate = $candidateDate->modify('+1 day');
         }
 
-        // No valid weeks remaining in this year, move to next interval year
+        // No more valid dates in current year, move to next interval year
         $nextYear = $currentYear + $interval;
         $firstWeek = $sortedWeeks[0]; // Use first week from sorted BYWEEKNO list
 
@@ -1136,10 +1308,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             $nextYear += $interval;
         }
 
+        // Start from the first day of the first specified week in the target year
         $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($nextYear, $firstWeek);
 
-        // Preserve the day of week from current date
-        return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
+        // Preserve the original time components
+        return $mondayOfWeek->setTime((int) $originalTime[0], (int) $originalTime[1], (int) $originalTime[2]);
     }
 
     /**
@@ -1158,42 +1331,42 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     private function findNextYearlyByWeekNo(DateTimeImmutable $start, array $byWeekNo): DateTimeImmutable
     {
         $currentYear = (int) $start->format('o'); // Use ISO week year, not calendar year
-        $currentWeek = DateValidationUtils::getIsoWeekNumber($start);
-        $currentDayOfWeek = (int) $start->format('N');
+        $originalTime = [$start->format('H'), $start->format('i'), $start->format('s')];
 
-        // Sort week numbers to find next valid week
+        // Sort week numbers to process them in order
         $sortedWeeks = $byWeekNo;
         sort($sortedWeeks);
 
-        // Look for a valid week after the current week in the same year
-        foreach ($sortedWeeks as $week) {
-            if ($week > $currentWeek) {
-                // Check if this week exists in the current year (important for week 53)
-                if ($week === 53 && !DateValidationUtils::yearHasWeek53($currentYear)) {
-                    continue; // Skip week 53 if it doesn't exist in current year
-                }
+        // Look for the first valid date in the specified weeks starting from the start date
+        $candidateDate = $start;
 
-                // Found a valid week later in the year
-                $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($currentYear, $week);
+        // Continue searching within the current year
+        while ($candidateDate->format('o') === (string) $currentYear) {
+            $candidateWeek = DateValidationUtils::getIsoWeekNumber($candidateDate);
 
-                // Preserve the day of week from start date
-                return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
+            if (in_array($candidateWeek, $byWeekNo, true)) {
+                // Found a valid date in one of the specified weeks
+                // Preserve the original time components
+                return $candidateDate->setTime((int) $originalTime[0], (int) $originalTime[1], (int) $originalTime[2]);
             }
+
+            $candidateDate = $candidateDate->modify('+1 day');
         }
 
-        // No valid weeks remaining in this year, move to next year
+        // No valid dates in current year, move to next year
         $nextYear = $currentYear + 1;
-        $firstWeek = $sortedWeeks[0]; // Use first week from BYWEEKNO list
+        $firstWeek = $sortedWeeks[0]; // Use first week from sorted BYWEEKNO list
 
         // Handle leap weeks - if week 53 doesn't exist in target year, find next year that has it
         while ($firstWeek === 53 && !DateValidationUtils::yearHasWeek53($nextYear)) {
             ++$nextYear;
         }
 
+        // Start from the first day of the first specified week in the target year
         $mondayOfWeek = DateValidationUtils::getFirstDateOfWeek($nextYear, $firstWeek);
 
-        // Preserve the day of week from start date
-        return $mondayOfWeek->modify('+'.($currentDayOfWeek - 1).' days');
+        // Preserve the original time components
+        return $mondayOfWeek->setTime((int) $originalTime[0], (int) $originalTime[1], (int) $originalTime[2]);
     }
 
     /**
@@ -1255,9 +1428,53 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
                 // Expand all occurrences within this period (pass start as timeSource to preserve time)
                 $expandedOccurrences = $this->expandOccurrencesInPeriod($rrule, $currentPeriod, $start);
 
-                // For first period, pre-filter by start date before BYSETPOS to avoid missing valid selections
+                // For first period, handle weekly vs other frequencies differently
                 if ($isFirstPeriod) {
-                    $expandedOccurrences = array_filter($expandedOccurrences, fn ($occ) => $occ >= $start);
+                    if ($rrule->getFrequency() === 'WEEKLY') {
+                        // Special weekly logic: if start date matches BYDAY, include it regardless of BYSETPOS
+                        $filteredOccurrences = array_filter($expandedOccurrences, fn ($occ) => $occ >= $start);
+                        $startMatchesByDay = false;
+
+                        // Check if start date matches any BYDAY specification
+                        if ($rrule->hasByDay()) {
+                            $byDay = $rrule->getByDay();
+                            if ($byDay !== null) {
+                                $startMatchesByDay = $this->isDateValidForByDay($start, 'WEEKLY', $byDay);
+                            }
+                        }
+
+                        // For weekly patterns, if start date matches BYDAY, include it
+                        if ($startMatchesByDay && !empty($filteredOccurrences)) {
+                            $expandedOccurrences = $filteredOccurrences;
+                        } else {
+                            // Apply normal BYSETPOS logic for non-matching start dates
+                            $selectedOccurrences = $this->applyBySetPosSelection($expandedOccurrences, $rrule->getBySetPos() ?? []);
+                            $validSelectedOccurrences = array_filter($selectedOccurrences, fn ($occ) => $occ >= $start);
+
+                            // If BYSETPOS selection results in no valid occurrences >= start,
+                            // include the first valid occurrence from the period (weekly pattern fallback)
+                            if (empty($validSelectedOccurrences)) {
+                                $validOccurrencesInPeriod = array_filter($expandedOccurrences, fn ($occ) => $occ >= $start);
+                                if (!empty($validOccurrencesInPeriod)) {
+                                    $expandedOccurrences = [reset($validOccurrencesInPeriod)];
+                                } else {
+                                    $expandedOccurrences = [];
+                                }
+                            } else {
+                                $expandedOccurrences = $validSelectedOccurrences;
+                            }
+                        }
+                    } else {
+                        // Monthly/yearly patterns: apply strict BYSETPOS logic
+                        $selectedOccurrences = $this->applyBySetPosSelection($expandedOccurrences, $rrule->getBySetPos() ?? []);
+                        $validSelectedOccurrences = array_filter($selectedOccurrences, fn ($occ) => $occ >= $start);
+
+                        if (empty($validSelectedOccurrences)) {
+                            $expandedOccurrences = [];
+                        } else {
+                            $expandedOccurrences = array_filter($expandedOccurrences, fn ($occ) => $occ >= $start);
+                        }
+                    }
                 }
 
                 // Apply BYSETPOS to select specific positions (unless already applied in expansion)

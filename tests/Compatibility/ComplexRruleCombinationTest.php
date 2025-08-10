@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Complex RRULE combination compatibility tests.
@@ -45,6 +46,7 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyByDayWithBySetPosFirst(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
@@ -58,6 +60,7 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyByDayWithBySetPosLast(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');

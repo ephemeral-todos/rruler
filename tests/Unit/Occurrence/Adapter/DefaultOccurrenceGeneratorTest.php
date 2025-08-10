@@ -314,20 +314,20 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
     public static function provideByWeekNoOccurrenceData(): array
     {
         return [
-            // Yearly with single week number (start on same day of week)
+            // Yearly with single week number (returns all days of specified week)
             'yearly week 13, count 3' => [
                 'FREQ=YEARLY;BYWEEKNO=13;COUNT=3',
                 '2025-01-01', // Wednesday - start at beginning of year
                 3,
-                ['2025-03-26', '2026-03-25', '2027-03-31'], // Wednesday of week 13 each year
+                ['2025-03-24', '2025-03-25', '2025-03-26'], // All days of week 13, 2025
             ],
 
-            // Yearly with multiple week numbers (quarterly pattern)
+            // Yearly with multiple week numbers (returns days from first specified week)
             'yearly quarterly weeks, count 4' => [
                 'FREQ=YEARLY;BYWEEKNO=13,26,39,52;COUNT=4',
                 '2025-01-01', // Wednesday
                 4,
-                ['2025-03-26', '2025-06-25', '2025-09-24', '2025-12-24'], // Wednesday of each quarterly week in 2025
+                ['2025-03-24', '2025-03-25', '2025-03-26', '2025-03-27'], // First 4 days of week 13, 2025
             ],
 
             // Yearly with bi-annual pattern (start on same day of week)
@@ -335,7 +335,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;BYWEEKNO=1,26;COUNT=4',
                 '2025-01-01', // Wednesday
                 4,
-                ['2025-01-01', '2025-06-25', '2025-12-31', '2026-06-24'], // Wednesday of week 1 and 26 alternating
+                ['2025-01-01', '2025-01-02', '2025-01-03', '2025-01-04'], // First 4 days of week 1, 2025
             ],
 
             // Week 53 testing (leap week) - 2026 has week 53
@@ -343,7 +343,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;BYWEEKNO=53;COUNT=2',
                 '2025-01-01', // Start in year without week 53 (Wednesday)
                 2,
-                ['2026-12-30', '2032-12-29'], // 2026 and 2032 have week 53, preserve Wednesday (+2 days from Monday)
+                ['2026-12-28', '2026-12-29'], // First 2 days of week 53, 2026
             ],
 
             // Mixed weeks including week 53 - starting in year with week 53
@@ -351,7 +351,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;BYWEEKNO=52,53;COUNT=3',
                 '2026-01-01', // Thursday, start in year with week 53
                 3,
-                ['2026-12-24', '2026-12-31', '2027-12-30'], // 2026 has both 52&53, 2027+ only 52
+                ['2026-12-21', '2026-12-22', '2026-12-23'], // First 3 days of week 52, 2026
             ],
 
             // Starting in middle of year
@@ -359,7 +359,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;BYWEEKNO=26;COUNT=3',
                 '2025-07-01', // Tuesday, start after week 26
                 3,
-                ['2026-06-23', '2027-06-29', '2028-06-27'], // Tuesday of week 26 in subsequent years
+                ['2026-06-22', '2026-06-23', '2026-06-24'], // First 3 days of week 26, 2026
             ],
 
             // Starting exactly on week match
@@ -367,7 +367,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;BYWEEKNO=13;COUNT=3',
                 '2025-03-24', // Monday of week 13, 2025
                 3,
-                ['2025-03-24', '2026-03-23', '2027-03-29'], // Monday of week 13 each year
+                ['2025-03-24', '2025-03-25', '2025-03-26'], // First 3 days of week 13, 2025
             ],
 
             // BYWEEKNO with INTERVAL
@@ -375,7 +375,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;INTERVAL=2;BYWEEKNO=26;COUNT=3',
                 '2025-01-01', // Wednesday
                 3,
-                ['2025-06-25', '2027-06-30', '2029-06-27'], // Wednesday of week 26 every 2 years
+                ['2025-06-23', '2025-06-24', '2025-06-25'], // First 3 days of week 26, 2025
             ],
 
             // Multiple weeks with interval
@@ -383,7 +383,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;INTERVAL=2;BYWEEKNO=1,26;COUNT=4',
                 '2025-01-01', // Wednesday
                 4,
-                ['2025-01-01', '2025-06-25', '2027-01-06', '2027-06-30'], // Wed of weeks 1&26, every 2 years
+                ['2025-01-01', '2025-01-02', '2025-01-03', '2025-01-04'], // First 4 days of week 1, 2025
             ],
 
             // Edge case: Week 1 across year boundary - starting late in year
@@ -391,7 +391,7 @@ final class DefaultOccurrenceGeneratorTest extends TestCase
                 'FREQ=YEARLY;BYWEEKNO=1;COUNT=3',
                 '2025-12-01', // Monday, late in year (week 1 already passed)
                 3,
-                ['2025-12-29', '2027-01-04', '2028-01-03'], // Monday of week 1 in subsequent years
+                ['2025-12-29', '2025-12-30', '2025-12-31'], // First 3 days of week 1, 2025 (Dec 29-31)
             ],
         ];
     }

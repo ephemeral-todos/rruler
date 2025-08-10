@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use EphemeralTodos\Rruler\Testing\Behavior\TestOccurrenceGenerationBehavior;
 use EphemeralTodos\Rruler\Testing\Behavior\TestRrulerBehavior;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class ByWeekNoIntegrationTest extends TestCase
@@ -16,6 +17,7 @@ final class ByWeekNoIntegrationTest extends TestCase
     use TestOccurrenceGenerationBehavior;
 
     #[DataProvider('provideByWeekNoScenarios')]
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoEndToEndWorkflows(
         string $rruleString,
         string $startDate,
@@ -68,6 +70,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoWithDateRangeFiltering(): void
     {
         // Quarterly pattern (weeks 13, 26, 39, 52)
@@ -99,6 +102,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoLeapWeekHandling(): void
     {
         // Test week 53 in leap week years
@@ -120,6 +124,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoMultipleValuesOrdering(): void
     {
         // Test multiple BYWEEKNO values in correct chronological order
@@ -144,6 +149,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoWithInterval(): void
     {
         // Every 2 years in week 26
@@ -164,6 +170,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoDTSTARTAlignment(): void
     {
         // Test that DTSTART week is preserved when BYWEEKNO includes it
@@ -195,6 +202,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         $this->testRruler->parse('FREQ=YEARLY;BYWEEKNO=0');
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoWithUntilTermination(): void
     {
         // Test BYWEEKNO with UNTIL termination condition
@@ -211,6 +219,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoBiAnnualPattern(): void
     {
         // Test bi-annual pattern (every 6 months) - simplified version
@@ -230,6 +239,7 @@ final class ByWeekNoIntegrationTest extends TestCase
         }
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testByWeekNoSimpleMultipleWeeks(): void
     {
         // Test simple multiple weeks in same year

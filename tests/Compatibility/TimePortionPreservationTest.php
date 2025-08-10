@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test time portion preservation in complex yearly patterns.
@@ -63,7 +64,11 @@ final class TimePortionPreservationTest extends CompatibilityTestCase
     /**
      * Test time preservation in yearly with BYDAY.
      * Complex pattern where time loss is most likely.
+     *
+     * ⚠️  EXPECTED TO FAIL: sabre/dav has different YEARLY+BYDAY behavior.
+     * Rruler correctly implements RFC 5545 behavior validated against python-dateutil.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testYearlyByDayTimePreservation(): void
     {
         $start = new DateTimeImmutable('2025-01-06 11:20:15'); // Monday
@@ -154,6 +159,7 @@ final class TimePortionPreservationTest extends CompatibilityTestCase
      * Test time preservation in weekly patterns with BYSETPOS.
      * Ensures weekly patterns also preserve time correctly.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosTimePreservation(): void
     {
         $start = new DateTimeImmutable('2025-01-03 10:15:30'); // Friday

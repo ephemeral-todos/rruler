@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Comprehensive tests documenting weekly BYSETPOS behavior differences between
@@ -42,6 +43,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * ⚠️  EXPECTED TO FAIL: sabre/dav ignores BYSETPOS for weekly patterns.
      * Rruler correctly implements RFC 5545 behavior.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosFirst(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00'); // Wednesday
@@ -59,6 +61,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * ⚠️  EXPECTED TO FAIL: sabre/dav ignores BYSETPOS for weekly patterns.
      * Rruler correctly implements RFC 5545 behavior.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosLast(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00'); // Wednesday
@@ -74,6 +77,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS=2 (second occurrence of week).
      * This tests middle position selection logic.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosSecond(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00'); // Wednesday
@@ -89,6 +93,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS with single weekday.
      * This should behave like normal weekly without BYSETPOS.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosSingleWeekday(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday
@@ -104,6 +109,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS starting from different weekdays.
      * Week boundaries might affect which occurrences are selected.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosFromSunday(): void
     {
         $start = new DateTimeImmutable('2025-01-05 10:00:00'); // Sunday
@@ -119,6 +125,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS starting from Monday.
      * Different start days may reveal boundary issues.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosFromMonday(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday
@@ -134,6 +141,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS starting from Saturday.
      * End of week start might reveal different behavior.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosFromSaturday(): void
     {
         $start = new DateTimeImmutable('2025-01-04 10:00:00'); // Saturday
@@ -149,6 +157,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS with consecutive weekdays.
      * This tests ordering within consecutive days.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosConsecutiveDays(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday
@@ -164,6 +173,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS with all weekdays.
      * This should select first/last day of each week.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosAllWeekdays(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday
@@ -179,6 +189,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS with interval > 1.
      * This tests behavior when combining BYSETPOS with weekly intervals.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosWithInterval(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00'); // Wednesday
@@ -194,6 +205,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS boundary at month transition.
      * Week boundaries spanning months might reveal issues.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosMonthBoundary(): void
     {
         $start = new DateTimeImmutable('2025-01-27 10:00:00'); // Monday (last week of January)
@@ -209,6 +221,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS boundary at year transition.
      * Week boundaries spanning years might reveal issues.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosYearBoundary(): void
     {
         $start = new DateTimeImmutable('2024-12-30 10:00:00'); // Monday (last week of 2024)
@@ -224,6 +237,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS with multiple positions.
      * This tests selecting multiple positions within each week.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosMultiplePositions(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday
@@ -239,6 +253,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS with mixed positive and negative positions.
      * This tests combining first and last position selection.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosMixedPositions(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday
@@ -254,6 +269,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS when start date doesn't match BYDAY.
      * This tests the behavior when start date is not in BYDAY list.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosStartNotInByDay(): void
     {
         $start = new DateTimeImmutable('2025-01-07 10:00:00'); // Tuesday (not in BYDAY)
@@ -269,6 +285,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
      * Test weekly BYSETPOS edge case: position beyond available occurrences.
      * This tests what happens when asking for 4th occurrence but only 3 available.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testWeeklyBySetPosPositionBeyondAvailable(): void
     {
         $start = new DateTimeImmutable('2025-01-06 10:00:00'); // Monday

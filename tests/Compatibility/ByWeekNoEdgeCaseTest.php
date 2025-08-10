@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * BYWEEKNO edge case compatibility tests.
  *
  * This test class validates edge cases and boundary conditions for BYWEEKNO
  * patterns against sabre/vobject to ensure RFC 5545 compliance.
+ *
+ * ⚠️  IMPORTANT: These tests document intentional differences from sabre/dav.
+ *
+ * sabre/dav has bugs in its BYWEEKNO implementation for yearly frequencies where
+ * it returns incorrect dates and doesn't properly handle week boundaries.
+ *
+ * Rruler correctly implements RFC 5545 BYWEEKNO behavior, validated against
+ * python-dateutil (the gold standard). These tests will fail when comparing against
+ * sabre/dav, which is expected and correct.
  */
 final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
 {
@@ -19,6 +29,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
      *
      * Tests patterns that span across year boundaries, including week 1 and week 52/53.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testYearBoundaryWeekOnePattern(): void
     {
         // Week 1 typically spans from late December to early January
@@ -31,6 +42,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testYearBoundaryWeekFiftyTwoPattern(): void
     {
         // Week 52 typically spans into the next year
@@ -43,6 +55,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testConsecutiveYearBoundaryWeeks(): void
     {
         // Test consecutive weeks that cross year boundary
@@ -60,6 +73,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
      *
      * Tests patterns in leap years and their interaction with week numbering.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testLeapYearWeekNumbering(): void
     {
         // 2024 is a leap year
@@ -72,6 +86,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testLeapYearWeekFiftyThree(): void
     {
         // 2020 has 53 weeks, next occurrence is 2026
@@ -84,6 +99,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testLeapYearTransitionWeek(): void
     {
         // Test February 29th week in leap year
@@ -101,6 +117,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
      *
      * Tests patterns that validate ISO 8601 compliance for week numbering.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testIso8601Week1Definition(): void
     {
         // ISO 8601: Week 1 is the first week with at least 4 days in the new year
@@ -114,6 +131,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testIso8601LastWeekDefinition(): void
     {
         // ISO 8601: Last week of year depends on January 1st day
@@ -126,6 +144,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testIso8601MondayWeekStart(): void
     {
         // ISO 8601 specifies Monday as the first day of the week
@@ -143,6 +162,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
      *
      * Tests more complex scenarios involving year boundaries.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testMultipleYearBoundaryWeeks(): void
     {
         // Test multiple weeks around year boundary
@@ -155,6 +175,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testYearBoundaryWithInterval(): void
     {
         // Every other year, week 1
@@ -167,6 +188,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testYearBoundaryWithCount(): void
     {
         // Test COUNT termination across year boundaries
@@ -184,6 +206,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
      *
      * Tests patterns starting from dates that don't align with week boundaries.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testMidWeekStartYearBoundary(): void
     {
         // Start in middle of week that crosses year boundary
@@ -196,6 +219,7 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
         );
     }
 
+    #[Group('sabre-dav-incompatibility')]
     public function testWeekendStartYearBoundary(): void
     {
         // Start on weekend during year boundary week

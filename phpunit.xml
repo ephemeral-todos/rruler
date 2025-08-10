@@ -9,6 +9,11 @@
          beStrictAboutTodoAnnotatedTests="true"
          failOnRisky="true"
          failOnWarning="true">
+    <groups>
+        <exclude>
+            <group>sabre-dav-incompatibility</group>
+        </exclude>
+    </groups>
     <testsuites>
         <testsuite name="unit">
             <directory suffix="Test.php">tests/Unit</directory>

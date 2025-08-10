@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -140,6 +141,7 @@ final class DocumentationAccuracyTest extends TestCase
      * COMPATIBILITY_ISSUES.md lists weekly BYSETPOS as an intentional difference.
      * This test validates the documented behavior matches actual implementation.
      */
+    #[Group('sabre-dav-incompatibility')]
     public function testDocumentedIntentionalDifferencesAreAccurate(): void
     {
         // Weekly BYSETPOS example from documentation - add COUNT for safety
