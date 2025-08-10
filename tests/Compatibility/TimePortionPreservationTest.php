@@ -157,11 +157,13 @@ final class TimePortionPreservationTest extends CompatibilityTestCase
     public function testWeeklyBySetPosTimePreservation(): void
     {
         $start = new DateTimeImmutable('2025-01-03 10:15:30'); // Friday
+        
+        // ⚠️ EXPECTED FAILURE: sabre/vobject ignores BYSETPOS for weekly frequencies
         $this->assertRruleCompatibility(
             'FREQ=WEEKLY;BYDAY=FR;BYSETPOS=1;COUNT=4',
             $start,
             4,
-            'Weekly BYSETPOS should preserve time portions'
+            'Weekly BYSETPOS time preservation (RFC 5545 compliant, differs from sabre/vobject)'
         );
     }
 

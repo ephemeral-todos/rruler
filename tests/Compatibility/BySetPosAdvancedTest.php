@@ -106,17 +106,20 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
      * Test BYSETPOS boundary condition tests.
      *
      * Tests edge cases for first, last, and out-of-bounds positions.
+     * 
+     * ⚠️ WEEKLY BYSETPOS tests will fail due to intentional RFC 5545 compliance difference.
+     * See COMPATIBILITY_ISSUES.md for details on weekly BYSETPOS behavior.
      */
     public function testFirstPositionBoundary(): void
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
 
-        // Test first position explicitly
+        // ⚠️ EXPECTED FAILURE: sabre/vobject ignores BYSETPOS for weekly frequencies
         $this->assertRruleCompatibility(
             'FREQ=WEEKLY;BYDAY=SA,SU;BYSETPOS=1;COUNT=8',
             $start,
             8,
-            'First weekend day of each week'
+            'First weekend day of each week (RFC 5545 compliant, differs from sabre/vobject)'
         );
     }
 
@@ -124,12 +127,12 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
 
-        // Test last position explicitly
+        // ⚠️ EXPECTED FAILURE: sabre/vobject ignores BYSETPOS for weekly frequencies
         $this->assertRruleCompatibility(
             'FREQ=WEEKLY;BYDAY=SA,SU;BYSETPOS=-1;COUNT=8',
             $start,
             8,
-            'Last weekend day of each week'
+            'Last weekend day of each week (RFC 5545 compliant, differs from sabre/vobject)'
         );
     }
 
@@ -168,12 +171,12 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
 
-        // Weekly pattern with BYSETPOS
+        // ⚠️ EXPECTED FAILURE: sabre/vobject ignores BYSETPOS for weekly frequencies
         $this->assertRruleCompatibility(
             'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=2,4;COUNT=8',
             $start,
             8,
-            'Second and fourth weekdays of each week'
+            'Second and fourth weekdays of each week (RFC 5545 compliant, differs from sabre/vobject)'
         );
     }
 

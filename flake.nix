@@ -26,6 +26,8 @@
             configuredPkgs.php.packages.phive
             pkgs.gnupg
             pkgs.just
+            pkgs.python3
+            pkgs.python3Packages.python-dateutil
           ];
           shellHook = ''
             export PATH=$(pwd)/tools:$PATH

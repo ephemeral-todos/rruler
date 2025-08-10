@@ -49,12 +49,12 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
 
-        // Take first of Monday/Wednesday/Friday each week
+        // ⚠️ EXPECTED FAILURE: sabre/vobject ignores BYSETPOS for weekly frequencies
         $this->assertRruleCompatibility(
             'FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1;COUNT=8',
             $start,
             8,
-            'First occurrence from Mon/Wed/Fri each week (Monday only)'
+            'First occurrence from Mon/Wed/Fri each week (RFC 5545 compliant, differs from sabre/vobject)'
         );
     }
 
@@ -62,12 +62,12 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
     {
         $start = new DateTimeImmutable('2025-01-01 10:00:00');
 
-        // Take last of Monday/Wednesday/Friday each week
+        // ⚠️ EXPECTED FAILURE: sabre/vobject ignores BYSETPOS for weekly frequencies
         $this->assertRruleCompatibility(
             'FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=-1;COUNT=8',
             $start,
             8,
-            'Last occurrence from Mon/Wed/Fri each week (Friday only)'
+            'Last occurrence from Mon/Wed/Fri each week (RFC 5545 compliant, differs from sabre/vobject)'
         );
     }
 
