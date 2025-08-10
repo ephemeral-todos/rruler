@@ -238,65 +238,286 @@ final readonly class Rrule implements Stringable
     }
 
     /**
-     * @return array<array{position: int|null, weekday: string}>|null
+     * Gets the weekday specifications for BYDAY parameter.
+     *
+     * Returns an array of weekday specifications where each element contains
+     * a position (for positional references like "first Monday") and weekday code.
+     * Position can be null for simple weekday references, positive (1-5) for
+     * "Nth weekday", or negative (-1 to -5) for "Nth from end" references.
+     *
+     * @return array<array{position: int|null, weekday: string}>|null Array of day specifications or null if not set.
+     *                                                                Format: [['position' => 1, 'weekday' => 'MO'], ['position' => null, 'weekday' => 'FR']]
+     *
+     * @example Simple weekdays
+     * ```php
+     * $rrule = $rruler->parse('FREQ=WEEKLY;BYDAY=MO,WE,FR');
+     * foreach ($rrule->getByDay() as $daySpec) {
+     *     echo $daySpec['weekday']; // 'MO', 'WE', 'FR'
+     *     var_dump($daySpec['position']); // null (no position specified)
+     * }
+     * ```
+     * @example Positional weekdays
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=1MO,-1FR');
+     * foreach ($rrule->getByDay() as $daySpec) {
+     *     if ($daySpec['position'] === 1) {
+     *         echo "First {$daySpec['weekday']} of the month"; // "First MO of the month"
+     *     } elseif ($daySpec['position'] === -1) {
+     *         echo "Last {$daySpec['weekday']} of the month"; // "Last FR of the month"
+     *     }
+     * }
+     * ```
      */
     public function getByDay(): ?array
     {
         return $this->byDay;
     }
 
+    /**
+     * Checks if weekday specifications are present.
+     *
+     * @return bool True if BYDAY parameter is specified, false otherwise
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=WEEKLY;BYDAY=MO,FR');
+     * if ($rrule->hasByDay()) {
+     *     echo "Recurring on specific weekdays";
+     *     foreach ($rrule->getByDay() as $daySpec) {
+     *         echo $daySpec['weekday'] . " ";
+     *     }
+     * }
+     * ```
+     */
     public function hasByDay(): bool
     {
         return $this->byDay !== null;
     }
 
     /**
-     * @return array<int>|null
+     * Gets the day-of-month specifications for BYMONTHDAY parameter.
+     *
+     * Returns an array of integers representing specific days of the month.
+     * Positive values (1-31) count from the beginning of the month, while
+     * negative values (-1 to -31) count from the end of the month.
+     *
+     * @return array<int>|null Array of month day values or null if not set.
+     *                         Positive: 1-31 (1st, 2nd, ..., 31st)
+     *                         Negative: -1 to -31 (last, second-to-last, etc.)
+     *
+     * @example Specific days of month
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYMONTHDAY=1,15,-1');
+     * foreach ($rrule->getByMonthDay() as $day) {
+     *     if ($day > 0) {
+     *         echo "Day {$day} of the month\n"; // "Day 1 of the month", "Day 15 of the month"
+     *     } else {
+     *         echo "Day {$day} from the end\n"; // "Day -1 from the end" (last day)
+     *     }
+     * }
+     * ```
+     * @example Monthly recurring on last day
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYMONTHDAY=-1');
+     * // Will occur on Jan 31, Feb 28/29, Mar 31, Apr 30, etc.
+     * echo "Always on the last day of each month";
+     * ```
      */
     public function getByMonthDay(): ?array
     {
         return $this->byMonthDay;
     }
 
+    /**
+     * Checks if day-of-month specifications are present.
+     *
+     * @return bool True if BYMONTHDAY parameter is specified, false otherwise
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYMONTHDAY=15');
+     * if ($rrule->hasByMonthDay()) {
+     *     echo "Recurring on specific days of the month: ";
+     *     echo implode(', ', $rrule->getByMonthDay());
+     * }
+     * ```
+     */
     public function hasByMonthDay(): bool
     {
         return $this->byMonthDay !== null;
     }
 
     /**
-     * @return array<int>|null
+     * Gets the month specifications for BYMONTH parameter.
+     *
+     * Returns an array of integers representing specific months for yearly
+     * patterns. Values range from 1 (January) to 12 (December). This parameter
+     * is commonly used with FREQ=YEARLY to create quarterly, semi-annual,
+     * or other month-specific recurring patterns.
+     *
+     * @return array<int>|null Array of month values (1-12) or null if not set.
+     *                         1=January, 2=February, ..., 12=December
+     *
+     * @example Quarterly recurrence
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYMONTH=3,6,9,12;BYMONTHDAY=15');
+     * foreach ($rrule->getByMonth() as $month) {
+     *     $monthName = date('F', mktime(0, 0, 0, $month, 1));
+     *     echo "Recurring in {$monthName}\n"; // "Recurring in March", etc.
+     * }
+     * // Results in: March 15, June 15, September 15, December 15 each year
+     * ```
+     * @example Semi-annual pattern
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYMONTH=1,7;BYDAY=1MO');
+     * // First Monday in January and July each year
+     * echo "Semi-annual meetings on first Monday";
+     * ```
      */
     public function getByMonth(): ?array
     {
         return $this->byMonth;
     }
 
+    /**
+     * Checks if month specifications are present.
+     *
+     * @return bool True if BYMONTH parameter is specified, false otherwise
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYMONTH=6,12');
+     * if ($rrule->hasByMonth()) {
+     *     echo "Occurring in specific months: ";
+     *     foreach ($rrule->getByMonth() as $month) {
+     *         echo date('F', mktime(0, 0, 0, $month, 1)) . " ";
+     *     }
+     * }
+     * ```
+     */
     public function hasByMonth(): bool
     {
         return $this->byMonth !== null;
     }
 
     /**
-     * @return array<int>|null
+     * Gets the week number specifications for BYWEEKNO parameter.
+     *
+     * Returns an array of integers representing specific ISO 8601 week numbers
+     * for yearly patterns. Positive values (1-53) count from the beginning of
+     * the year, while negative values (-1 to -53) count from the end. This
+     * parameter is only valid with FREQ=YEARLY.
+     *
+     * Week numbers follow ISO 8601 standard where week 1 is the first week
+     * that contains at least 4 days in the new year, and weeks start on Monday.
+     *
+     * @return array<int>|null Array of week numbers (1-53, -1 to -53) or null if not set.
+     *                         Positive: 1-53 (1st week, 2nd week, ..., 53rd week)
+     *                         Negative: -1 to -53 (last week, second-to-last week, etc.)
+     *
+     * @example First and last week of year
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYWEEKNO=1,-1;BYDAY=MO');
+     * foreach ($rrule->getByWeekNo() as $weekNo) {
+     *     if ($weekNo > 0) {
+     *         echo "Week {$weekNo} of the year\n";
+     *     } else {
+     *         echo "Week {$weekNo} from the end\n"; // Week -1 = last week
+     *     }
+     * }
+     * // Results in: First Monday of first week, First Monday of last week
+     * ```
+     * @example Quarterly week-based pattern
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYWEEKNO=13,26,39,52;BYDAY=FR');
+     * // Friday of weeks 13, 26, 39, 52 (roughly quarterly)
+     * echo "Quarterly Friday meetings";
+     * ```
      */
     public function getByWeekNo(): ?array
     {
         return $this->byWeekNo;
     }
 
+    /**
+     * Checks if week number specifications are present.
+     *
+     * @return bool True if BYWEEKNO parameter is specified, false otherwise
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYWEEKNO=1,52;BYDAY=MO');
+     * if ($rrule->hasByWeekNo()) {
+     *     echo "Recurring on specific weeks: ";
+     *     echo implode(', ', $rrule->getByWeekNo());
+     * }
+     * ```
+     */
     public function hasByWeekNo(): bool
     {
         return $this->byWeekNo !== null;
     }
 
     /**
-     * @return array<int>|null
+     * Gets the position specifications for BYSETPOS parameter.
+     *
+     * Returns an array of integers representing positions to select from the
+     * set of occurrences generated by other BY* rules within each period.
+     * Positive values (1-N) select from the beginning, while negative values
+     * (-1 to -N) select from the end. This is an advanced parameter that
+     * operates on the results of other BY* constraints.
+     *
+     * BYSETPOS is applied after all other BY* rules are processed, selecting
+     * specific positions from the expanded occurrence set within each period
+     * (day, week, month, or year depending on FREQ).
+     *
+     * @return array<int>|null Array of position values (1 to N, -1 to -N) or null if not set.
+     *                         Positive: 1-N (1st occurrence, 2nd occurrence, etc.)
+     *                         Negative: -1 to -N (last occurrence, second-to-last, etc.)
+     *
+     * @example Last Friday of each month
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=FR;BYSETPOS=-1');
+     * // Step 1: Find all Fridays in each month
+     * // Step 2: Select the last one (-1) from each month's Fridays
+     * echo "Last Friday of each month";
+     * ```
+     * @example First and third Monday of each month
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1,3');
+     * foreach ($rrule->getBySetPos() as $pos) {
+     *     echo "Position {$pos} Monday of each month\n";
+     * }
+     * // Results in: 1st Monday and 3rd Monday of each month
+     * ```
+     * @example Complex yearly pattern
+     * ```php
+     * $rrule = $rruler->parse('FREQ=YEARLY;BYMONTH=1,4,7,10;BYDAY=MO;BYSETPOS=2');
+     * // Find all Mondays in Jan, Apr, Jul, Oct, then select the 2nd Monday from each quarter
+     * echo "Second Monday of each quarter";
+     * ```
      */
     public function getBySetPos(): ?array
     {
         return $this->bySetPos;
     }
 
+    /**
+     * Checks if position specifications are present.
+     *
+     * @return bool True if BYSETPOS parameter is specified, false otherwise
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=FR;BYSETPOS=-1');
+     * if ($rrule->hasBySetPos()) {
+     *     echo "Using position selection: ";
+     *     foreach ($rrule->getBySetPos() as $pos) {
+     *         echo ($pos > 0) ? "position {$pos}" : "position {$pos} from end";
+     *     }
+     * }
+     * ```
+     */
     public function hasBySetPos(): bool
     {
         return $this->bySetPos !== null;

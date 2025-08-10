@@ -1,5 +1,6 @@
 /.direnv/
 /.php-cs-fixer.cache
+/.phpdoc/
 /.phpunit.cache/
 /composer.lock
 /coverage/
