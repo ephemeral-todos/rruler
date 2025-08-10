@@ -485,23 +485,23 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         // For yearly patterns, BYDAY specifications are applied across the entire year
         $weekday = $this->getWeekdayFromDate($date);
-        
+
         foreach ($byDay as $byDaySpec) {
             if ($byDaySpec['weekday'] !== $weekday) {
                 continue;
             }
-            
+
             // If no position specified, any occurrence of this weekday matches
             if ($byDaySpec['position'] === null) {
                 return true;
             }
-            
+
             // Check if this date matches the positional specification within the year
             if ($this->dateMatchesYearlyPosition($date, $byDaySpec['position'])) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -610,7 +610,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     {
         $yearEnd = $yearStart->modify('last day of December this year');
         $candidate = $yearStart;
-        
+
         // Extract time components from yearStart to preserve in result
         $timeComponents = $yearStart->format('H:i:s');
 
@@ -1439,10 +1439,10 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         // This is crucial for RFC 5545 compliance
         foreach ($byDay as $byDaySpec) {
             $weekday = $byDaySpec['weekday'];
-            
+
             // Find the date for this weekday within the period
             $weekdayDate = $this->findWeekdayInPeriod($weekday, $periodStart, $periodEnd);
-            
+
             if ($weekdayDate !== null) {
                 // Preserve time components from the time source if provided
                 if ($timeSource !== null) {
@@ -1470,20 +1470,20 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         // Map weekday abbreviations to PHP day names
         $dayNames = [
             'SU' => 'Sunday',
-            'MO' => 'Monday', 
+            'MO' => 'Monday',
             'TU' => 'Tuesday',
             'WE' => 'Wednesday',
             'TH' => 'Thursday',
             'FR' => 'Friday',
-            'SA' => 'Saturday'
+            'SA' => 'Saturday',
         ];
-        
+
         if (!isset($dayNames[$weekday])) {
             return null;
         }
-        
+
         $dayName = $dayNames[$weekday];
-        
+
         // Find the specific weekday within the period
         $current = $periodStart;
         while ($current <= $periodEnd) {
@@ -1492,7 +1492,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             }
             $current = $current->modify('+1 day');
         }
-        
+
         return null;
     }
 

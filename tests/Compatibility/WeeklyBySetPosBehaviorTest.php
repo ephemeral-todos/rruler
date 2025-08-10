@@ -11,12 +11,12 @@ use DateTimeImmutable;
  * Rruler and sabre/dav implementations.
  *
  * ⚠️  IMPORTANT: These tests document an intentional difference from sabre/dav.
- * 
+ *
  * sabre/dav has a bug where it completely ignores BYSETPOS for weekly frequencies,
  * treating FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1 identically to FREQ=WEEKLY;BYDAY=MO,WE,FR.
- * 
- * Rruler correctly implements RFC 5545 weekly BYSETPOS behavior, validated against 
- * python-dateutil (the gold standard). These tests will fail when comparing against 
+ *
+ * Rruler correctly implements RFC 5545 weekly BYSETPOS behavior, validated against
+ * python-dateutil (the gold standard). These tests will fail when comparing against
  * sabre/dav, which is expected and correct.
  *
  * See COMPATIBILITY_ISSUES.md for detailed documentation of this difference.
@@ -30,15 +30,15 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
     public function testSabreDavWeeklyBySetPosBugDocumentation(): void
     {
         $this->markTestSkipped(
-            'sabre/dav has a confirmed bug where it ignores BYSETPOS for weekly frequencies. ' .
-            'Rruler implements correct RFC 5545 behavior validated against python-dateutil. ' .
+            'sabre/dav has a confirmed bug where it ignores BYSETPOS for weekly frequencies. '.
+            'Rruler implements correct RFC 5545 behavior validated against python-dateutil. '.
             'This intentional difference is documented in COMPATIBILITY_ISSUES.md'
         );
     }
 
     /**
      * Test basic weekly BYSETPOS=1 (first occurrence of week).
-     * 
+     *
      * ⚠️  EXPECTED TO FAIL: sabre/dav ignores BYSETPOS for weekly patterns.
      * Rruler correctly implements RFC 5545 behavior.
      */
@@ -55,7 +55,7 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
 
     /**
      * Test basic weekly BYSETPOS=-1 (last occurrence of week).
-     * 
+     *
      * ⚠️  EXPECTED TO FAIL: sabre/dav ignores BYSETPOS for weekly patterns.
      * Rruler correctly implements RFC 5545 behavior.
      */

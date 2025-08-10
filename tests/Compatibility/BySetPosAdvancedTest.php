@@ -106,7 +106,7 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
      * Test BYSETPOS boundary condition tests.
      *
      * Tests edge cases for first, last, and out-of-bounds positions.
-     * 
+     *
      * ⚠️ WEEKLY BYSETPOS tests will fail due to intentional RFC 5545 compliance difference.
      * See COMPATIBILITY_ISSUES.md for details on weekly BYSETPOS behavior.
      */

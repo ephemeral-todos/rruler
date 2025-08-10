@@ -88,8 +88,8 @@ final class ReadmeCodeExampleTest extends TestCase
         $this->assertCount(4, $reviews);
 
         // Should be the last Friday of March, June, September, December for year 2024
-        // Note: The pattern starts from the start date year and continues
-        $expectedMonthsInSequence = [6, 9, 12, 3]; // June 2024, Sep 2024, Dec 2024, March 2025
+        // Note: The pattern starts from the start date since it matches the pattern
+        $expectedMonthsInSequence = [3, 6, 9, 12]; // March 2024, June 2024, Sep 2024, Dec 2024
         foreach ($reviews as $index => $review) {
             $this->assertEquals(5, (int) $review->format('N'), 'Review should be on Friday');
             $this->assertEquals($expectedMonthsInSequence[$index], (int) $review->format('n'), 'Review should be in expected month sequence');
