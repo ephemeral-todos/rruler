@@ -16,6 +16,7 @@ use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
 use EphemeralTodos\Rruler\Parser\Ast\Node;
 use EphemeralTodos\Rruler\Parser\Ast\RruleAst;
 use EphemeralTodos\Rruler\Parser\Ast\UntilNode;
+use EphemeralTodos\Rruler\Parser\Ast\WkstNode;
 
 /**
  * Parses RFC 5545 recurrence rule strings into Abstract Syntax Tree (AST) representation.
@@ -47,6 +48,7 @@ use EphemeralTodos\Rruler\Parser\Ast\UntilNode;
  * - BYMONTH: Month selection
  * - BYWEEKNO: Week number selection
  * - BYSETPOS: Position-based occurrence selection
+ * - WKST: Week start day configuration
  *
  * @example Basic usage
  * ```php
@@ -101,6 +103,7 @@ final class RruleParser
         ByMonthNode::NAME => ByMonthNode::class,
         BySetPosNode::NAME => BySetPosNode::class,
         ByWeekNoNode::NAME => ByWeekNoNode::class,
+        WkstNode::NAME => WkstNode::class,
     ];
 
     /**

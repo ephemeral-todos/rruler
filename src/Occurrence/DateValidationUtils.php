@@ -280,4 +280,63 @@ final class DateValidationUtils
 
         return false;
     }
+
+    /**
+     * Get week boundaries (start and end dates) for a given date using a specific week start day.
+     *
+     * @param DateTimeImmutable $date The date to find the week boundaries for
+     * @param string $weekStart Week start day ('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA')
+     * @return array{start: DateTimeImmutable, end: DateTimeImmutable} Week start and end dates
+     */
+    public static function getWeekBoundaries(DateTimeImmutable $date, string $weekStart): array
+    {
+        $dayOfWeek = (int) $date->format('w'); // 0=Sunday, 6=Saturday
+        $weekStartOffset = self::mapWeekdayToOffset($weekStart);
+
+        // Calculate days to subtract to get to the week start
+        $daysToSubtract = ($dayOfWeek - $weekStartOffset + 7) % 7;
+
+        $weekStartDate = $date->modify("-{$daysToSubtract} days");
+        $weekEndDate = $weekStartDate->modify('+6 days');
+
+        return [
+            'start' => $weekStartDate,
+            'end' => $weekEndDate,
+        ];
+    }
+
+    /**
+     * Get the offset of a weekday relative to a specific week start day.
+     *
+     * @param string $weekday Target weekday ('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA')
+     * @param string $weekStart Week start day ('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA')
+     * @return int Offset (0-6) where 0 is the week start day
+     */
+    public static function getWeekdayOffset(string $weekday, string $weekStart): int
+    {
+        $weekdayOffset = self::mapWeekdayToOffset($weekday);
+        $weekStartOffset = self::mapWeekdayToOffset($weekStart);
+
+        return ($weekdayOffset - $weekStartOffset + 7) % 7;
+    }
+
+    /**
+     * Map a weekday string to its numeric offset (0=Sunday, 1=Monday, etc.).
+     *
+     * @param string $weekday Weekday ('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA')
+     * @return int Numeric offset (0-6)
+     */
+    public static function mapWeekdayToOffset(string $weekday): int
+    {
+        return match ($weekday) {
+            'SU' => 0,
+            'MO' => 1,
+            'TU' => 2,
+            'WE' => 3,
+            'TH' => 4,
+            'FR' => 5,
+            'SA' => 6,
+            default => throw new \InvalidArgumentException("Invalid weekday: {$weekday}"),
+        };
+    }
 }

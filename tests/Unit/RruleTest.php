@@ -100,6 +100,92 @@ final class RruleTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $rruleWithUntil->getUntil());
     }
 
+    public function testDefaultWeekStartDay(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY');
+
+        $this->assertEquals('MO', $rrule->getWeekStart());
+        $this->assertFalse($rrule->hasWeekStart());
+    }
+
+    public function testExplicitWeekStartDay(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;WKST=SU');
+
+        $this->assertEquals('SU', $rrule->getWeekStart());
+        $this->assertTrue($rrule->hasWeekStart());
+    }
+
+    public function testWeekStartDayValues(): void
+    {
+        $testCases = [
+            'FREQ=WEEKLY;WKST=SU' => 'SU',
+            'FREQ=WEEKLY;WKST=MO' => 'MO',
+            'FREQ=WEEKLY;WKST=TU' => 'TU',
+            'FREQ=WEEKLY;WKST=WE' => 'WE',
+            'FREQ=WEEKLY;WKST=TH' => 'TH',
+            'FREQ=WEEKLY;WKST=FR' => 'FR',
+            'FREQ=WEEKLY;WKST=SA' => 'SA',
+        ];
+
+        foreach ($testCases as $rruleString => $expectedWeekStart) {
+            $rrule = $this->testRruler->parse($rruleString);
+            $this->assertEquals($expectedWeekStart, $rrule->getWeekStart(), "Failed for RRULE: {$rruleString}");
+        }
+    }
+
+    public function testWeekStartWithDifferentFrequencies(): void
+    {
+        $frequencies = ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'];
+
+        foreach ($frequencies as $frequency) {
+            $rrule = $this->testRruler->parse("FREQ={$frequency};WKST=SU");
+            $this->assertEquals('SU', $rrule->getWeekStart(), "Failed for frequency: {$frequency}");
+            $this->assertTrue($rrule->hasWeekStart(), "Failed hasWeekStart for frequency: {$frequency}");
+        }
+    }
+
+    public function testRruleToStringWithWkst(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;WKST=SU;COUNT=5');
+        $stringRepresentation = (string) $rrule;
+
+        $this->assertStringContainsString('FREQ=WEEKLY', $stringRepresentation);
+        $this->assertStringContainsString('WKST=SU', $stringRepresentation);
+        $this->assertStringContainsString('COUNT=5', $stringRepresentation);
+    }
+
+    public function testRruleToStringWithoutWkst(): void
+    {
+        $rrule = $this->testRruler->parse('FREQ=WEEKLY;COUNT=5');
+        $stringRepresentation = (string) $rrule;
+
+        $this->assertStringContainsString('FREQ=WEEKLY', $stringRepresentation);
+        $this->assertStringNotContainsString('WKST=', $stringRepresentation);
+        $this->assertStringContainsString('COUNT=5', $stringRepresentation);
+    }
+
+    public function testWkstRoundTripParsing(): void
+    {
+        $originalStrings = [
+            'FREQ=WEEKLY;WKST=SU',
+            'FREQ=WEEKLY;WKST=MO;COUNT=10',
+            'FREQ=WEEKLY;WKST=FR;INTERVAL=2',
+            'FREQ=YEARLY;WKST=SA;BYMONTH=6,12',
+        ];
+
+        foreach ($originalStrings as $originalString) {
+            $rrule = $this->testRruler->parse($originalString);
+            $recreatedRrule = $this->testRruler->parse((string) $rrule);
+
+            $this->assertEquals($rrule->getFrequency(), $recreatedRrule->getFrequency());
+            $this->assertEquals($rrule->getWeekStart(), $recreatedRrule->getWeekStart());
+            $this->assertEquals($rrule->hasWeekStart(), $recreatedRrule->hasWeekStart());
+            $this->assertEquals($rrule->getInterval(), $recreatedRrule->getInterval());
+            $this->assertEquals($rrule->getCount(), $recreatedRrule->getCount());
+        }
+    }
+
     public function testHasCountAndHasUntilMethods(): void
     {
         $rruleWithCount = $this->testRruler->parse('FREQ=DAILY;COUNT=10');
@@ -131,6 +217,7 @@ final class RruleTest extends TestCase
             'byMonth' => null,
             'byWeekNo' => null,
             'bySetPos' => null,
+            'weekStart' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -174,6 +261,7 @@ final class RruleTest extends TestCase
             'byMonth' => null,
             'byWeekNo' => null,
             'bySetPos' => null,
+            'weekStart' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -206,6 +294,7 @@ final class RruleTest extends TestCase
             'byMonth' => [1, 6, 12],
             'byWeekNo' => null,
             'bySetPos' => null,
+            'weekStart' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);
@@ -272,6 +361,7 @@ final class RruleTest extends TestCase
             'byMonth' => null,
             'byWeekNo' => [1, 26, 53],
             'bySetPos' => null,
+            'weekStart' => null,
         ];
 
         $this->assertEquals($expectedArray, $array);

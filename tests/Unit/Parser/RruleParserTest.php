@@ -13,6 +13,7 @@ use EphemeralTodos\Rruler\Parser\Ast\ByWeekNoNode;
 use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
+use EphemeralTodos\Rruler\Parser\Ast\WkstNode;
 use EphemeralTodos\Rruler\Parser\RruleParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -108,6 +109,16 @@ final class RruleParserTest extends TestCase
         $this->assertEquals([13, 26, 39, 52], $ast->getNode('BYWEEKNO')->getValue());
     }
 
+    public function testParseWkstParameter(): void
+    {
+        $parser = new RruleParser();
+        $ast = $parser->parse('FREQ=WEEKLY;WKST=SU');
+
+        $this->assertTrue($ast->hasNode('WKST'));
+        $this->assertInstanceOf(WkstNode::class, $ast->getNode('WKST'));
+        $this->assertEquals('SU', $ast->getNode('WKST')->getValue());
+    }
+
     public function testGetNonExistentNodeThrowsException(): void
     {
         $parser = new RruleParser();
@@ -197,6 +208,22 @@ final class RruleParserTest extends TestCase
             'byweekno with spaces' => [
                 ['FREQ' => 'YEARLY', 'BYWEEKNO' => [1, 26, 53]],
                 'FREQ=YEARLY;BYWEEKNO=1, 26, 53',
+            ],
+            'weekly with wkst sunday' => [
+                ['FREQ' => 'WEEKLY', 'WKST' => 'SU'],
+                'FREQ=WEEKLY;WKST=SU',
+            ],
+            'weekly with wkst monday' => [
+                ['FREQ' => 'WEEKLY', 'WKST' => 'MO'],
+                'FREQ=WEEKLY;WKST=MO',
+            ],
+            'weekly with wkst friday' => [
+                ['FREQ' => 'WEEKLY', 'WKST' => 'FR'],
+                'FREQ=WEEKLY;WKST=FR',
+            ],
+            'wkst with spaces' => [
+                ['FREQ' => 'WEEKLY', 'WKST' => 'TU'],
+                ' FREQ = WEEKLY ; WKST = TU ',
             ],
         ];
     }
@@ -328,6 +355,26 @@ final class RruleParserTest extends TestCase
                 ValidationException::class,
                 'BYWEEKNO cannot contain empty week specifications',
                 'FREQ=YEARLY;BYWEEKNO=1,,26',
+            ],
+            'invalid wkst empty' => [
+                ParseException::class,
+                'Invalid parameter format: WKST=. Expected parameter=value',
+                'FREQ=WEEKLY;WKST=',
+            ],
+            'invalid wkst invalid value' => [
+                ValidationException::class,
+                'Invalid week start day value: INVALID. Valid values are: SU, MO, TU, WE, TH, FR, SA',
+                'FREQ=WEEKLY;WKST=INVALID',
+            ],
+            'invalid wkst lowercase' => [
+                ValidationException::class,
+                'Invalid week start day value: mo. Valid values are: SU, MO, TU, WE, TH, FR, SA',
+                'FREQ=WEEKLY;WKST=mo',
+            ],
+            'invalid wkst full name' => [
+                ValidationException::class,
+                'Invalid week start day value: MONDAY. Valid values are: SU, MO, TU, WE, TH, FR, SA',
+                'FREQ=WEEKLY;WKST=MONDAY',
             ],
         ];
     }

@@ -288,4 +288,156 @@ final class DateValidationUtilsTest extends TestCase
             [false, 2019], // Regular year with 52 weeks
         ];
     }
+
+    #[DataProvider('provideWeekBoundaryData')]
+    public function testGetWeekBoundariesWithWkst(array $expected, DateTimeImmutable $date, string $weekStart): void
+    {
+        $boundaries = DateValidationUtils::getWeekBoundaries($date, $weekStart);
+
+        $this->assertEquals($expected['start'], $boundaries['start']->format('Y-m-d'));
+        $this->assertEquals($expected['end'], $boundaries['end']->format('Y-m-d'));
+    }
+
+    #[DataProvider('provideWeekdayOffsetData')]
+    public function testGetWeekdayOffset(int $expected, string $weekday, string $weekStart): void
+    {
+        $offset = DateValidationUtils::getWeekdayOffset($weekday, $weekStart);
+
+        $this->assertEquals($expected, $offset);
+    }
+
+    #[DataProvider('provideWeekdayMappingData')]
+    public function testMapWeekdayToOffset(int $expected, string $weekday): void
+    {
+        $offset = DateValidationUtils::mapWeekdayToOffset($weekday);
+
+        $this->assertEquals($expected, $offset);
+    }
+
+    public static function provideWeekBoundaryData(): array
+    {
+        return [
+            // Monday as week start (default ISO)
+            [
+                ['start' => '2024-01-01', 'end' => '2024-01-07'],
+                new DateTimeImmutable('2024-01-03'), // Wednesday
+                'MO',
+            ],
+            [
+                ['start' => '2024-01-01', 'end' => '2024-01-07'],
+                new DateTimeImmutable('2024-01-01'), // Monday (week start)
+                'MO',
+            ],
+            [
+                ['start' => '2024-01-01', 'end' => '2024-01-07'],
+                new DateTimeImmutable('2024-01-07'), // Sunday (week end)
+                'MO',
+            ],
+
+            // Sunday as week start (US style)
+            [
+                ['start' => '2023-12-31', 'end' => '2024-01-06'],
+                new DateTimeImmutable('2024-01-03'), // Wednesday
+                'SU',
+            ],
+            [
+                ['start' => '2023-12-31', 'end' => '2024-01-06'],
+                new DateTimeImmutable('2023-12-31'), // Sunday (week start)
+                'SU',
+            ],
+            [
+                ['start' => '2023-12-31', 'end' => '2024-01-06'],
+                new DateTimeImmutable('2024-01-06'), // Saturday (week end)
+                'SU',
+            ],
+
+            // Tuesday as week start
+            [
+                ['start' => '2024-01-02', 'end' => '2024-01-08'],
+                new DateTimeImmutable('2024-01-03'), // Wednesday
+                'TU',
+            ],
+            [
+                ['start' => '2024-01-02', 'end' => '2024-01-08'],
+                new DateTimeImmutable('2024-01-02'), // Tuesday (week start)
+                'TU',
+            ],
+            [
+                ['start' => '2024-01-02', 'end' => '2024-01-08'],
+                new DateTimeImmutable('2024-01-08'), // Monday (week end)
+                'TU',
+            ],
+
+            // Friday as week start
+            [
+                ['start' => '2024-01-05', 'end' => '2024-01-11'],
+                new DateTimeImmutable('2024-01-08'), // Monday
+                'FR',
+            ],
+            [
+                ['start' => '2024-01-05', 'end' => '2024-01-11'],
+                new DateTimeImmutable('2024-01-05'), // Friday (week start)
+                'FR',
+            ],
+            [
+                ['start' => '2024-01-05', 'end' => '2024-01-11'],
+                new DateTimeImmutable('2024-01-11'), // Thursday (week end)
+                'FR',
+            ],
+        ];
+    }
+
+    public static function provideWeekdayOffsetData(): array
+    {
+        return [
+            // Monday as week start (standard ISO offset)
+            [0, 'MO', 'MO'], // Monday = 0 offset from Monday
+            [1, 'TU', 'MO'], // Tuesday = 1 offset from Monday
+            [2, 'WE', 'MO'], // Wednesday = 2 offset from Monday
+            [3, 'TH', 'MO'], // Thursday = 3 offset from Monday
+            [4, 'FR', 'MO'], // Friday = 4 offset from Monday
+            [5, 'SA', 'MO'], // Saturday = 5 offset from Monday
+            [6, 'SU', 'MO'], // Sunday = 6 offset from Monday
+
+            // Sunday as week start (US style)
+            [0, 'SU', 'SU'], // Sunday = 0 offset from Sunday
+            [1, 'MO', 'SU'], // Monday = 1 offset from Sunday
+            [2, 'TU', 'SU'], // Tuesday = 2 offset from Sunday
+            [3, 'WE', 'SU'], // Wednesday = 3 offset from Sunday
+            [4, 'TH', 'SU'], // Thursday = 4 offset from Sunday
+            [5, 'FR', 'SU'], // Friday = 5 offset from Sunday
+            [6, 'SA', 'SU'], // Saturday = 6 offset from Sunday
+
+            // Tuesday as week start
+            [0, 'TU', 'TU'], // Tuesday = 0 offset from Tuesday
+            [1, 'WE', 'TU'], // Wednesday = 1 offset from Tuesday
+            [2, 'TH', 'TU'], // Thursday = 2 offset from Tuesday
+            [3, 'FR', 'TU'], // Friday = 3 offset from Tuesday
+            [4, 'SA', 'TU'], // Saturday = 4 offset from Tuesday
+            [5, 'SU', 'TU'], // Sunday = 5 offset from Tuesday
+            [6, 'MO', 'TU'], // Monday = 6 offset from Tuesday
+
+            // Friday as week start
+            [0, 'FR', 'FR'], // Friday = 0 offset from Friday
+            [1, 'SA', 'FR'], // Saturday = 1 offset from Friday
+            [2, 'SU', 'FR'], // Sunday = 2 offset from Friday
+            [3, 'MO', 'FR'], // Monday = 3 offset from Friday
+            [4, 'TU', 'FR'], // Tuesday = 4 offset from Friday
+            [5, 'WE', 'FR'], // Wednesday = 5 offset from Friday
+            [6, 'TH', 'FR'], // Thursday = 6 offset from Friday
+        ];
+    }
+
+    public static function provideWeekdayMappingData(): array
+    {
+        return [
+            [0, 'SU'], // Sunday = 0 (matches PHP's w format)
+            [1, 'MO'], // Monday = 1
+            [2, 'TU'], // Tuesday = 2
+            [3, 'WE'], // Wednesday = 3
+            [4, 'TH'], // Thursday = 4
+            [5, 'FR'], // Friday = 5
+            [6, 'SA'], // Saturday = 6
+        ];
+    }
 }

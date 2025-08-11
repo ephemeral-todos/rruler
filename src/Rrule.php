@@ -102,6 +102,7 @@ final readonly class Rrule implements Stringable
      * @param array<int>|null $byMonth Month values (1-12) for yearly patterns
      * @param array<int>|null $byWeekNo Week number values (1-53, -1 to -53) for yearly patterns
      * @param array<int>|null $bySetPos Position values for occurrence selection (1 to N, -1 to -N)
+     * @param string|null $weekStart Week start day: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA' (defaults to 'MO')
      *
      * @example Constructor usage (typically internal)
      * ```php
@@ -128,6 +129,7 @@ final readonly class Rrule implements Stringable
         private ?array $byMonth = null,
         private ?array $byWeekNo = null,
         private ?array $bySetPos = null,
+        private ?string $weekStart = null,
     ) {
     }
 
@@ -524,6 +526,51 @@ final readonly class Rrule implements Stringable
     }
 
     /**
+     * Gets the week start day for this recurrence rule.
+     *
+     * Returns the explicitly specified week start day or the RFC 5545 default
+     * of 'MO' (Monday) when no WKST parameter is present. This affects how
+     * week-based calculations are performed for BYDAY and BYWEEKNO parameters.
+     *
+     * @return string One of: 'SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=WEEKLY;WKST=SU');
+     * echo $rrule->getWeekStart(); // 'SU'
+     *
+     * $rrule = $rruler->parse('FREQ=WEEKLY');
+     * echo $rrule->getWeekStart(); // 'MO' (default)
+     * ```
+     */
+    public function getWeekStart(): string
+    {
+        return $this->weekStart ?? 'MO';
+    }
+
+    /**
+     * Checks if a week start day is explicitly specified.
+     *
+     * Returns true only if the WKST parameter was explicitly set in the
+     * original RRULE string, false if using the RFC 5545 default of Monday.
+     *
+     * @return bool True if WKST parameter is specified, false if using default
+     *
+     * @example
+     * ```php
+     * $rrule = $rruler->parse('FREQ=WEEKLY;WKST=SU');
+     * echo $rrule->hasWeekStart(); // true
+     *
+     * $rrule = $rruler->parse('FREQ=WEEKLY');
+     * echo $rrule->hasWeekStart(); // false (using default MO)
+     * ```
+     */
+    public function hasWeekStart(): bool
+    {
+        return $this->weekStart !== null;
+    }
+
+    /**
      * Converts the Rrule to a structured array representation.
      *
      * Returns all recurrence parameters as an associative array with standardized
@@ -565,6 +612,7 @@ final readonly class Rrule implements Stringable
             'byMonth' => $this->byMonth,
             'byWeekNo' => $this->byWeekNo,
             'bySetPos' => $this->bySetPos,
+            'weekStart' => $this->weekStart,
         ];
     }
 
@@ -637,6 +685,10 @@ final readonly class Rrule implements Stringable
 
         if ($this->bySetPos !== null) {
             $parts[] = 'BYSETPOS='.implode(',', $this->bySetPos);
+        }
+
+        if ($this->weekStart !== null) {
+            $parts[] = "WKST={$this->weekStart}";
         }
 
         return implode(';', $parts);

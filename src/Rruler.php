@@ -13,6 +13,7 @@ use EphemeralTodos\Rruler\Parser\Ast\CountNode;
 use EphemeralTodos\Rruler\Parser\Ast\FrequencyNode;
 use EphemeralTodos\Rruler\Parser\Ast\IntervalNode;
 use EphemeralTodos\Rruler\Parser\Ast\UntilNode;
+use EphemeralTodos\Rruler\Parser\Ast\WkstNode;
 use EphemeralTodos\Rruler\Parser\RruleParser;
 
 /**
@@ -32,6 +33,7 @@ use EphemeralTodos\Rruler\Parser\RruleParser;
  * - BYMONTH - month selection for yearly patterns
  * - BYWEEKNO - week number selection
  * - BYSETPOS - position-based occurrence selection
+ * - WKST - week start day configuration
  *
  * @example Basic daily recurrence
  * ```php
@@ -187,6 +189,12 @@ final class Rruler
             $bySetPos = $bySetPosNode->getValue();
         }
 
-        return new Rrule($frequency, $interval, $count, $until, $byDay, $byMonthDay, $byMonth, $byWeekNo, $bySetPos);
+        $weekStart = null;
+        if ($ast->hasNode(WkstNode::class)) {
+            $wkstNode = $ast->getNode(WkstNode::class);
+            $weekStart = $wkstNode->getValue();
+        }
+
+        return new Rrule($frequency, $interval, $count, $until, $byDay, $byMonthDay, $byMonth, $byWeekNo, $bySetPos, $weekStart);
     }
 }

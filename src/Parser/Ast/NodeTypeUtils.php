@@ -12,6 +12,7 @@ final class NodeTypeUtils
         CountNode::class => 'Count',
         UntilNode::class => 'Until',
         ByDayNode::class => 'BYDAY',
+        WkstNode::class => 'Week start day',
     ];
 
     public static function toPrettyName(string|object $nodeClass): string
