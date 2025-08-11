@@ -15,7 +15,9 @@ Rruler is a standalone RFC 5545 RRULE parser that helps PHP developers building 
   - [Weekly Recurring Patterns](#weekly-recurring-patterns)
   - [Monthly Recurring Patterns](#monthly-recurring-patterns)
   - [Complex Yearly Patterns](#complex-yearly-patterns)
-  - [Error Handling](#error-handling)
+  - [Advanced BYSETPOS Business Patterns](#advanced-bysetpos-business-patterns)
+  - [Multi-Parameter Complex Patterns](#multi-parameter-complex-patterns)
+  - [Error Handling & Validation](#error-handling--validation)
   - [Date Range Filtering](#date-range-filtering)
   - [iCalendar Context Parsing](#icalendar-context-parsing)
 - [Compatibility & Migration](#compatibility--migration)
@@ -158,18 +160,78 @@ foreach ($generator->generateOccurrences($rrule, $start, 8) as $sprint) {
 }
 ```
 
-### Error Handling
+### Advanced BYSETPOS Business Patterns
+
+```php
+// First Monday of each quarter for executive meetings
+$rrule = $rruler->parse('FREQ=MONTHLY;INTERVAL=3;BYDAY=MO;BYSETPOS=1');
+$start = new DateTimeImmutable('2024-01-01 10:00:00');
+
+foreach ($generator->generateOccurrences($rrule, $start, 4) as $meeting) {
+    echo "Executive meeting: " . $meeting->format('Y-m-d l') . "\n";
+}
+
+// Last working day of each month for reports
+$rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1');
+$start = new DateTimeImmutable('2024-01-31 17:00:00');
+
+foreach ($generator->generateOccurrences($rrule, $start, 6) as $reportDue) {
+    echo "Monthly report due: " . $reportDue->format('Y-m-d l') . "\n";
+}
+```
+
+### Multi-Parameter Complex Patterns
+
+```php
+// Board meetings: 2nd Thursday of March, June, September, December
+$rrule = $rruler->parse('FREQ=YEARLY;BYMONTH=3,6,9,12;BYDAY=TH;BYSETPOS=2');
+$start = new DateTimeImmutable('2024-03-14 14:00:00');
+
+foreach ($generator->generateOccurrences($rrule, $start, 8) as $boardMeeting) {
+    echo "Board meeting: " . $boardMeeting->format('Y-m-d l \a\t H:i') . "\n";
+}
+
+// First and third Friday of every month (bi-weekly team sync)
+$rrule = $rruler->parse('FREQ=MONTHLY;BYDAY=FR;BYSETPOS=1,3');
+$start = new DateTimeImmutable('2024-01-05 15:00:00');
+
+foreach ($generator->generateOccurrences($rrule, $start, 12) as $sync) {
+    echo "Team sync: " . $sync->format('Y-m-d l') . "\n";
+}
+```
+
+### Error Handling & Validation
 
 ```php
 use EphemeralTodos\Rruler\Exception\ValidationException;
 use EphemeralTodos\Rruler\Exception\ParseException;
 
-try {
-    $rrule = $rruler->parse('FREQ=INVALID;COUNT=5');
-} catch (ValidationException $e) {
-    echo "Validation error: " . $e->getMessage() . "\n";
-} catch (ParseException $e) {
-    echo "Parse error: " . $e->getMessage() . "\n";
+// Robust parsing with comprehensive validation
+function parseRruleWithValidation(string $rruleString): ?Rrule
+{
+    try {
+        $rruler = new Rruler();
+        return $rruler->parse($rruleString);
+    } catch (ValidationException $e) {
+        echo "Validation error: " . $e->getMessage() . "\n";
+        // Handle specific validation errors (invalid FREQ, BYSETPOS without BY* rules, etc.)
+        return null;
+    } catch (ParseException $e) {
+        echo "Parse error: " . $e->getMessage() . "\n";
+        // Handle malformed RRULE strings
+        return null;
+    }
+}
+
+// Example usage with error recovery
+$rruleString = 'FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1'; // Valid pattern
+$rrule = parseRruleWithValidation($rruleString);
+
+if ($rrule !== null) {
+    $occurrences = $generator->generateOccurrences($rrule, new DateTimeImmutable('2024-01-01'), 5);
+    foreach ($occurrences as $occurrence) {
+        echo "Valid occurrence: " . $occurrence->format('Y-m-d l') . "\n";
+    }
 }
 ```
 
@@ -212,6 +274,19 @@ foreach ($contexts as $context) {
         echo "  - " . $occurrence->format('Y-m-d H:i:s') . "\n";
     }
 }
+
+// Handle multi-component enterprise calendar files
+$enterpriseCalendar = file_get_contents('enterprise-calendar.ics'); // 100+ components
+$contexts = $icalParser->parseCalendar($enterpriseCalendar);
+
+echo "Parsed " . count($contexts) . " calendar components:\n";
+foreach ($contexts as $context) {
+    if ($context->getComponentType() === 'VEVENT') {
+        echo "Meeting: " . $context->getSummary() . " (" . $context->getRrule()->toString() . ")\n";
+    } elseif ($context->getComponentType() === 'VTODO') {
+        echo "Task: " . $context->getSummary() . " (Due: " . $context->getStartDate()->format('Y-m-d') . ")\n";
+    }
+}
 ```
 
 **Enhanced iCalendar Features:**
@@ -219,6 +294,18 @@ foreach ($contexts as $context) {
 - **Extended format support** - Compatible with Outlook, Google Calendar, Apple Calendar formats
 - **Error recovery** - Gracefully handles malformed real-world calendar data
 - **100% sabre/vobject compatibility** - Validated against industry standard iCalendar parser
+
+**Supported Calendar Applications:**
+```php
+// Microsoft Outlook exports (with BOM, timezone variations)
+$outlookData = $icalParser->parseCalendar($outlookExport); // ✅ Full support
+
+// Google Calendar exports (strict RFC 5545 compliance)
+$googleData = $icalParser->parseCalendar($googleExport); // ✅ Full support  
+
+// Apple Calendar exports (nested component variations)
+$appleData = $icalParser->parseCalendar($appleExport); // ✅ Full support
+```
 
 ## Compatibility & Migration
 
