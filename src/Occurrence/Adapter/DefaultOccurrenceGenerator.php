@@ -200,7 +200,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
         return match ($frequency) {
             'DAILY' => $this->getNextDailyByDay($current, $byDay, $interval),
-            'WEEKLY' => $this->getNextWeeklyByDay($current, $byDay, $interval),
+            'WEEKLY' => $this->getNextWeeklyByDay($rrule, $current, $byDay, $interval),
             'MONTHLY' => $this->getNextMonthlyByDay($current, $byDay, $interval),
             'YEARLY' => $byMonth !== null
                 ? $this->getNextYearlyByDayWithByMonth($current, $byDay, $byMonth, $interval)
@@ -230,14 +230,16 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     /**
      * @param array<array{position: int|null, weekday: string}> $byDay
      */
-    private function getNextWeeklyByDay(DateTimeImmutable $current, array $byDay, int $interval): DateTimeImmutable
+    private function getNextWeeklyByDay(Rrule $rrule, DateTimeImmutable $current, array $byDay, int $interval): DateTimeImmutable
     {
         $validWeekdays = array_column($byDay, 'weekday');
+        $weekStart = $rrule->getWeekStart();
 
         // First, check for remaining valid weekdays in the current week
         $candidate = $current->modify('+1 day');
-        $currentWeekStart = $current->modify('monday this week');
-        $currentWeekEnd = $currentWeekStart->modify('+6 days 23:59:59');
+        $weekBoundaries = DateValidationUtils::getWeekBoundaries($current, $weekStart);
+        $currentWeekStart = $weekBoundaries['start'];
+        $currentWeekEnd = $weekBoundaries['end'];
 
         // Look for next valid weekday in the current weekly interval
         while ($candidate <= $currentWeekEnd) {
@@ -746,7 +748,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
             // Find the first valid date after start
             return match ($frequency) {
                 'DAILY' => $this->findNextDailyByDay($start, $byDay),
-                'WEEKLY' => $this->findNextWeeklyByDay($start, $byDay),
+                'WEEKLY' => $this->findNextWeeklyByDay($rrule, $start, $byDay),
                 'MONTHLY' => $this->findNextMonthlyByDay($start, $byDay),
                 'YEARLY' => $byMonth !== null
                     ? $this->findFirstMatchingDayInYearForMonths($start, $byDay, $byMonth)
@@ -945,12 +947,14 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     /**
      * @param array<array{position: int|null, weekday: string}> $byDay
      */
-    private function findNextWeeklyByDay(DateTimeImmutable $start, array $byDay): DateTimeImmutable
+    private function findNextWeeklyByDay(Rrule $rrule, DateTimeImmutable $start, array $byDay): DateTimeImmutable
     {
         $validWeekdays = array_column($byDay, 'weekday');
+        $weekStartDay = $rrule->getWeekStart();
         $candidate = $start->modify('+1 day');
-        $weekStart = $start->modify('monday this week');
-        $weekEnd = $weekStart->modify('+6 days');
+        $weekBoundaries = DateValidationUtils::getWeekBoundaries($start, $weekStartDay);
+        $weekStart = $weekBoundaries['start'];
+        $weekEnd = $weekBoundaries['end'];
 
         // Look for next valid day in same week
         while ($candidate <= $weekEnd) {
@@ -1565,7 +1569,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         return match ($rrule->getFrequency()) {
             'YEARLY' => $start->modify('first day of January')->setTime(0, 0, 0),
             'MONTHLY' => $start->modify('first day of this month')->setTime(0, 0, 0),
-            'WEEKLY' => $this->findWeeklyStartingPeriod($start),
+            'WEEKLY' => $this->findWeeklyStartingPeriod($rrule, $start),
             'DAILY' => $start->setTime(0, 0, 0), // For daily, each day is its own period
             default => throw new \InvalidArgumentException("Unsupported frequency for BYSETPOS: {$rrule->getFrequency()}"),
         };
@@ -1575,13 +1579,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
      * Find the appropriate starting period for weekly BYSETPOS patterns.
      * This ensures we don't miss occurrences in the week containing the start date.
      */
-    private function findWeeklyStartingPeriod(DateTimeImmutable $start): DateTimeImmutable
+    private function findWeeklyStartingPeriod(Rrule $rrule, DateTimeImmutable $start): DateTimeImmutable
     {
-        $weekStart = $start->modify('Monday this week')->setTime(0, 0, 0);
-
-        // If the start date is at the beginning of the week (Monday-Tuesday),
-        // use this week. Otherwise, check if we should include this week or start from next week.
-        $dayOfWeek = (int) $start->format('N'); // 1=Monday, 7=Sunday
+        $weekStartDay = $rrule->getWeekStart();
+        $weekBoundaries = DateValidationUtils::getWeekBoundaries($start, $weekStartDay);
+        $weekStart = $weekBoundaries['start']->setTime(0, 0, 0);
 
         // Always start from the week containing the start date to ensure we don't miss occurrences
         return $weekStart;
@@ -1721,10 +1723,18 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         return match ($rrule->getFrequency()) {
             'YEARLY' => $periodStart->modify('last day of December 23:59:59'),
             'MONTHLY' => $periodStart->modify('last day of this month 23:59:59'),
-            'WEEKLY' => $periodStart->modify('Sunday this week 23:59:59'),
+            'WEEKLY' => $this->getWeeklyPeriodEnd($rrule, $periodStart),
             'DAILY' => $periodStart->setTime(23, 59, 59), // End of the same day
             default => throw new \InvalidArgumentException("Unsupported frequency for BYSETPOS: {$rrule->getFrequency()}"),
         };
+    }
+
+    private function getWeeklyPeriodEnd(Rrule $rrule, DateTimeImmutable $periodStart): DateTimeImmutable
+    {
+        $weekStartDay = $rrule->getWeekStart();
+        $weekBoundaries = DateValidationUtils::getWeekBoundaries($periodStart, $weekStartDay);
+
+        return $weekBoundaries['end']->setTime(23, 59, 59);
     }
 
     /**
