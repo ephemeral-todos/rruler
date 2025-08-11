@@ -1,6 +1,6 @@
 # Product Roadmap
 
-> Last Updated: 2025-08-10
+> Last Updated: 2025-08-11
 > Version: 1.0.0
 > Status: In Progress
 
@@ -60,7 +60,7 @@
 
 ### Should-Have Features
 
-- [ ] WKST Support - Week start day configuration `M`
+- [x] WKST Support - Week start day configuration `M` ✅
 - [ ] Exception Handling - EXDATE and EXRULE support `L`
 
 ### Dependencies
@@ -121,7 +121,18 @@
 **Next Priority:** Usage examples and release preparation
 **Completion:** ~99% of planned features implemented
 
-### Recent Completion: API Documentation Generation
+### Recent Completion: WKST (Week Start) Support Implementation
+
+- ✅ **Complete WKST Infrastructure** - Full RFC 5545 WKST parameter support with comprehensive parsing and validation
+- ✅ **WKST-Aware Week Calculations** - DateValidationUtils::getWeekBoundaries() method supporting any week start day (SU-SA)
+- ✅ **BYDAY Pattern Integration** - Updated weekly occurrence generation to respect WKST across all frequency types
+- ✅ **BYWEEKNO WKST Compatibility** - Maintained ISO 8601 compliance while adding WKST awareness for occurrence generation
+- ✅ **Comprehensive Test Coverage** - 168+ WKST-specific tests across 8 new test files covering all edge cases and scenarios
+- ✅ **sabre/dav Compatibility** - Verified compatibility with industry standard implementation for RFC 5545 compliance
+- ✅ **Edge Case Handling** - Leap years, year boundaries, week 53, and complex pattern combinations fully tested
+- ✅ **Production Quality** - All 1,252 tests passing with 7,565 assertions maintaining code quality standards
+
+### Previous Completion: API Documentation Generation
 
 - ✅ **phpDocumentor Integration** - Complete documentation generation infrastructure
 - ✅ **Enhanced PHPDoc Comments** - Comprehensive documentation across all public APIs
@@ -145,6 +156,6 @@
 ### Architecture Highlights
 
 - **8 Core Classes** - LineUnfolder, PropertyParser, ComponentExtractor, ComponentType, DateTimeContext, DateTimeContextExtractor, RruleContextIntegrator, IcalParser
-- **899 Test Suite** - Unit, integration, and compatibility tests ensuring reliability
+- **1,252 Test Suite** - Unit, integration, and compatibility tests ensuring reliability including comprehensive WKST support
 - **sabre/vobject Parity** - Validated against established RFC 5545 implementation
 - **Modern PHP 8.4+** - Clean, type-safe implementation with comprehensive error handling

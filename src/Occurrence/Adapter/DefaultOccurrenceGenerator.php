@@ -813,7 +813,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
 
             // Find the first valid date after start
             return match ($frequency) {
-                'YEARLY' => $this->findNextYearlyByWeekNo($start, $byWeekNo),
+                'YEARLY' => $this->findNextYearlyByWeekNo($rrule, $start, $byWeekNo),
                 default => throw new \InvalidArgumentException("BYWEEKNO is not supported for frequency: {$frequency}"),
             };
         }
@@ -1270,7 +1270,7 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
         }
 
         return match ($frequency) {
-            'YEARLY' => $this->getNextYearlyByWeekNo($current, $byWeekNo, $interval),
+            'YEARLY' => $this->getNextYearlyByWeekNo($rrule, $current, $byWeekNo, $interval),
             default => throw new \InvalidArgumentException("BYWEEKNO is not supported for frequency: {$frequency}"),
         };
     }
@@ -1278,10 +1278,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     /**
      * @param array<int> $byWeekNo
      */
-    private function getNextYearlyByWeekNo(DateTimeImmutable $current, array $byWeekNo, int $interval): DateTimeImmutable
+    private function getNextYearlyByWeekNo(Rrule $rrule, DateTimeImmutable $current, array $byWeekNo, int $interval): DateTimeImmutable
     {
         $currentYear = (int) $current->format('o'); // Use ISO week year, not calendar year
         $originalTime = [$current->format('H'), $current->format('i'), $current->format('s')];
+        $weekStart = $rrule->getWeekStart();
 
         // Sort week numbers to process them in order
         $sortedWeeks = $byWeekNo;
@@ -1332,10 +1333,11 @@ final class DefaultOccurrenceGenerator implements OccurrenceGenerator
     /**
      * @param array<int> $byWeekNo
      */
-    private function findNextYearlyByWeekNo(DateTimeImmutable $start, array $byWeekNo): DateTimeImmutable
+    private function findNextYearlyByWeekNo(Rrule $rrule, DateTimeImmutable $start, array $byWeekNo): DateTimeImmutable
     {
         $currentYear = (int) $start->format('o'); // Use ISO week year, not calendar year
         $originalTime = [$start->format('H'), $start->format('i'), $start->format('s')];
+        $weekStart = $rrule->getWeekStart();
 
         // Sort week numbers to process them in order
         $sortedWeeks = $byWeekNo;

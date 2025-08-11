@@ -1,0 +1,3 @@
+# WKST Support - Lite Summary
+
+Implement WKST (Week Start Day) parameter support in the rruler library to allow users to configure which day of the week is considered the start of a week for RRULE calculations. This feature ensures proper week-based recurrence calculations for different cultural and business contexts where weeks may start on Sunday, Monday, or other days, with RFC 5545 compliant parsing, validation, and integration with existing BYDAY and BYWEEKNO features.
