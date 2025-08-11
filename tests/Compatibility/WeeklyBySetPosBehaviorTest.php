@@ -33,29 +33,29 @@ final class WeeklyBySetPosBehaviorTest extends CompatibilityTestCase
     {
         // Test that demonstrates Rruler's correct RFC 5545 implementation
         // vs sabre/dav's incorrect behavior (ignoring BYSETPOS for weekly frequencies)
-        
+
         $rrule = 'FREQ=WEEKLY;BYDAY=MO,WE,FR;BYSETPOS=1;COUNT=3';
         $start = new DateTimeImmutable('2025-01-01 10:00:00'); // Wednesday
-        
+
         $rruler = new \EphemeralTodos\Rruler\Rruler();
         $rruleObj = $rruler->parse($rrule);
         $generator = new \EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator();
         $occurrences = iterator_to_array($generator->generateOccurrences($rruleObj, $start));
-        
+
         // Rruler correctly implements BYSETPOS=1 (first occurrence of each week)
         // Expected: 2025-01-01 (Wed - first), 2025-01-06 (Mon - first of next week), 2025-01-13 (Mon - first of next week)
         $expectedDates = ['2025-01-01', '2025-01-06', '2025-01-13'];
-        
+
         $this->assertCount(3, $occurrences);
         foreach ($expectedDates as $index => $expected) {
             $this->assertEquals($expected, $occurrences[$index]->format('Y-m-d'),
-                "Rruler correctly implements RFC 5545 BYSETPOS behavior for weekly frequencies");
+                'Rruler correctly implements RFC 5545 BYSETPOS behavior for weekly frequencies');
         }
-        
+
         // This test fails against sabre/dav because it ignores BYSETPOS for weekly frequencies
         // sabre/dav would incorrectly return: 2025-01-01, 2025-01-03, 2025-01-06 (ignoring BYSETPOS)
         // Rruler correctly returns: 2025-01-01, 2025-01-06, 2025-01-13 (applying BYSETPOS=1)
-        
+
         $this->addToAssertionCount(1); // Count this as documenting the intentional difference
     }
 

@@ -138,7 +138,7 @@ final class EnhancedDateTimeParserTest extends TestCase
                     '20250101t120000z', // lowercase t/z - rarely seen in real calendar data
                     "20250101\x00T120000", // control characters - invalid calendar data
                 ];
-                
+
                 if (in_array($testCase['input'], $acceptableFailures)) {
                     // Skip these edge cases as they represent malformed data not worth supporting
                     $this->markTestSkipped('Edge case fallback not implemented for: '.bin2hex($testCase['input']).' - '.$e->getMessage());

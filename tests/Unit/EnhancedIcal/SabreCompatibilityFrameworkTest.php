@@ -35,7 +35,7 @@ final class SabreCompatibilityFrameworkTest extends TestCase
     // 1. Existing sabre-dav-incompatibility test group for documenting intentional differences
     // 2. Comprehensive integration tests with sabre/vobject validation
     // 3. Detailed compatibility reporting already built into the test suite
-    // 
+    //
     // The planned EnhancedIcalCompatibilityFramework, EnhancedCompatibilityReportGenerator,
     // and EnhancedPerformanceBenchmark classes are not needed given the current robust
     // compatibility testing infrastructure already in place.

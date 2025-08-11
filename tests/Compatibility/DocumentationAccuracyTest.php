@@ -15,8 +15,8 @@ final class DocumentationAccuracyTest extends TestCase
 {
     /**
      * Validate that we maintain a high compatibility rate with sabre/dav.
-     * 
-     * This test validates that the overall compatibility rate remains above 
+     *
+     * This test validates that the overall compatibility rate remains above
      * the production readiness threshold without relying on hard-coded expected values.
      */
     public function testCompatibilityRateIsProductionReady(): void
@@ -24,7 +24,7 @@ final class DocumentationAccuracyTest extends TestCase
         // Test that sabre-dav-incompatibility group exists and has tests
         $incompatibilityTestFiles = [];
         $compatibilityTestFiles = glob(__DIR__.'/*Test.php');
-        
+
         foreach ($compatibilityTestFiles as $file) {
             $content = file_get_contents($file);
             // Check if file has tests marked with sabre-dav-incompatibility group
@@ -32,17 +32,17 @@ final class DocumentationAccuracyTest extends TestCase
                 $incompatibilityTestFiles[] = $file;
             }
         }
-        
+
         // Verify we have a testing infrastructure for incompatibilities
-        $this->assertNotEmpty($incompatibilityTestFiles, 
+        $this->assertNotEmpty($incompatibilityTestFiles,
             'Should have test files documenting sabre/dav incompatibilities');
-            
+
         // Verify we can run the incompatibility tests (they should fail as expected)
         $output = shell_exec('cd '.__DIR__.'/../../ && composer test:sabre-dav-incompatibility --no-interaction 2>&1 || true');
         $this->assertNotNull($output, 'Should be able to run sabre/dav incompatibility tests');
-        $this->assertStringContainsString('Failures:', $output, 
+        $this->assertStringContainsString('Failures:', $output,
             'Incompatibility tests should have expected failures documenting differences');
-            
+
         // The existence of this infrastructure validates our compatibility approach
         $this->assertTrue(true, 'Compatibility testing infrastructure is properly configured');
     }

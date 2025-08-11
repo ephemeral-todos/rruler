@@ -22,7 +22,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasRequiredSections(): void
     {
-
         $content = file_get_contents($this->readmePath);
         $this->assertNotFalse($content, 'README.md should be readable');
 
@@ -34,7 +33,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasValueProposition(): void
     {
-
         $content = file_get_contents($this->readmePath);
 
         // Test for key value proposition elements
@@ -45,7 +43,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasPositioning(): void
     {
-
         $content = file_get_contents($this->readmePath);
 
         // Test for positioning elements
@@ -55,7 +52,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasWorkingCodeExamples(): void
     {
-
         $content = file_get_contents($this->readmePath);
 
         // Test for code example structure
@@ -66,7 +62,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeIsReasonableLength(): void
     {
-
         $content = file_get_contents($this->readmePath);
         $lineCount = count(explode("\n", $content));
 
