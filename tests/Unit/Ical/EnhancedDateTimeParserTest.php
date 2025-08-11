@@ -133,8 +133,19 @@ final class EnhancedDateTimeParserTest extends TestCase
                 $result = $this->parser->parse($testCase['input']);
                 $this->assertEquals($testCase['expected'], $result->format('Y-m-d H:i:s'), 'Failed parsing with fallback: '.bin2hex($testCase['input']));
             } catch (\InvalidArgumentException $e) {
-                // Some fallbacks might still fail, but we should attempt them
-                $this->markTestIncomplete('Fallback failed for: '.bin2hex($testCase['input']).' - '.$e->getMessage());
+                // Define edge cases that are acceptable to fail (not worth implementing)
+                $acceptableFailures = [
+                    '20250101t120000z', // lowercase t/z - rarely seen in real calendar data
+                    "20250101\x00T120000", // control characters - invalid calendar data
+                ];
+                
+                if (in_array($testCase['input'], $acceptableFailures)) {
+                    // Skip these edge cases as they represent malformed data not worth supporting
+                    $this->markTestSkipped('Edge case fallback not implemented for: '.bin2hex($testCase['input']).' - '.$e->getMessage());
+                } else {
+                    // This is a fallback that should work, so fail the test
+                    $this->fail('Expected fallback parsing to work for: '.bin2hex($testCase['input']).' - '.$e->getMessage());
+                }
             }
         }
     }

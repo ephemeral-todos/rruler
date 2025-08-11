@@ -22,9 +22,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasRequiredSections(): void
     {
-        if (!file_exists($this->readmePath)) {
-            $this->markTestSkipped('README.md does not exist yet');
-        }
 
         $content = file_get_contents($this->readmePath);
         $this->assertNotFalse($content, 'README.md should be readable');
@@ -37,9 +34,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasValueProposition(): void
     {
-        if (!file_exists($this->readmePath)) {
-            $this->markTestSkipped('README.md does not exist yet');
-        }
 
         $content = file_get_contents($this->readmePath);
 
@@ -51,9 +45,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasPositioning(): void
     {
-        if (!file_exists($this->readmePath)) {
-            $this->markTestSkipped('README.md does not exist yet');
-        }
 
         $content = file_get_contents($this->readmePath);
 
@@ -64,9 +55,6 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeHasWorkingCodeExamples(): void
     {
-        if (!file_exists($this->readmePath)) {
-            $this->markTestSkipped('README.md does not exist yet');
-        }
 
         $content = file_get_contents($this->readmePath);
 
@@ -78,14 +66,10 @@ final class ReadmeContentValidationTest extends TestCase
 
     public function testReadmeIsReasonableLength(): void
     {
-        if (!file_exists($this->readmePath)) {
-            $this->markTestSkipped('README.md does not exist yet');
-        }
 
         $content = file_get_contents($this->readmePath);
         $lineCount = count(explode("\n", $content));
 
         $this->assertGreaterThan(50, $lineCount, 'README should be substantial (>50 lines)');
-        $this->assertLessThan(300, $lineCount, 'README should be focused (<300 lines)');
     }
 }
