@@ -2,6 +2,8 @@
 
 > Spec: BYWEEKNO Support
 > Created: 2025-08-06
+> Status: **COMPLETED** ✅
+> Completed: 2025-08-06
 
 ## Overview
 

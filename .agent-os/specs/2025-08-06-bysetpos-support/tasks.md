@@ -3,7 +3,8 @@
 These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-08-06-bysetpos-support/spec.md
 
 > Created: 2025-08-06
-> Status: Ready for Implementation
+> Status: **IN PROGRESS** 🔄
+> Started: 2025-08-06
 
 ## Tasks
 

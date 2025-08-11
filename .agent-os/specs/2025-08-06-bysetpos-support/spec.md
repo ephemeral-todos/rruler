@@ -2,6 +2,8 @@
 
 > Spec: BYSETPOS Support Implementation  
 > Created: 2025-08-06
+> Status: **IN PROGRESS** 🔄
+> Started: 2025-08-06
 
 ## Overview
 
