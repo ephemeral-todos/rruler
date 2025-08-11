@@ -3,19 +3,19 @@
 These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-08-06-bysetpos-support/spec.md
 
 > Created: 2025-08-06
-> Status: **IN PROGRESS** 🔄
-> Started: 2025-08-06
+> Status: **COMPLETED** ✅
+> Completed: 2025-08-06
 
 ## Tasks
 
-- [ ] 1. Implement BYSETPOS Parser and AST Node
-  - [ ] 1.1 Write tests for BySetPosNode parsing and validation
-  - [ ] 1.2 Create BySetPosNode class extending Node interface
-  - [ ] 1.3 Implement NodeWithChoices interface for position values
-  - [ ] 1.4 Add position value parsing with comma-separated validation
-  - [ ] 1.5 Implement validation for non-zero integers and reasonable bounds
-  - [ ] 1.6 Add BYSETPOS case to RruleParser parameter parsing
-  - [ ] 1.7 Verify all BySetPosNode and parser tests pass
+- [x] 1. Implement BYSETPOS Parser and AST Node ✅
+  - [x] 1.1 Write tests for BySetPosNode parsing and validation
+  - [x] 1.2 Create BySetPosNode class extending Node interface
+  - [x] 1.3 Implement NodeWithChoices interface for position values
+  - [x] 1.4 Add position value parsing with comma-separated validation
+  - [x] 1.5 Implement validation for non-zero integers and reasonable bounds
+  - [x] 1.6 Add BYSETPOS case to RruleParser parameter parsing
+  - [x] 1.7 Verify all BySetPosNode and parser tests pass
 
 - [x] 2. Extend Rrule Value Object for BYSETPOS
   - [x] 2.1 Write tests for Rrule getBySetPos() and hasBySetPos() methods
