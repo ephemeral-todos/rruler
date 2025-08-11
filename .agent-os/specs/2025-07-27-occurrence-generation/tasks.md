@@ -3,7 +3,8 @@
 These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-07-27-occurrence-generation/spec.md
 
 > Created: 2025-07-27
-> Status: Ready for Implementation
+> Status: **COMPLETED** ✅
+> Completed: 2025-07-28
 
 ## Tasks
 

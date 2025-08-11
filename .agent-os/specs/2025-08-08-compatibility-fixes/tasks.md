@@ -3,7 +3,8 @@
 These are the tasks to be completed for the spec detailed in @.agent-os/specs/2025-08-08-compatibility-fixes/spec.md
 
 > Created: 2025-08-08
-> Status: Ready for Implementation
+> Status: **COMPLETED** ✅
+> Completed: 2025-08-09
 
 ## Tasks
 
