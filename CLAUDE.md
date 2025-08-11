@@ -17,12 +17,14 @@ The project uses both Composer and Just for task management:
 - `composer test:unit` - Run unit tests only
 - `composer test:integration` - Run integration tests only
 - `composer test:coverage` - Run tests with coverage report (requires XDEBUG_MODE=coverage)
+- `composer test:sabre-dav-incompatibility` - Run tests that are known to be incompatible with sabre/dav
 - `composer analyse` - Run PHPStan static analysis
 - `composer format` - Format code with PHP-CS-Fixer
 - `composer format:check` - Check code formatting without fixing
 
 ### Just Commands (alternative interface)
 - `just test` - Run all tests
+- `just test-sabre-dav-incompatibility` - Run tests that are known to be incompatible with sabre/dav
 - `just analyse` - Run static analysis
 - `just format` - Format code
 - `just format-check` - Check formatting
@@ -58,7 +60,7 @@ The project uses both Composer and Just for task management:
 - PHPUnit configuration supports separate test suites
 
 ### Supported RRULE Features
-Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH
+Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH, BYWEEKNO, BYSETPOS
 
 **Core Parameters:**
 - `FREQ` - Frequency (DAILY, WEEKLY, MONTHLY, YEARLY) - Required
@@ -70,8 +72,29 @@ Currently supports: FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH
 - `BYDAY` - Weekday specifications with optional positional prefixes (e.g., MO, 1MO, -1FR)
 - `BYMONTHDAY` - Days of month selection with positive (1-31) and negative (-1 to -31) values
 - `BYMONTH` - Month selection for yearly patterns with values 1-12 (e.g., 3,6,9,12 for quarterly)
+- `BYWEEKNO` - ISO 8601 week number selection for yearly patterns (1-53, -1 to -53)
+- `BYSETPOS` - Position-based occurrence selection from expanded recurrence sets
 
 The parser validates mutually exclusive parameters (COUNT vs UNTIL), required parameters (FREQ), and handles complex date validation including leap years and varying month lengths.
+
+### sabre/dav Compatibility Testing
+
+The project maintains comprehensive compatibility testing against sabre/dav (the industry standard WebDAV/CalDAV implementation). Currently achieves **98.7% compatibility** with documented differences for edge cases where RFC 5545 compliance differs from sabre/dav behavior.
+
+**Testing Commands:**
+- `composer test:sabre-dav-incompatibility` - Run tests that document known incompatibilities
+- `just test-sabre-dav-incompatibility` - Same as above using Just
+
+**Understanding Compatibility:**
+- **Default tests (`composer test`)** - Exclude incompatibility tests for clean CI runs
+- **Incompatibility tests** - Document specific cases where Rruler follows RFC 5545 more strictly than sabre/dav
+- **All documented in:** `COMPATIBILITY_ISSUES.md` with detailed explanations
+
+**When to use incompatibility tests:**
+- **Investigate compatibility issues** with sabre/dav-based systems
+- **Verify current status** of known differences  
+- **Document new incompatibilities** discovered during development
+- **Validate fixes** for compatibility issues
 
 ### Writing Tests
 - Write tests according to rules defined here: @~/.claude/instructions/phpunit.md

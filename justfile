@@ -30,6 +30,11 @@ phpunit-unit: vendor
 phpunit-integration: vendor
     composer test:integration
 
+[group('phpunit')]
+[doc('Runs sabre/dav incompatibility tests')]
+phpunit-sabre-dav-incompatibility: vendor
+    composer test:sabre-dav-incompatibility
+
 [group('development')]
 [doc('Runs all tests')]
 test: vendor
@@ -61,4 +66,9 @@ check: vendor
 [doc('Generates API documentation')]
 docs: vendor
     composer docs
+
+[group('development')]
+[doc('Runs sabre/dav incompatibility tests')]
+test-sabre-dav-incompatibility: vendor
+    composer test:sabre-dav-incompatibility
 
