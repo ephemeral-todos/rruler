@@ -143,7 +143,7 @@ final class YamlFixtureLoader
             }
         }
 
-        /* @var array<string, mixed> $data */
+        /** @var array<string, mixed> $data */
         return $this->validateFixture($data, $filePath);
     }
 
@@ -287,7 +287,7 @@ final class YamlFixtureLoader
                 }
             }
 
-            /* @var array<string, mixed> $testCase */
+            /** @var array<string, mixed> $testCase */
             $this->validateTestCase($testCase, $index, $filePath);
         }
 

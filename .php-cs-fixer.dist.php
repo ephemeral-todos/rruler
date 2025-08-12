@@ -33,6 +33,10 @@ return (new Config())
             ]
         ],
 
+        'phpdoc_to_comment' => [
+            'ignored_tags' => ['var'],
+        ],
+
         // Global namespace imports
         'global_namespace_import' => [
             'import_classes' => null,
