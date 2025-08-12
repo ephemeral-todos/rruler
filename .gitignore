@@ -2,8 +2,7 @@
 /.php-cs-fixer.cache
 /.phpdoc/
 /.phpunit.cache/
+/build/
 /composer.lock
-/coverage/
-/docs/
 /tools/
 /vendor/

@@ -24,7 +24,7 @@
     </source>
     <coverage>
         <report>
-            <html outputDirectory="coverage"/>
+            <html outputDirectory="build/coverage"/>
             <text outputFile="php://stdout" showUncoveredFiles="true"/>
         </report>
     </coverage>
