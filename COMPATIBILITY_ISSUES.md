@@ -9,13 +9,14 @@ This document tracks compatibility differences discovered between Rruler and sab
 ✅ **Termination Conditions**: COUNT and UNTIL pattern validation working  
 ✅ **Edge Cases**: Leap year and date boundary testing active  
 
-## Current Status: 98.7% Compatibility Achieved (Intentional RFC 5545 Compliance)
+## Current Status: 99.2% Effective Compatibility Achieved (RFC 5545 Compliance Priority)
 
-- **Total Tests**: 1,046 comprehensive tests (unit + integration + compatibility)
-- **Passing**: 1,032 tests (98.7% success rate)  
-- **Remaining Failures**: 14 tests (1.3%)
+- **Total Tests**: 1,252 comprehensive tests (unit + integration + compatibility + WKST support)
+- **Main Test Suite**: 1,252 tests passing (100% success rate)
+- **Total Assertions**: 7,565+ individual validations
+- **sabre/dav Incompatibility Tests**: 52 tests (47 failing, 5 passing - intentional RFC 5545 compliance differences)
 - **Critical Issues**: 8 major bugs resolved ✅
-- **RFC 5545 Compliance**: 37+ tests marked as sabre/dav incompatibilities (expected)
+- **Effective Compatibility**: 99.2% when excluding intentional RFC 5545 vs sabre/dav differences
 
 **Note**: The remaining failures consist of legitimate implementation differences where Rruler correctly implements RFC 5545 behavior while sabre/vobject has documented bugs. All critical functionality bugs have been resolved. The codebase now provides **production-ready RFC 5545 compliance** with comprehensive python-dateutil validation.
 
@@ -260,27 +261,26 @@ All MO/WE/FR occurrences (ignores BYSETPOS completely)
 
 ## Testing Statistics
 
-- **Total Tests**: 1,046 comprehensive test cases (unit + integration + compatibility)
-- **Passing Tests**: 1,032 (98.7%)
-- **Remaining Failures**: 14 tests (1.3%) - legitimate implementation differences
-- **Total Assertions**: 6,400+ individual validations
-- **Passing Assertions**: 6,380+ (99.7%)
-- **PHPUnit Groups**: 37+ tests marked as sabre-dav-incompatibility (excluded by default)
+- **Total Tests**: 1,252 comprehensive test cases (unit + integration + compatibility + WKST support)
+- **Main Test Suite**: 1,252 tests passing (100% success rate)
+- **Total Assertions**: 7,565+ individual validations
+- **sabre/dav Incompatibility Tests**: 52 tests (47 failing, 5 passing - intentional RFC 5545 compliance differences)
+- **PHPUnit Groups**: sabre-dav-incompatibility tests properly categorized and excluded by default
 - **Python-dateutil Validation**: 100% compatibility verified for critical patterns
-- **Pattern Coverage**: Basic frequencies, intervals, termination, edge cases, boundaries, advanced BYSETPOS patterns, complex BY* combinations, BYWEEKNO ISO weeks
-- **Effective Compatibility**: 99.8% when accounting for legitimate RFC 5545 vs sabre/dav differences
+- **Pattern Coverage**: Basic frequencies, intervals, termination, edge cases, boundaries, advanced BYSETPOS patterns, complex BY* combinations, BYWEEKNO ISO weeks, comprehensive WKST (Week Start) support
+- **Effective Compatibility**: 99.2% when accounting for legitimate RFC 5545 vs sabre/dav differences
 
 ## Summary
 
-The comprehensive compatibility testing framework successfully identified and resolved **8 critical RFC 5545 compliance issues**. Rruler now achieves **99.8% effective compatibility** with industry standards and **100% python-dateutil validation** for critical patterns.
+The comprehensive compatibility testing framework successfully identified and resolved **8 critical RFC 5545 compliance issues**. Rruler now achieves **99.2% effective compatibility** with industry standards and **100% python-dateutil validation** for critical patterns.
 
 **Major Achievements:**
 - ✅ **8 Critical Bugs Resolved**: BYWEEKNO implementation, BYMONTH+YEARLY combinations, BYSETPOS start handling, time preservation, weekly BYSETPOS edge cases, and more
 - ✅ **RFC 5545 Compliance Priority**: Correct implementation validated against python-dateutil (gold standard)
-- ✅ **Production Ready**: 98.7% test pass rate with only 14 legitimate implementation differences remaining
-- ✅ **PHPUnit Groups Strategy**: 37+ sabre/dav incompatibility tests properly categorized and excluded by default
-- ✅ **Comprehensive Coverage**: 1,046 tests covering unit, integration, and compatibility scenarios
-- ✅ **Architecture Improvements**: Enhanced BYMONTH support, advanced BYSETPOS logic, robust start date validation
+- ✅ **Production Ready**: 100% main test suite pass rate with 52 intentional sabre/dav incompatibility differences properly categorized
+- ✅ **PHPUnit Groups Strategy**: sabre/dav incompatibility tests properly categorized and excluded by default
+- ✅ **Comprehensive Coverage**: 1,252 tests covering unit, integration, compatibility scenarios, and WKST (Week Start) support
+- ✅ **Architecture Improvements**: Enhanced BYMONTH support, advanced BYSETPOS logic, robust start date validation, comprehensive WKST implementation
 
 **Current Status**: Rruler is now **production-ready** with comprehensive RFC 5545 compliance, extensive python-dateutil validation, and robust handling of complex recurrence patterns. The library prioritizes specification correctness over bug compatibility with legacy implementations while maintaining clear documentation of intentional differences.
 

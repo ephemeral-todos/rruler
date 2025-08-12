@@ -31,6 +31,9 @@ The project uses both Composer and Just for task management:
 - `just check` - Run all quality checks (analyse + format:check + test)
 - `just build` - Set up project dependencies
 
+### Development Scripts
+- `scripts/analyze-test-performance.sh` - Analyze PHPUnit test performance (individual and aggregate timing)
+
 ## Architecture
 
 ### Core Classes
@@ -140,6 +143,42 @@ When asked to work on this codebase:
 ### Git
 - Generate git commits according to rules defined here: @~/.claude/instructions/git-commits.md
 - Use Conventional Commits format for the first line: `type(scope): description` (e.g., `feat: add BYMONTHDAY support`, `fix: handle leap year edge case`)
+
+## Performance Analysis
+
+### Test Performance Monitoring
+
+The project includes a comprehensive test performance analysis script at `scripts/analyze-test-performance.sh` that provides both individual and aggregate test timing analysis.
+
+**Key Features:**
+- **Individual Analysis**: Identifies slowest individual test executions with statistical breakdowns
+- **Aggregate Analysis**: Groups tests by name to show total time consumption across multiple runs
+- **Smart Insights**: Compares individual vs aggregate performance leaders and identifies optimization opportunities
+
+**Usage Examples:**
+```bash
+# Full analysis (both individual and aggregate)
+scripts/analyze-test-performance.sh
+
+# Quiet mode with top 10 tests only
+scripts/analyze-test-performance.sh -q -t 10
+
+# Aggregate analysis only (useful for identifying high-volume tests)
+scripts/analyze-test-performance.sh -a
+
+# Analyze existing timing data without running tests
+scripts/analyze-test-performance.sh --no-run
+
+# Keep timing logs for later analysis
+scripts/analyze-test-performance.sh -k
+```
+
+**Performance Insights:**
+- Tests with data providers may consume more aggregate time than individually slow tests
+- Use aggregate analysis to identify optimization opportunities in high-volume test patterns
+- Individual analysis helps find complex tests that may benefit from refactoring
+
+**Dependencies:** Requires `bc` command for mathematical calculations (`brew install bc` on macOS)
 
 ## Testing Guidelines
 
