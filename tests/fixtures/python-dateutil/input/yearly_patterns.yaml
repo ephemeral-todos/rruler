@@ -1,0 +1,41 @@
+metadata:
+  name: "Yearly Recurrence Patterns"
+  description: "Complex yearly patterns with multiple BY* rule combinations"
+  category: "yearly-patterns"
+
+test_cases:
+  - title: "Quarterly monthly pattern"
+    rrule: "FREQ=YEARLY;BYMONTH=3,6,9,12;BYDAY=MO;BYSETPOS=1;COUNT=8"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2026-12-31T23:59:59"
+    notes: "First Monday of quarterly months (March, June, September, December)"
+    
+  - title: "Bi-annual last Friday pattern"
+    rrule: "FREQ=YEARLY;BYMONTH=3,9;BYDAY=FR;BYSETPOS=-1;COUNT=6"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2027-12-31T23:59:59"
+    notes: "Last Friday of March and September each year"
+    
+  - title: "Week number pattern"
+    rrule: "FREQ=YEARLY;BYWEEKNO=1,13,26,39,52;BYDAY=MO;COUNT=10"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2026-12-31T23:59:59"
+    notes: "Monday of specific ISO weeks (quarterly distribution)"
+    
+  - title: "Complex yearly filtering"
+    rrule: "FREQ=YEARLY;BYMONTH=1,4,7,10;BYDAY=MO;BYSETPOS=1,-1;COUNT=4"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-12-31T23:59:59"
+    notes: "First and last Monday of quarterly months in same year"

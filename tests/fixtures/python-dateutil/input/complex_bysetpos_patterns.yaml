@@ -1,0 +1,50 @@
+metadata:
+  name: "Complex BYSETPOS Patterns"
+  description: "Advanced BYSETPOS combinations critical for RFC 5545 compliance validation"
+  category: "complex-patterns"
+
+test_cases:
+  - title: "Complex positional filtering"
+    rrule: "FREQ=MONTHLY;BYDAY=TU;BYSETPOS=1,-1;COUNT=6"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-06-30T23:59:59"
+    notes: "First and last Tuesday of each month"
+    
+  - title: "Multiple consecutive positions"
+    rrule: "FREQ=MONTHLY;BYDAY=FR;BYSETPOS=2,3;COUNT=6"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-06-30T23:59:59"
+    notes: "Second and third Friday of each month"
+    
+  - title: "Large occurrence set filtering"
+    rrule: "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,5,10,15,20;COUNT=10"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-06-30T23:59:59"
+    notes: "Specific positions from all weekdays in month"
+    
+  - title: "Mixed positive and negative positions"
+    rrule: "FREQ=MONTHLY;BYDAY=SA,SU;BYSETPOS=1,-1;COUNT=8"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-06-30T23:59:59"
+    notes: "First and last weekend day of each month"
+    
+  - title: "Out-of-bounds position handling"
+    rrule: "FREQ=MONTHLY;BYDAY=TU;BYSETPOS=5;COUNT=6"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-06-30T23:59:59"
+    notes: "Fifth Tuesday - tests months with only 4 Tuesdays"

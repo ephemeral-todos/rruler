@@ -1,0 +1,41 @@
+metadata:
+  name: "Boundary Condition Tests"
+  description: "Edge cases for leap years, month boundaries, and year transitions"
+  category: "boundary-conditions"
+
+test_cases:
+  - title: "Leap year February handling"
+    rrule: "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;COUNT=4"
+    dtstart: "2024-02-29T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2024-01-01T00:00:00"
+      end: "2027-12-31T23:59:59"
+    notes: "February 29th in leap years only"
+    
+  - title: "Year boundary crossing"
+    rrule: "FREQ=MONTHLY;BYDAY=FR;BYSETPOS=-1;COUNT=4"
+    dtstart: "2024-12-15T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2024-12-01T00:00:00"
+      end: "2025-03-31T23:59:59"
+    notes: "Last Friday starting in December, crossing year boundary"
+    
+  - title: "Month-end date handling"
+    rrule: "FREQ=MONTHLY;BYMONTHDAY=28,29,30,31;BYSETPOS=1,-1;COUNT=6"
+    dtstart: "2025-01-01T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-01-01T00:00:00"
+      end: "2025-06-30T23:59:59"
+    notes: "First and last occurrence from month-end dates"
+    
+  - title: "Non-matching start date"
+    rrule: "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1;COUNT=3"
+    dtstart: "2025-02-15T10:00:00"
+    timezone: "UTC"
+    range:
+      start: "2025-02-01T00:00:00"
+      end: "2025-04-30T23:59:59"
+    notes: "First Monday starting mid-February on Saturday"

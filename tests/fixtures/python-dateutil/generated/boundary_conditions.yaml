@@ -1,0 +1,61 @@
+metadata:
+  category: boundary-conditions
+  description: Edge cases for leap years, month boundaries, and year transitions
+  input_hash: 764172bb0041bf44a98ac4ce8351122f6d25db2b40b469430bed8a3b2020179c
+  name: Boundary Condition Tests
+  python_dateutil_version: 2.9.0.post0
+  script_version: 2.0.0
+test_cases:
+- expected_occurrences:
+  - '2024-02-29T10:00:00+00:00'
+  input:
+    dtstart: '2024-02-29T10:00:00'
+    notes: February 29th in leap years only
+    range:
+      end: '2027-12-31T23:59:59'
+      start: '2024-01-01T00:00:00'
+    rrule: FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;COUNT=4
+    timezone: UTC
+    title: Leap year February handling
+- expected_occurrences:
+  - '2024-12-27T10:00:00+00:00'
+  - '2025-01-31T10:00:00+00:00'
+  - '2025-02-28T10:00:00+00:00'
+  - '2025-03-28T10:00:00+00:00'
+  input:
+    dtstart: '2024-12-15T10:00:00'
+    notes: Last Friday starting in December, crossing year boundary
+    range:
+      end: '2025-03-31T23:59:59'
+      start: '2024-12-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=FR;BYSETPOS=-1;COUNT=4
+    timezone: UTC
+    title: Year boundary crossing
+- expected_occurrences:
+  - '2025-01-28T10:00:00+00:00'
+  - '2025-01-31T10:00:00+00:00'
+  - '2025-02-28T10:00:00+00:00'
+  - '2025-03-28T10:00:00+00:00'
+  - '2025-03-31T10:00:00+00:00'
+  - '2025-04-28T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: First and last occurrence from month-end dates
+    range:
+      end: '2025-06-30T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYMONTHDAY=28,29,30,31;BYSETPOS=1,-1;COUNT=6
+    timezone: UTC
+    title: Month-end date handling
+- expected_occurrences:
+  - '2025-03-03T10:00:00+00:00'
+  - '2025-04-07T10:00:00+00:00'
+  input:
+    dtstart: '2025-02-15T10:00:00'
+    notes: First Monday starting mid-February on Saturday
+    range:
+      end: '2025-04-30T23:59:59'
+      start: '2025-02-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1;COUNT=3
+    timezone: UTC
+    title: Non-matching start date

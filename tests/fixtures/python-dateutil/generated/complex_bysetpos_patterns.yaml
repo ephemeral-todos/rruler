@@ -1,0 +1,89 @@
+metadata:
+  category: complex-patterns
+  description: Advanced BYSETPOS combinations critical for RFC 5545 compliance validation
+  input_hash: 3eb0be03a0a812e6ee49090fb4fec20668860c5fdf3a1a57f0c1cef23cd7ef0b
+  name: Complex BYSETPOS Patterns
+  python_dateutil_version: 2.9.0.post0
+  script_version: 2.0.0
+test_cases:
+- expected_occurrences:
+  - '2025-01-07T10:00:00+00:00'
+  - '2025-01-28T10:00:00+00:00'
+  - '2025-02-04T10:00:00+00:00'
+  - '2025-02-25T10:00:00+00:00'
+  - '2025-03-04T10:00:00+00:00'
+  - '2025-03-25T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: First and last Tuesday of each month
+    range:
+      end: '2025-06-30T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=TU;BYSETPOS=1,-1;COUNT=6
+    timezone: UTC
+    title: Complex positional filtering
+- expected_occurrences:
+  - '2025-01-10T10:00:00+00:00'
+  - '2025-01-17T10:00:00+00:00'
+  - '2025-02-14T10:00:00+00:00'
+  - '2025-02-21T10:00:00+00:00'
+  - '2025-03-14T10:00:00+00:00'
+  - '2025-03-21T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: Second and third Friday of each month
+    range:
+      end: '2025-06-30T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=FR;BYSETPOS=2,3;COUNT=6
+    timezone: UTC
+    title: Multiple consecutive positions
+- expected_occurrences:
+  - '2025-01-01T10:00:00+00:00'
+  - '2025-01-07T10:00:00+00:00'
+  - '2025-01-14T10:00:00+00:00'
+  - '2025-01-21T10:00:00+00:00'
+  - '2025-01-28T10:00:00+00:00'
+  - '2025-02-03T10:00:00+00:00'
+  - '2025-02-07T10:00:00+00:00'
+  - '2025-02-14T10:00:00+00:00'
+  - '2025-02-21T10:00:00+00:00'
+  - '2025-02-28T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: Specific positions from all weekdays in month
+    range:
+      end: '2025-06-30T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,5,10,15,20;COUNT=10
+    timezone: UTC
+    title: Large occurrence set filtering
+- expected_occurrences:
+  - '2025-01-04T10:00:00+00:00'
+  - '2025-01-26T10:00:00+00:00'
+  - '2025-02-01T10:00:00+00:00'
+  - '2025-02-23T10:00:00+00:00'
+  - '2025-03-01T10:00:00+00:00'
+  - '2025-03-30T10:00:00+00:00'
+  - '2025-04-05T10:00:00+00:00'
+  - '2025-04-27T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: First and last weekend day of each month
+    range:
+      end: '2025-06-30T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=SA,SU;BYSETPOS=1,-1;COUNT=8
+    timezone: UTC
+    title: Mixed positive and negative positions
+- expected_occurrences:
+  - '2025-04-29T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: Fifth Tuesday - tests months with only 4 Tuesdays
+    range:
+      end: '2025-06-30T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;BYDAY=TU;BYSETPOS=5;COUNT=6
+    timezone: UTC
+    title: Out-of-bounds position handling

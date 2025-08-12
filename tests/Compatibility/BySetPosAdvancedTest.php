@@ -57,6 +57,12 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
             8,
             'First and last weekend day of each month'
         );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'complex_bysetpos_patterns',
+            'Mixed positive and negative positions'
+        );
     }
 
     public function testHighPositiveBySetPos(): void
@@ -100,6 +106,12 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
             $start,
             10,
             'Specific positions from all weekdays in month'
+        );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'complex_bysetpos_patterns',
+            'Large occurrence set filtering'
         );
     }
 
@@ -149,6 +161,12 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
             $start,
             6,
             'Fifth Tuesday of month (when available)'
+        );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'complex_bysetpos_patterns',
+            'Out-of-bounds position handling'
         );
     }
 
@@ -274,6 +292,12 @@ final class BySetPosAdvancedTest extends CompatibilityTestCase
             $start,
             10,
             'Multiple positions should be chronologically ordered'
+        );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'comprehensive_edge_cases',
+            'Chronological ordering validation'
         );
     }
 }

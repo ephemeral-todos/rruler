@@ -1,0 +1,12 @@
+metadata:
+  name: "Weekly BYDAY Patterns"
+  description: "Weekly recurrence on specific weekdays with various termination methods"
+  category: "weekly-patterns"
+test_cases:
+  - rrule: "FREQ=WEEKLY;BYDAY=MO,WE,FR;UNTIL=20230115T235959Z"
+    dtstart: "2023-01-02T14:00:00"
+    timezone: "UTC"
+    range:
+      start: "2023-01-01T00:00:00"
+      end: "2023-01-20T23:59:59"
+    notes: "Basic weekly pattern with UNTIL termination"

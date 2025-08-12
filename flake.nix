@@ -28,6 +28,7 @@
             pkgs.just
             pkgs.python3
             pkgs.python3Packages.python-dateutil
+            pkgs.python3Packages.pyyaml
           ];
           shellHook = ''
             export PATH=$(pwd)/tools:$PATH

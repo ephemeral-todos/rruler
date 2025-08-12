@@ -31,6 +31,12 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
             6,
             'First and last Tuesday of each month'
         );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'complex_bysetpos_patterns',
+            'Complex positional filtering'
+        );
     }
 
     public function testMonthlyByDayWithBySetPosMultiple(): void
@@ -43,6 +49,12 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
             $start,
             6,
             'Second and third Friday of each month'
+        );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'complex_bysetpos_patterns',
+            'Multiple consecutive positions'
         );
     }
 
@@ -182,6 +194,12 @@ final class ComplexRruleCombinationTest extends CompatibilityTestCase
             $start,
             4,
             'Second Tuesday every other month'
+        );
+
+        // Validate against python-dateutil fixture
+        $this->assertPythonDateutilFixtureCompatibility(
+            'interval_combinations',
+            'Bi-monthly with positional filtering'
         );
     }
 

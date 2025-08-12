@@ -1,0 +1,3 @@
+# Python-dateutil Fixture Testing System - Lite Summary
+
+Implement a hybrid python-dateutil fixture generation system that adds authoritative RRULE correctness validation alongside existing sabre/vobject compatibility tests, using YAML fixtures for focused testing without disrupting current infrastructure. The system preserves all 18 existing compatibility test files while adding python-dateutil validation for critical edge cases, ensuring both sabre/vobject compatibility and RFC 5545 compliance through dual validation approach.

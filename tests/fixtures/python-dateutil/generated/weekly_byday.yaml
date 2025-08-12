@@ -1,0 +1,23 @@
+metadata:
+  category: weekly-patterns
+  description: Weekly recurrence on specific weekdays with various termination methods
+  input_hash: bf0c29765ef5b545b2be222c125bdd20d98dbfa6a120f9996243066b37979218
+  name: Weekly BYDAY Patterns
+  python_dateutil_version: 2.9.0.post0
+  script_version: 2.0.0
+test_cases:
+- expected_occurrences:
+  - '2023-01-02T14:00:00+00:00'
+  - '2023-01-04T14:00:00+00:00'
+  - '2023-01-06T14:00:00+00:00'
+  - '2023-01-09T14:00:00+00:00'
+  - '2023-01-11T14:00:00+00:00'
+  - '2023-01-13T14:00:00+00:00'
+  input:
+    dtstart: '2023-01-02T14:00:00'
+    notes: Basic weekly pattern with UNTIL termination
+    range:
+      end: '2023-01-20T23:59:59'
+      start: '2023-01-01T00:00:00'
+    rrule: FREQ=WEEKLY;BYDAY=MO,WE,FR;UNTIL=20230115T235959Z
+    timezone: UTC

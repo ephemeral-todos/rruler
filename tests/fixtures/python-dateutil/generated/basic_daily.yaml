@@ -1,0 +1,22 @@
+metadata:
+  category: basic-patterns
+  description: Test basic daily recurrence patterns with various termination methods
+  input_hash: 80e9d656a56983b52a4c5dddd6941c984cd7535421f4273e5ced04d9142e0b28
+  name: Basic Daily Patterns
+  python_dateutil_version: 2.9.0.post0
+  script_version: 2.0.0
+test_cases:
+- expected_occurrences:
+  - '2023-01-01T09:00:00+00:00'
+  - '2023-01-02T09:00:00+00:00'
+  - '2023-01-03T09:00:00+00:00'
+  - '2023-01-04T09:00:00+00:00'
+  - '2023-01-05T09:00:00+00:00'
+  input:
+    dtstart: '2023-01-01T09:00:00'
+    notes: Basic daily pattern with COUNT termination
+    range:
+      end: '2023-01-10T23:59:59'
+      start: '2023-01-01T00:00:00'
+    rrule: FREQ=DAILY;COUNT=5
+    timezone: UTC

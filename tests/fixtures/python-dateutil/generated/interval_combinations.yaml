@@ -1,0 +1,76 @@
+metadata:
+  category: interval-patterns
+  description: Non-default interval patterns with complex BY* rule combinations
+  input_hash: 75877a025c42b156e1cb253dee76c290a0d66294604dd755dd989ff18f1e9808
+  name: Interval Combination Patterns
+  python_dateutil_version: 2.9.0.post0
+  script_version: 2.0.0
+test_cases:
+- expected_occurrences:
+  - '2025-01-14T10:00:00+00:00'
+  - '2025-03-11T10:00:00+00:00'
+  - '2025-05-13T10:00:00+00:00'
+  - '2025-07-08T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: Second Tuesday every other month
+    range:
+      end: '2025-08-31T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;INTERVAL=2;BYDAY=TU;BYSETPOS=2;COUNT=4
+    timezone: UTC
+    title: Bi-monthly with positional filtering
+- expected_occurrences:
+  - '2025-01-04T10:00:00+00:00'
+  - '2025-01-05T10:00:00+00:00'
+  - '2025-04-05T10:00:00+00:00'
+  - '2025-04-06T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: First two weekend days every 3 months
+    range:
+      end: '2025-12-31T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;INTERVAL=3;BYDAY=SA,SU;BYSETPOS=1,2;COUNT=4
+    timezone: UTC
+    title: Quarterly weekend pattern
+- expected_occurrences:
+  - '2025-01-01T10:00:00+00:00'
+  - '2025-01-03T10:00:00+00:00'
+  - '2025-01-13T10:00:00+00:00'
+  - '2025-01-15T10:00:00+00:00'
+  - '2025-01-17T10:00:00+00:00'
+  - '2025-01-27T10:00:00+00:00'
+  - '2025-01-29T10:00:00+00:00'
+  - '2025-01-31T10:00:00+00:00'
+  - '2025-02-10T10:00:00+00:00'
+  - '2025-02-12T10:00:00+00:00'
+  - '2025-02-14T10:00:00+00:00'
+  - '2025-02-24T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: Monday, Wednesday, Friday every other week
+    range:
+      end: '2025-03-31T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;COUNT=12
+    timezone: UTC
+    title: Bi-weekly with multiple weekdays
+- expected_occurrences:
+  - '2025-01-01T10:00:00+00:00'
+  - '2025-01-02T10:00:00+00:00'
+  - '2025-01-30T10:00:00+00:00'
+  - '2025-01-31T10:00:00+00:00'
+  - '2025-07-01T10:00:00+00:00'
+  - '2025-07-02T10:00:00+00:00'
+  - '2025-07-30T10:00:00+00:00'
+  - '2025-07-31T10:00:00+00:00'
+  input:
+    dtstart: '2025-01-01T10:00:00'
+    notes: First two and last two weekdays every 6 months
+    range:
+      end: '2027-12-31T23:59:59'
+      start: '2025-01-01T00:00:00'
+    rrule: FREQ=MONTHLY;INTERVAL=6;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,2,-2,-1;COUNT=8
+    timezone: UTC
+    title: Large interval with boundaries
