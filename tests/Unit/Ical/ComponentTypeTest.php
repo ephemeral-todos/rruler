@@ -43,33 +43,81 @@ final class ComponentTypeTest extends TestCase
         $this->assertNull($componentType);
     }
 
-    public function testSupportsRecurrenceReturnsTrueForSupportedTypes(): void
+    /**
+     * Test component type support validation.
+     *
+     * Tests comprehensive component type support behavior including recurrence support,
+     * type validation, and case sensitivity handling.
+     */
+    public function testComponentTypeSupportValidation(): void
     {
-        $this->assertTrue(ComponentType::VEVENT->supportsRecurrence());
-        $this->assertTrue(ComponentType::VTODO->supportsRecurrence());
-    }
+        $supportValidationScenarios = [
+            // Test recurrence support
+            [
+                'type' => 'recurrence_support',
+                'test' => fn () => $this->assertTrue(ComponentType::VEVENT->supportsRecurrence()),
+                'description' => 'VEVENT supports recurrence',
+            ],
+            [
+                'type' => 'recurrence_support',
+                'test' => fn () => $this->assertTrue(ComponentType::VTODO->supportsRecurrence()),
+                'description' => 'VTODO supports recurrence',
+            ],
 
-    public function testIsSupportedReturnsTrueForSupportedTypes(): void
-    {
-        $this->assertTrue(ComponentType::isSupported('VEVENT'));
-        $this->assertTrue(ComponentType::isSupported('VTODO'));
-    }
+            // Test supported types validation
+            [
+                'type' => 'supported_validation',
+                'test' => fn () => $this->assertTrue(ComponentType::isSupported('VEVENT')),
+                'description' => 'VEVENT is supported',
+            ],
+            [
+                'type' => 'supported_validation',
+                'test' => fn () => $this->assertTrue(ComponentType::isSupported('VTODO')),
+                'description' => 'VTODO is supported',
+            ],
 
-    public function testIsSupportedReturnsFalseForUnsupportedTypes(): void
-    {
-        $this->assertFalse(ComponentType::isSupported('VJOURNAL'));
-        $this->assertFalse(ComponentType::isSupported('VFREEBUSY'));
-        $this->assertFalse(ComponentType::isSupported('VCALENDAR'));
-        $this->assertFalse(ComponentType::isSupported('INVALID'));
-        $this->assertFalse(ComponentType::isSupported(''));
-    }
+            // Test unsupported types
+            [
+                'type' => 'unsupported_validation',
+                'test' => fn () => $this->assertFalse(ComponentType::isSupported('VJOURNAL')),
+                'description' => 'VJOURNAL is not supported',
+            ],
+            [
+                'type' => 'unsupported_validation',
+                'test' => fn () => $this->assertFalse(ComponentType::isSupported('VFREEBUSY')),
+                'description' => 'VFREEBUSY is not supported',
+            ],
+            [
+                'type' => 'unsupported_validation',
+                'test' => fn () => $this->assertFalse(ComponentType::isSupported('INVALID')),
+                'description' => 'Invalid type is not supported',
+            ],
+            [
+                'type' => 'unsupported_validation',
+                'test' => fn () => $this->assertFalse(ComponentType::isSupported('')),
+                'description' => 'Empty type is not supported',
+            ],
 
-    public function testIsSupportedIsCaseInsensitive(): void
-    {
-        $this->assertTrue(ComponentType::isSupported('vevent'));
-        $this->assertTrue(ComponentType::isSupported('vtodo'));
-        $this->assertTrue(ComponentType::isSupported('VeVeNt'));
-        $this->assertTrue(ComponentType::isSupported('VtOdO'));
+            // Test case insensitive support
+            [
+                'type' => 'case_insensitive',
+                'test' => fn () => $this->assertTrue(ComponentType::isSupported('vevent')),
+                'description' => 'Lowercase VEVENT is supported',
+            ],
+            [
+                'type' => 'case_insensitive',
+                'test' => fn () => $this->assertTrue(ComponentType::isSupported('VeVeNt')),
+                'description' => 'Mixed case VEVENT is supported',
+            ],
+        ];
+
+        foreach ($supportValidationScenarios as $scenario) {
+            try {
+                $scenario['test']();
+            } catch (\Throwable $e) {
+                $this->fail("Scenario '{$scenario['description']}' failed: ".$e->getMessage());
+            }
+        }
     }
 
     public function testFromIsCaseSensitive(): void

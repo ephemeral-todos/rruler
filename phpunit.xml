@@ -12,6 +12,7 @@
     <groups>
         <exclude>
             <group>sabre-dav-incompatibility</group>
+            <group>documentation-consistency</group>
         </exclude>
     </groups>
     <testsuites>

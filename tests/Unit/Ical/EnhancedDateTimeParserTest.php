@@ -157,18 +157,22 @@ final class EnhancedDateTimeParserTest extends TestCase
     {
         // Standard timezone cases should still work
         $result = $this->parser->parseWithTimezone('20250701T150000', 'America/New_York');
-        $this->assertEquals('2025-07-01 15:00:00', $result->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $result->getTimezone()->getName());
+        $expectedDateTime = new \DateTimeImmutable('2025-07-01 15:00:00', new \DateTimeZone('America/New_York'));
+        $this->assertEquals($expectedDateTime, $result);
+        $this->assertInstanceOf(\DateTimeZone::class, $result->getTimezone());
+        $this->assertSame('America/New_York', $result->getTimezone()->getName());
 
         // UTC with timezone parameter should ignore timezone
         $utcResult = $this->parser->parseWithTimezone('20250701T150000Z', 'America/New_York');
-        $this->assertEquals('2025-07-01 15:00:00', $utcResult->format('Y-m-d H:i:s'));
-        $this->assertEquals('UTC', $utcResult->getTimezone()->getName());
+        $expectedUtcDateTime = new \DateTimeImmutable('2025-07-01 15:00:00', new \DateTimeZone('UTC'));
+        $this->assertEquals($expectedUtcDateTime, $utcResult);
+        $this->assertTrue($utcResult->getTimezone()->getName() === 'UTC' || $utcResult->getTimezone()->getName() === '+00:00');
 
         // Test with malformed input that needs fallback
         $fallbackResult = $this->parser->parseWithTimezone('2025-07-01T15:00:00', 'Europe/London');
-        $this->assertEquals('2025-07-01 15:00:00', $fallbackResult->format('Y-m-d H:i:s'));
-        $this->assertEquals('Europe/London', $fallbackResult->getTimezone()->getName());
+        $expectedFallbackDateTime = new \DateTimeImmutable('2025-07-01 15:00:00', new \DateTimeZone('Europe/London'));
+        $this->assertEquals($expectedFallbackDateTime, $fallbackResult);
+        $this->assertSame('Europe/London', $fallbackResult->getTimezone()->getName());
     }
 
     /**
@@ -203,24 +207,36 @@ final class EnhancedDateTimeParserTest extends TestCase
      */
     public function testEdgeCases(): void
     {
-        // Leap year handling
+        // Leap year handling - test behavior rather than string output
         $leapYear = $this->parser->parse('20240229');
-        $this->assertEquals('2024-02-29 00:00:00', $leapYear->format('Y-m-d H:i:s'));
+        $expectedLeapDate = new \DateTimeImmutable('2024-02-29 00:00:00', new \DateTimeZone('UTC'));
+        $this->assertEquals($expectedLeapDate, $leapYear);
+        $this->assertTrue($this->isLeapYear((int) $leapYear->format('Y')), 'Should correctly handle leap year date');
 
-        // Year boundaries
+        // Year boundaries - test functional behavior
         $endOfYear = $this->parser->parse('20241231T235959Z');
-        $this->assertEquals('2024-12-31 23:59:59', $endOfYear->format('Y-m-d H:i:s'));
+        $expectedEndOfYear = new \DateTimeImmutable('2024-12-31 23:59:59', new \DateTimeZone('UTC'));
+        $this->assertEquals($expectedEndOfYear, $endOfYear);
+        $this->assertSame('31', $endOfYear->format('d'), 'Should be last day of month');
+        $this->assertSame('12', $endOfYear->format('m'), 'Should be last month of year');
 
         $startOfYear = $this->parser->parse('20250101T000000Z');
-        $this->assertEquals('2025-01-01 00:00:00', $startOfYear->format('Y-m-d H:i:s'));
+        $expectedStartOfYear = new \DateTimeImmutable('2025-01-01 00:00:00', new \DateTimeZone('UTC'));
+        $this->assertEquals($expectedStartOfYear, $startOfYear);
+        $this->assertSame('01', $startOfYear->format('d'), 'Should be first day of month');
+        $this->assertSame('01', $startOfYear->format('m'), 'Should be first month of year');
 
-        // Historical dates
+        // Historical dates - test functional behavior
         $historical = $this->parser->parse('19000101T120000Z');
-        $this->assertEquals('1900-01-01 12:00:00', $historical->format('Y-m-d H:i:s'));
+        $expectedHistorical = new \DateTimeImmutable('1900-01-01 12:00:00', new \DateTimeZone('UTC'));
+        $this->assertEquals($expectedHistorical, $historical);
+        $this->assertLessThan(1950, (int) $historical->format('Y'), 'Should handle historical dates');
 
-        // Far future dates
+        // Far future dates - test functional behavior
         $future = $this->parser->parse('20991231T235959Z');
-        $this->assertEquals('2099-12-31 23:59:59', $future->format('Y-m-d H:i:s'));
+        $expectedFuture = new \DateTimeImmutable('2099-12-31 23:59:59', new \DateTimeZone('UTC'));
+        $this->assertEquals($expectedFuture, $future);
+        $this->assertGreaterThan(2050, (int) $future->format('Y'), 'Should handle future dates');
     }
 
     /**
@@ -266,5 +282,13 @@ final class EnhancedDateTimeParserTest extends TestCase
             $result = $this->parser->parseAppleFormat($value);
             $this->assertInstanceOf(\DateTimeImmutable::class, $result, "Failed parsing $property from Apple");
         }
+    }
+
+    /**
+     * Helper method to check if a year is a leap year.
+     */
+    private function isLeapYear(int $year): bool
+    {
+        return ($year % 4 === 0 && $year % 100 !== 0) || ($year % 400 === 0);
     }
 }

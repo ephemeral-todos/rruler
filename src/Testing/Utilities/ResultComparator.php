@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EphemeralTodos\Rruler\Tests\Compatibility;
+namespace EphemeralTodos\Rruler\Testing\Utilities;
 
 use DateTimeImmutable;
 

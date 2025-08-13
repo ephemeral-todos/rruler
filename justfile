@@ -35,6 +35,11 @@ phpunit-integration: vendor
 phpunit-sabre-dav-incompatibility: vendor
     composer test:sabre-dav-incompatibility
 
+[group('phpunit')]
+[doc('Runs documentation consistency tests')]
+phpunit-documentation-consistency: vendor
+    composer test:documentation-consistency
+
 [group('development')]
 [doc('Runs all tests')]
 test: vendor
@@ -71,4 +76,14 @@ docs: vendor
 [doc('Runs sabre/dav incompatibility tests')]
 test-sabre-dav-incompatibility: vendor
     composer test:sabre-dav-incompatibility
+
+[group('development')]
+[doc('Runs documentation consistency tests')]
+test-documentation-consistency: vendor
+    composer test:documentation-consistency
+
+[group('development')]
+[doc('Updates documentation statistics')]
+update-docs: vendor
+    composer update-docs
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use EphemeralTodos\Rruler\Testing\TestCase\CompatibilityTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -25,47 +26,43 @@ use PHPUnit\Framework\Attributes\Group;
 final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
 {
     /**
-     * Test week number patterns across year boundaries.
+     * Test year boundary week pattern validation.
      *
-     * Tests patterns that span across year boundaries, including week 1 and week 52/53.
+     * Tests comprehensive year boundary week patterns including week 1,
+     * week 52/53, consecutive weeks, and patterns with intervals.
      */
     #[Group('sabre-dav-incompatibility')]
-    public function testYearBoundaryWeekOnePattern(): void
+    public function testYearBoundaryWeekPatternValidation(): void
     {
-        // Week 1 typically spans from late December to early January
-        $start = new DateTimeImmutable('2024-12-30 10:00:00'); // Monday of week 1 in 2025
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYWEEKNO=1;COUNT=3',
-            $start,
-            3,
-            'Week 1 pattern across year boundaries'
-        );
-    }
+        $yearBoundaryScenarios = [
+            [
+                'start' => new DateTimeImmutable('2024-12-30 10:00:00'), // Monday of week 1 in 2025
+                'rrule' => 'FREQ=YEARLY;BYWEEKNO=1;COUNT=3',
+                'count' => 3,
+                'description' => 'Week 1 pattern across year boundaries',
+            ],
+            [
+                'start' => new DateTimeImmutable('2025-01-01 10:00:00'),
+                'rrule' => 'FREQ=YEARLY;BYWEEKNO=52;COUNT=3',
+                'count' => 3,
+                'description' => 'Week 52 pattern across year boundaries',
+            ],
+            [
+                'start' => new DateTimeImmutable('2025-01-01 10:00:00'),
+                'rrule' => 'FREQ=YEARLY;BYWEEKNO=52,1;COUNT=4',
+                'count' => 4,
+                'description' => 'Consecutive weeks 52 and 1 crossing year boundary',
+            ],
+        ];
 
-    #[Group('sabre-dav-incompatibility')]
-    public function testYearBoundaryWeekFiftyTwoPattern(): void
-    {
-        // Week 52 typically spans into the next year
-        $start = new DateTimeImmutable('2025-01-01 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYWEEKNO=52;COUNT=3',
-            $start,
-            3,
-            'Week 52 pattern across year boundaries'
-        );
-    }
-
-    #[Group('sabre-dav-incompatibility')]
-    public function testConsecutiveYearBoundaryWeeks(): void
-    {
-        // Test consecutive weeks that cross year boundary
-        $start = new DateTimeImmutable('2025-01-01 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYWEEKNO=52,1;COUNT=4',
-            $start,
-            4,
-            'Consecutive weeks 52 and 1 crossing year boundary'
-        );
+        foreach ($yearBoundaryScenarios as $scenario) {
+            $this->assertRruleCompatibility(
+                $scenario['rrule'],
+                $scenario['start'],
+                $scenario['count'],
+                $scenario['description']
+            );
+        }
     }
 
     /**
@@ -162,43 +159,44 @@ final class ByWeekNoEdgeCaseTest extends CompatibilityTestCase
      *
      * Tests more complex scenarios involving year boundaries.
      */
+    /**
+     * Test complex year boundary scenarios validation.
+     *
+     * Tests more complex year boundary scenarios including multiple weeks,
+     * intervals, and various termination conditions.
+     */
     #[Group('sabre-dav-incompatibility')]
-    public function testMultipleYearBoundaryWeeks(): void
+    public function testComplexYearBoundaryScenarioValidation(): void
     {
-        // Test multiple weeks around year boundary
-        $start = new DateTimeImmutable('2024-12-20 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYWEEKNO=51,52,1,2;COUNT=8',
-            $start,
-            8,
-            'Multiple weeks around year boundary'
-        );
-    }
+        $complexScenarios = [
+            [
+                'start' => new DateTimeImmutable('2024-12-20 10:00:00'),
+                'rrule' => 'FREQ=YEARLY;BYWEEKNO=51,52,1,2;COUNT=8',
+                'count' => 8,
+                'description' => 'Multiple weeks around year boundary',
+            ],
+            [
+                'start' => new DateTimeImmutable('2024-12-30 10:00:00'),
+                'rrule' => 'FREQ=YEARLY;INTERVAL=2;BYWEEKNO=1;COUNT=3',
+                'count' => 3,
+                'description' => 'Year boundary week 1 with interval',
+            ],
+            [
+                'start' => new DateTimeImmutable('2024-12-28 10:00:00'), // Saturday
+                'rrule' => 'FREQ=YEARLY;BYWEEKNO=52;COUNT=2',
+                'count' => 2,
+                'description' => 'Year boundary with COUNT termination',
+            ],
+        ];
 
-    #[Group('sabre-dav-incompatibility')]
-    public function testYearBoundaryWithInterval(): void
-    {
-        // Every other year, week 1
-        $start = new DateTimeImmutable('2024-12-30 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;INTERVAL=2;BYWEEKNO=1;COUNT=3',
-            $start,
-            3,
-            'Year boundary week 1 with interval'
-        );
-    }
-
-    #[Group('sabre-dav-incompatibility')]
-    public function testYearBoundaryWithCount(): void
-    {
-        // Test COUNT termination across year boundaries
-        $start = new DateTimeImmutable('2024-12-28 10:00:00'); // Saturday
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYWEEKNO=52;COUNT=2',
-            $start,
-            2,
-            'Year boundary with COUNT termination'
-        );
+        foreach ($complexScenarios as $scenario) {
+            $this->assertRruleCompatibility(
+                $scenario['rrule'],
+                $scenario['start'],
+                $scenario['count'],
+                $scenario['description']
+            );
+        }
     }
 
     /**

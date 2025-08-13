@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use EphemeralTodos\Rruler\Testing\TestCase\CompatibilityTestCase;
 
 /**
  * Boundary condition validation compatibility tests.
@@ -15,52 +16,48 @@ use DateTimeImmutable;
 final class BoundaryConditionTest extends CompatibilityTestCase
 {
     /**
-     * Test month-end date calculations.
+     * Test month boundary behavior validation.
      *
-     * Tests patterns that involve end-of-month dates and varying month lengths.
+     * Tests comprehensive month boundary behavior including end-of-month dates,
+     * varying month lengths, and negative BYMONTHDAY calculations.
      */
-    public function testMonthEndDateCalculations(): void
+    public function testMonthBoundaryBehaviorValidation(): void
     {
-        $start = new DateTimeImmutable('2025-01-31 10:00:00'); // January 31st
-        $this->assertRruleCompatibility(
-            'FREQ=MONTHLY;BYMONTHDAY=31;COUNT=6',
-            $start,
-            6,
-            '31st of each month (skipping months without 31 days)'
-        );
-    }
+        $monthBoundaryScenarios = [
+            [
+                'start' => new DateTimeImmutable('2025-01-31 10:00:00'), // January 31st
+                'rrule' => 'FREQ=MONTHLY;BYMONTHDAY=31;COUNT=6',
+                'count' => 6,
+                'description' => '31st of each month (skipping months without 31 days)',
+            ],
+            [
+                'start' => new DateTimeImmutable('2025-01-30 10:00:00'), // January 30th
+                'rrule' => 'FREQ=MONTHLY;BYMONTHDAY=30;COUNT=12',
+                'count' => 12,
+                'description' => '30th of each month (skipping February)',
+            ],
+            [
+                'start' => new DateTimeImmutable('2025-01-31 10:00:00'),
+                'rrule' => 'FREQ=MONTHLY;BYMONTHDAY=-1;COUNT=6',
+                'count' => 6,
+                'description' => 'Last day of each month',
+            ],
+            [
+                'start' => new DateTimeImmutable('2025-01-30 10:00:00'),
+                'rrule' => 'FREQ=MONTHLY;BYMONTHDAY=-2;COUNT=6',
+                'count' => 6,
+                'description' => 'Second-to-last day of each month',
+            ],
+        ];
 
-    public function testVaryingMonthLengths(): void
-    {
-        $start = new DateTimeImmutable('2025-01-30 10:00:00'); // January 30th
-        $this->assertRruleCompatibility(
-            'FREQ=MONTHLY;BYMONTHDAY=30;COUNT=12',
-            $start,
-            12,
-            '30th of each month (skipping February)'
-        );
-    }
-
-    public function testLastDayOfMonth(): void
-    {
-        $start = new DateTimeImmutable('2025-01-31 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=MONTHLY;BYMONTHDAY=-1;COUNT=6',
-            $start,
-            6,
-            'Last day of each month'
-        );
-    }
-
-    public function testSecondLastDayOfMonth(): void
-    {
-        $start = new DateTimeImmutable('2025-01-30 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=MONTHLY;BYMONTHDAY=-2;COUNT=6',
-            $start,
-            6,
-            'Second-to-last day of each month'
-        );
+        foreach ($monthBoundaryScenarios as $scenario) {
+            $this->assertRruleCompatibility(
+                $scenario['rrule'],
+                $scenario['start'],
+                $scenario['count'],
+                $scenario['description']
+            );
+        }
     }
 
     /**
@@ -81,38 +78,43 @@ final class BoundaryConditionTest extends CompatibilityTestCase
     //     );
     // }
 
-    public function testLeapYearTransition(): void
+    /**
+     * Test leap year behavior validation.
+     *
+     * Tests comprehensive leap year behavior including February patterns,
+     * last day calculations, and patterns spanning leap/non-leap years.
+     */
+    public function testLeapYearBehaviorValidation(): void
     {
-        // Start in non-leap year, test February patterns
-        $start = new DateTimeImmutable('2025-02-28 10:00:00');
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1;COUNT=4',
-            $start,
-            4,
-            'Last day of February (28th or 29th depending on year)'
-        );
-    }
+        $leapYearScenarios = [
+            [
+                'start' => new DateTimeImmutable('2025-02-28 10:00:00'),
+                'rrule' => 'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1;COUNT=4',
+                'count' => 4,
+                'description' => 'Last day of February (28th or 29th depending on year)',
+            ],
+            [
+                'start' => new DateTimeImmutable('2024-02-26 10:00:00'), // Monday in leap year
+                'rrule' => 'FREQ=YEARLY;BYMONTH=2;BYDAY=MO;BYSETPOS=-1;COUNT=3',
+                'count' => 3,
+                'description' => 'Last Monday of February across leap/non-leap years',
+            ],
+            [
+                'start' => new DateTimeImmutable('2020-03-01 10:00:00'), // Day after leap day
+                'rrule' => 'FREQ=YEARLY;BYMONTH=3;BYMONTHDAY=1;COUNT=5',
+                'count' => 5,
+                'description' => 'March 1st pattern spanning leap and non-leap years',
+            ],
+        ];
 
-    public function testLeapYearLastWeekOfFebruary(): void
-    {
-        $start = new DateTimeImmutable('2024-02-26 10:00:00'); // Monday in leap year
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYMONTH=2;BYDAY=MO;BYSETPOS=-1;COUNT=3',
-            $start,
-            3,
-            'Last Monday of February across leap/non-leap years'
-        );
-    }
-
-    public function testLeapYearYearlyPattern(): void
-    {
-        $start = new DateTimeImmutable('2020-03-01 10:00:00'); // Day after leap day
-        $this->assertRruleCompatibility(
-            'FREQ=YEARLY;BYMONTH=3;BYMONTHDAY=1;COUNT=5',
-            $start,
-            5,
-            'March 1st pattern spanning leap and non-leap years'
-        );
+        foreach ($leapYearScenarios as $scenario) {
+            $this->assertRruleCompatibility(
+                $scenario['rrule'],
+                $scenario['start'],
+                $scenario['count'],
+                $scenario['description']
+            );
+        }
     }
 
     /**

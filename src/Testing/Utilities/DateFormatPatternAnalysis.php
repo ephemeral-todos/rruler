@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EphemeralTodos\Rruler\Tests\Unit\Ical;
+namespace EphemeralTodos\Rruler\Testing\Utilities;
 
 use EphemeralTodos\Rruler\Ical\IcalParser;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Analysis of date format patterns from collected test data files.
@@ -13,11 +12,11 @@ use PHPUnit\Framework\TestCase;
  * This class analyzes various iCalendar files to identify date/time format
  * patterns used by different calendar applications.
  */
-final class DateFormatPatternAnalysis extends TestCase
+final class DateFormatPatternAnalysis
 {
     private IcalParser $parser;
 
-    protected function setUp(): void
+    public function __construct()
     {
         $this->parser = new IcalParser();
     }
@@ -25,35 +24,27 @@ final class DateFormatPatternAnalysis extends TestCase
     /**
      * Test pattern analysis from synthetic test data.
      */
-    public function testSyntheticDataPatterns(): void
+    public function analyzeSyntheticDataPatterns(string $testFilePath): array
     {
-        $testFile = __DIR__.'/../../data/enhanced-ical/synthetic/complex-mixed-components.ics';
-
-        if (!file_exists($testFile)) {
-            $this->markTestSkipped('Synthetic test data file not found');
+        if (!file_exists($testFilePath)) {
+            throw new \RuntimeException('Synthetic test data file not found: '.$testFilePath);
         }
 
-        $content = file_get_contents($testFile);
-        $this->assertNotFalse($content);
+        $content = file_get_contents($testFilePath);
+        if ($content === false) {
+            throw new \RuntimeException('Failed to read test data file');
+        }
 
         // Extract date/time patterns from the file
-        $patterns = $this->extractDateTimePatterns($content);
-
-        // Verify we found various patterns
-        $this->assertGreaterThan(0, count($patterns), 'Should find date/time patterns in synthetic data');
-
-        // Log patterns for analysis
-        foreach ($patterns as $pattern => $occurrences) {
-            echo "Pattern: $pattern, Occurrences: $occurrences\n";
-        }
+        return $this->extractDateTimePatterns($content);
     }
 
     /**
      * Analyze common date format patterns found in real-world scenarios.
      */
-    public function testCommonDateFormatPatterns(): void
+    public function getCommonDateFormatPatterns(): array
     {
-        $commonPatterns = [
+        return [
             // Standard RFC 5545 patterns
             'DATE-ONLY' => [
                 '20240115',
@@ -82,27 +73,15 @@ final class DateFormatPatternAnalysis extends TestCase
                 'DUE;TZID=America/Los_Angeles:20241031T170000',
             ],
         ];
-
-        foreach ($commonPatterns as $category => $examples) {
-            foreach ($examples as $example) {
-                // For non-property examples, test direct parsing
-                if (!str_contains($example, ':')) {
-                    $this->assertDateTimePattern($example, $category);
-                } else {
-                    // For property examples, test pattern recognition
-                    $this->assertPropertyPattern($example, $category);
-                }
-            }
-        }
     }
 
     /**
-     * Test Microsoft Outlook specific patterns.
+     * Validate Microsoft Outlook specific patterns.
      */
-    public function testMicrosoftOutlookPatterns(): void
+    public function getMicrosoftOutlookPatterns(): array
     {
         // Microsoft Outlook typically follows RFC 5545 but may have specific patterns
-        $outlookPatterns = [
+        return [
             // Standard Outlook export patterns
             '20250315T143000',     // Local time
             '20250315T143000Z',    // UTC time
@@ -112,23 +91,15 @@ final class DateFormatPatternAnalysis extends TestCase
             'DTSTART;TZID=Eastern Standard Time:20250315T143000',
             'DTSTART;TZID=Pacific Standard Time:20250315T100000',
         ];
-
-        foreach ($outlookPatterns as $pattern) {
-            if (!str_contains($pattern, ':')) {
-                $this->assertDateTimePattern($pattern, 'OUTLOOK');
-            } else {
-                $this->assertPropertyPattern($pattern, 'OUTLOOK');
-            }
-        }
     }
 
     /**
-     * Test Google Calendar specific patterns.
+     * Validate Google Calendar specific patterns.
      */
-    public function testGoogleCalendarPatterns(): void
+    public function getGoogleCalendarPatterns(): array
     {
         // Google Calendar follows RFC 5545 strictly
-        $googlePatterns = [
+        return [
             // Standard Google Calendar patterns
             '20250601T090000',     // Local time
             '20250601T090000Z',    // UTC time
@@ -138,23 +109,15 @@ final class DateFormatPatternAnalysis extends TestCase
             'DTSTART;TZID=America/New_York:20250601T090000',
             'DTSTART;TZID=Europe/London:20250601T140000',
         ];
-
-        foreach ($googlePatterns as $pattern) {
-            if (!str_contains($pattern, ':')) {
-                $this->assertDateTimePattern($pattern, 'GOOGLE');
-            } else {
-                $this->assertPropertyPattern($pattern, 'GOOGLE');
-            }
-        }
     }
 
     /**
-     * Test Apple Calendar specific patterns.
+     * Validate Apple Calendar specific patterns.
      */
-    public function testAppleCalendarPatterns(): void
+    public function getAppleCalendarPatterns(): array
     {
         // Apple Calendar patterns
-        $applePatterns = [
+        return [
             // Standard Apple Calendar patterns
             '20251225T000000',     // Local time (midnight)
             '20251225T235959Z',    // UTC time (end of day)
@@ -164,20 +127,37 @@ final class DateFormatPatternAnalysis extends TestCase
             'DTSTART;TZID=America/Los_Angeles:20251225T000000',
             'DTSTART;TZID=Australia/Sydney:20251225T120000',
         ];
+    }
 
-        foreach ($applePatterns as $pattern) {
-            if (!str_contains($pattern, ':')) {
-                $this->assertDateTimePattern($pattern, 'APPLE');
-            } else {
-                $this->assertPropertyPattern($pattern, 'APPLE');
-            }
-        }
+    /**
+     * Get edge cases in date format patterns.
+     */
+    public function getDateFormatEdgeCases(): array
+    {
+        return [
+            // Leap year edge cases
+            '20240229T120000',     // Leap year Feb 29
+            '20240229',            // Leap year date only
+
+            // Year boundaries
+            '20231231T235959Z',    // End of year
+            '20240101T000000Z',    // Start of year
+
+            // Month boundaries
+            '20240131T120000',     // End of January
+            '20240201T120000',     // Start of February
+
+            // Time boundaries
+            '20240615T000000',     // Midnight
+            '20240615T235959',     // End of day
+            '20240615T120000',     // Noon
+        ];
     }
 
     /**
      * Extract date/time patterns from iCalendar content.
      */
-    private function extractDateTimePatterns(string $content): array
+    public function extractDateTimePatterns(string $content): array
     {
         $patterns = [];
 
@@ -209,9 +189,9 @@ final class DateFormatPatternAnalysis extends TestCase
     }
 
     /**
-     * Assert that a date/time string follows expected pattern.
+     * Validate that a date/time string follows expected pattern.
      */
-    private function assertDateTimePattern(string $dateTime, string $category): void
+    public function validateDateTimePattern(string $dateTime, string $category): bool
     {
         // Validate the pattern is correctly formatted
         $validPatterns = [
@@ -220,21 +200,19 @@ final class DateFormatPatternAnalysis extends TestCase
             '/^\d{8}T\d{6}Z$/',            // UTC-DATETIME
         ];
 
-        $isValid = false;
         foreach ($validPatterns as $pattern) {
             if (preg_match($pattern, $dateTime)) {
-                $isValid = true;
-                break;
+                return true;
             }
         }
 
-        $this->assertTrue($isValid, "Invalid date/time pattern in $category: $dateTime");
+        return false;
     }
 
     /**
-     * Assert that a property string follows expected pattern.
+     * Validate that a property string follows expected pattern.
      */
-    private function assertPropertyPattern(string $property, string $category): void
+    public function validatePropertyPattern(string $property, string $category): bool
     {
         // Validate property patterns
         $propertyPatterns = [
@@ -242,43 +220,60 @@ final class DateFormatPatternAnalysis extends TestCase
             '/^[A-Z]+:\d{8}T?\d{0,6}Z?$/',             // SIMPLE-DATETIME
         ];
 
-        $isValid = false;
         foreach ($propertyPatterns as $pattern) {
             if (preg_match($pattern, $property)) {
-                $isValid = true;
-                break;
+                return true;
             }
         }
 
-        $this->assertTrue($isValid, "Invalid property pattern in $category: $property");
+        return false;
     }
 
     /**
-     * Test edge cases in date format patterns.
+     * Analyze all patterns for a given calendar application type.
      */
-    public function testDateFormatEdgeCases(): void
+    public function analyzeApplicationPatterns(string $applicationType): array
     {
-        $edgeCases = [
-            // Leap year edge cases
-            '20240229T120000',     // Leap year Feb 29
-            '20240229',            // Leap year date only
+        $patterns = match ($applicationType) {
+            'OUTLOOK' => $this->getMicrosoftOutlookPatterns(),
+            'GOOGLE' => $this->getGoogleCalendarPatterns(),
+            'APPLE' => $this->getAppleCalendarPatterns(),
+            'COMMON' => array_merge(...array_values($this->getCommonDateFormatPatterns())),
+            'EDGE-CASE' => $this->getDateFormatEdgeCases(),
+            default => throw new \InvalidArgumentException("Unknown application type: {$applicationType}"),
+        };
 
-            // Year boundaries
-            '20231231T235959Z',    // End of year
-            '20240101T000000Z',    // Start of year
-
-            // Month boundaries
-            '20240131T120000',     // End of January
-            '20240201T120000',     // Start of February
-
-            // Time boundaries
-            '20240615T000000',     // Midnight
-            '20240615T235959',     // End of day
-            '20240615T120000',     // Noon
+        $analysis = [
+            'application_type' => $applicationType,
+            'total_patterns' => count($patterns),
+            'date_only' => 0,
+            'local_datetime' => 0,
+            'utc_datetime' => 0,
+            'timezone_properties' => 0,
+            'validation_results' => [],
         ];
 
-        foreach ($edgeCases as $edgeCase) {
-            $this->assertDateTimePattern($edgeCase, 'EDGE-CASE');
+        foreach ($patterns as $pattern) {
+            $isValid = false;
+
+            if (!str_contains($pattern, ':')) {
+                $isValid = $this->validateDateTimePattern($pattern, $applicationType);
+
+                if (preg_match('/^\d{8}$/', $pattern)) {
+                    ++$analysis['date_only'];
+                } elseif (preg_match('/^\d{8}T\d{6}$/', $pattern)) {
+                    ++$analysis['local_datetime'];
+                } elseif (preg_match('/^\d{8}T\d{6}Z$/', $pattern)) {
+                    ++$analysis['utc_datetime'];
+                }
+            } else {
+                $isValid = $this->validatePropertyPattern($pattern, $applicationType);
+                ++$analysis['timezone_properties'];
+            }
+
+            $analysis['validation_results'][$pattern] = $isValid;
         }
+
+        return $analysis;
     }
 }

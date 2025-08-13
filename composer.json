@@ -38,7 +38,9 @@
         "test:coverage": "XDEBUG_MODE=coverage phpunit --configuration phpunit-coverage.xml",
         "test:unit": "phpunit --testsuite unit",
         "test:integration": "phpunit --testsuite integration",
-        "test:sabre-dav-incompatibility": "phpunit --group sabre-dav-incompatibility"
+        "test:sabre-dav-incompatibility": "phpunit --group sabre-dav-incompatibility",
+        "test:documentation-consistency": "phpunit --group documentation-consistency",
+        "update-docs": "php scripts/update-documentation-stats.php"
     },
     "config": {
         "optimize-autoloader": true,

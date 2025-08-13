@@ -30,7 +30,7 @@ Unlike complete WebDAV/CalDAV libraries, Rruler provides a **focused solution** 
 - 🎯 **Simple integration** - Just RRULE parsing, nothing more
 - 🚀 **Better performance** - No unnecessary WebDAV/CalDAV overhead  
 - 📦 **Minimal dependencies** - Modern PHP 8.3+ with zero production dependencies
-- 🧪 **Comprehensive testing** - 1,252+ tests with 99.2% effective sabre/dav compatibility
+- 🧪 **Comprehensive testing** - 1308+ tests with 99.2% effective sabre/dav compatibility
 
 ### Modern PHP Implementation
 - **PHP 8.3+** - Leveraging modern language features and type safety
@@ -310,9 +310,9 @@ $appleData = $icalParser->parseCalendar($appleExport); // ✅ Full support
 ## Compatibility & Migration
 
 ### sabre/dav Compatibility
-Rruler achieves **99.2% effective compatibility** with sabre/dav, representing industry-leading RRULE compliance. Our comprehensive test suite with 1,252+ tests validates:
+Rruler achieves **99.2% effective compatibility** with sabre/dav, representing industry-leading RRULE compliance. Our comprehensive test suite with 1308+ tests validates:
 
-- **Compatible occurrence generation** for all main RRULE patterns (1,252 tests passing with 7,565+ assertions)
+- **Compatible occurrence generation** for all main RRULE patterns (1308 tests passing with 8858+ assertions)
 - **Documented differences** represent RFC 5545 vs industry standard interpretations
 - **Compatible error handling** for invalid RRULE strings  
 - **Performance parity** with optimized algorithms

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace EphemeralTodos\Rruler\Tests\Compatibility\Performance;
 
-use EphemeralTodos\Rruler\Tests\Compatibility\CompatibilityTestCase;
+use EphemeralTodos\Rruler\Testing\TestCase\CompatibilityTestCase;
 
 /**
  * Fixture Validation Performance Test.

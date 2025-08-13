@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
+use EphemeralTodos\Rruler\Testing\TestCase\CompatibilityTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 /**

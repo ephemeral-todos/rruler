@@ -18,6 +18,8 @@ The project uses both Composer and Just for task management:
 - `composer test:integration` - Run integration tests only
 - `composer test:coverage` - Run tests with coverage report (requires XDEBUG_MODE=coverage)
 - `composer test:sabre-dav-incompatibility` - Run tests that are known to be incompatible with sabre/dav
+- `composer test:documentation-consistency` - Run tests that validate documentation accuracy
+- `composer update-docs` - Update documentation statistics to match current test counts
 - `composer analyse` - Run PHPStan static analysis
 - `composer format` - Format code with PHP-CS-Fixer
 - `composer format:check` - Check code formatting without fixing
@@ -25,6 +27,8 @@ The project uses both Composer and Just for task management:
 ### Just Commands (alternative interface)
 - `just test` - Run all tests
 - `just test-sabre-dav-incompatibility` - Run tests that are known to be incompatible with sabre/dav
+- `just test-documentation-consistency` - Run tests that validate documentation accuracy
+- `just update-docs` - Update documentation statistics to match current test counts
 - `just analyse` - Run static analysis
 - `just format` - Format code
 - `just format-check` - Check formatting
@@ -33,6 +37,7 @@ The project uses both Composer and Just for task management:
 
 ### Development Scripts
 - `scripts/analyze-test-performance.sh` - Analyze PHPUnit test performance (individual and aggregate timing)
+- `scripts/update-documentation-stats.php` - Update documentation test count statistics automatically
 
 ## Architecture
 
@@ -131,6 +136,25 @@ When asked to work on this codebase:
    - For new features: @~/.agent-os/instructions/core/create-spec.md
    - For tasks execution: @~/.agent-os/instructions/core/execute-tasks.md
 3. **Always**, adhere to the standards in the files listed above
+
+### 🚨 CRITICAL: Documentation Consistency Validation
+
+**Before considering ANY large chunk of work completed** (task, phase, or entire spec), you MUST:
+
+1. **Run documentation consistency tests**: `composer test:documentation-consistency`
+2. **If tests fail** (documentation out of date):
+   a. Run the documentation update script: `composer update-docs`
+   b. Re-run documentation consistency tests: `composer test:documentation-consistency`
+   c. Verify tests now pass
+3. **Only then consider work complete**
+
+This ensures documentation stays current with actual implementation. The `documentation-consistency` group is excluded from regular test runs to avoid slowing down development, but MUST be validated before completion.
+
+**Examples of when this applies:**
+- Completing any Agent OS spec task or phase
+- Finishing a significant refactoring
+- Adding/removing tests that change test counts
+- Before creating PRs for major features
 
 ## Important Notes
 

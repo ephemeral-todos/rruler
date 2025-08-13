@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use EphemeralTodos\Rruler\Testing\TestCase\CompatibilityTestCase;
 
 /**
  * Performance and regression testing for extended RRULE compatibility.

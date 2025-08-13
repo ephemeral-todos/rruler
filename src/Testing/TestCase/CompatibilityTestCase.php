@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EphemeralTodos\Rruler\Tests\Compatibility;
+namespace EphemeralTodos\Rruler\Testing\TestCase;
 
 use DateTimeImmutable;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
@@ -34,7 +34,7 @@ abstract class CompatibilityTestCase extends TestCase
         $this->occurrenceGenerator = new DefaultOccurrenceGenerator();
 
         // Initialize python-dateutil fixture loader if fixtures exist
-        $fixturesPath = __DIR__.'/../fixtures/python-dateutil/generated';
+        $fixturesPath = __DIR__.'/../../../tests/fixtures/python-dateutil/generated';
         if (is_dir($fixturesPath)) {
             $this->pythonDateutilFixtureLoader = new YamlFixtureLoader($fixturesPath);
         }
