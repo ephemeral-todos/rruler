@@ -1,0 +1,703 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method Sabre\\VObject\\Node\:\:add\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Cannot access offset ''dtstart'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Cannot access offset ''rrule'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Cannot access offset ''timezone'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Cannot call method loadAllFixtures\(\) on EphemeralTodos\\Rruler\\Testing\\Fixtures\\YamlFixtureLoader\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Instanceof between DateTimeImmutable and DateTime will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:assertPythonDateutilOccurrencesMatch\(\) has parameter \$metadata with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:createPythonDateutilDataProvider\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:getPreloadedFixtures\(\) should return array\<string, array\<string, mixed\>\> but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:loadPythonDateutilFixturesByCategory\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:validateFixtureIntegrity\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$datetime of class DateTimeImmutable constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$input of class Sabre\\VObject\\Recur\\EventIterator constructor expects array\|Sabre\\VObject\\Component, Sabre\\VObject\\Node given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$object of function spl_object_hash expects object, EphemeralTodos\\Rruler\\Testing\\Fixtures\\YamlFixtureLoader\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$rruleString of method EphemeralTodos\\Rruler\\Rruler\:\:parse\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$timezone of class DateTimeZone constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#2 \$expectedOccurrences of method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:assertPythonDateutilOccurrencesMatch\(\) expects array\<string\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#3 \$rruleString of method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:assertPythonDateutilOccurrencesMatch\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#3 \$rruleString of method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:handleFixtureValidationError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#5 \$metadata of method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:handleFixtureValidationError\(\) expects array\<string, mixed\>, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Parameter \#6 \$metadata of method EphemeralTodos\\Rruler\\Testing\\TestCase\\CompatibilityTestCase\:\:assertPythonDateutilOccurrencesMatch\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Part \$pythonDateutilVersion \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 3
+			path: src/Testing/TestCase/CompatibilityTestCase.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:analyzeApplicationPatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:analyzeSyntheticDataPatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:extractDateTimePatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:getAppleCalendarPatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:getCommonDateFormatPatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:getDateFormatEdgeCases\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:getGoogleCalendarPatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:getMicrosoftOutlookPatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Parameter \#1 \$dateTime of method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:validateDateTimePattern\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function str_contains expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Parameter \#1 \$property of method EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:validatePropertyPattern\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Property EphemeralTodos\\Rruler\\Testing\\Utilities\\DateFormatPatternAnalysis\:\:\$parser is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Testing/Utilities/DateFormatPatternAnalysis.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Binary operation "\+" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Binary operation "\." between ''\#\#\# Test Case '' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Binary operation "\." between ''\- \*\*Rruler Version\:…'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''component_match_percentage'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''differences'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''field'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''field_match_percentage'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''matching_components'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''occurrence_differences'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''occurrence_match_percentage'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''occurrence_similarities'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''parsing_errors'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''similarities'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''total_components'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''type'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Cannot access offset ''uid'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_slice expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$diff\[''field''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$diff\[''type''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$diff\[''uid''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$error \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$library \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$occSimilarities\[''component_match_percentage''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$occSimilarities\[''matching_components''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$occSimilarities\[''occurrence_match_percentage''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$occSimilarities\[''total_components''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$similarities\[''component_match_percentage''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$similarities\[''field_match_percentage''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$similarities\[''matching_components''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Part \$similarities\[''total_components''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/EnhancedCompatibilityReportGenerator.php
+
+		-
+			message: '#^Access to an undefined property Sabre\\VObject\\Component\\VEvent\|Sabre\\VObject\\Component\\VTodo\:\:\$UID\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<DateTimeImmutable\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access offset ''componentType'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access offset ''dateTimeContext'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access offset ''dtstart''\|''rrule''\|''summary''\|''type''\|''uid'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 6
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access offset ''rrule'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access offset ''summary'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access offset ''uid'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot access property \$value on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot call method format\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot call method getComponents\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot call method getDateTime\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 5
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:compareOccurrenceArrays\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|list\<DateTimeImmutable\>\|string\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:compareOccurrenceGeneration\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:compareParsingResults\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:identifyDifferences\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:normalizeRrulerResults\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:normalizeSabreResults\(\) has parameter \$sabreCalendar with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:normalizeSabreResults\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Offset ''dateTimeContext'' on array\{component\: EphemeralTodos\\Rruler\\Ical\\Component, dateTimeContext\: EphemeralTodos\\Rruler\\Ical\\DateTimeContext, rrule\: EphemeralTodos\\Rruler\\Rrule\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Offset ''uid'' on array\{component\: EphemeralTodos\\Rruler\\Ical\\Component, dateTimeContext\: EphemeralTodos\\Rruler\\Ical\\DateTimeContext, rrule\: EphemeralTodos\\Rruler\\Rrule\} on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Offset int\<0, max\> does not exist on array\<string, mixed\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 4
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_diff expects an array of values castable to string, array\<DateTimeImmutable\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_intersect expects an array of values castable to string, array\<DateTimeImmutable\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#1 \$rrulerOccurrences of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:calculateOccurrenceSimilarities\(\) expects array\<string, array\<DateTimeImmutable\>\>, array\<string, list\<string\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#1 \$rrulerOccurrences of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:compareOccurrenceArrays\(\) expects array\<string, array\<DateTimeImmutable\>\>, array\<string, list\<string\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#1 \$rrulerResults of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:normalizeRrulerResults\(\) expects array\<string, mixed\>, array\<array\<string, EphemeralTodos\\Rruler\\Ical\\Component\|EphemeralTodos\\Rruler\\Ical\\DateTimeContext\|EphemeralTodos\\Rruler\\Rrule\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$arrays of function array_diff expects an array of values castable to string, array\<DateTimeImmutable\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$arrays of function array_intersect expects an array of values castable to string, array\<DateTimeImmutable\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$sabreOccurrences of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:calculateOccurrenceSimilarities\(\) expects array\<string, array\<DateTimeImmutable\>\>, array\<string, list\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$sabreOccurrences of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:compareOccurrenceArrays\(\) expects array\<string, array\<DateTimeImmutable\>\>, array\<string, list\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$sabreResults of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:identifyDifferences\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$sabreResults of method EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:identifySimilarities\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Parameter \#2 \$uid of class Sabre\\VObject\\Recur\\EventIterator constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Property EphemeralTodos\\Rruler\\Testing\\Utilities\\EnhancedIcalCompatibilityFramework\:\:\$rruler is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: src/Testing/Utilities/EnhancedIcalCompatibilityFramework.php
+
+		-
+			message: '#^Cannot call method format\(\) on DateTimeImmutable\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Testing/Utilities/ResultComparator.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: src/Testing/Utilities/ResultComparator.php
+
+		-
+			message: '#^Method EphemeralTodos\\Rruler\\Testing\\Utilities\\ComparisonResult\:\:getMismatches\(\) should return array\<string, array\{expected\: mixed, actual\: mixed, message\: string\}\> but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Testing/Utilities/ResultComparator.php
+
+		-
+			message: '#^Parameter \#1 \$num of function number_format expects float, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Testing/Utilities/ResultComparator.php
+
+		-
+			message: '#^Part \$stats\[''actual_count''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/ResultComparator.php
+
+		-
+			message: '#^Part \$stats\[''expected_count''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Testing/Utilities/ResultComparator.php
+
+		-
+			message: '#^Property EphemeralTodos\\Rruler\\Testing\\Utilities\\ComparisonResult\:\:\$mismatches type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Testing/Utilities/ResultComparator.php
