@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EphemeralTodos\Rruler\Tests\Compatibility;
+namespace EphemeralTodos\Rruler\Testing\Utilities;
 
 /**
  * Generates systematic RRULE patterns for compatibility testing.
@@ -15,6 +15,9 @@ final class RrulePatternGenerator
     /**
      * Generate basic frequency patterns with various intervals.
      *
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
+    /**
      * @return array<array{rrule: string, start: string, description: string}>
      */
     public static function generateBasicFrequencyPatterns(): array
@@ -41,6 +44,9 @@ final class RrulePatternGenerator
      *
      * @return array<array{rrule: string, start: string, description: string}>
      */
+    /**
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
     public static function generateCountPatterns(): array
     {
         $patterns = [];
@@ -60,6 +66,9 @@ final class RrulePatternGenerator
     /**
      * Generate patterns with UNTIL termination.
      *
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
+    /**
      * @return array<array{rrule: string, start: string, description: string}>
      */
     public static function generateUntilPatterns(): array
@@ -91,6 +100,9 @@ final class RrulePatternGenerator
     /**
      * Generate BYDAY patterns.
      *
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
+    /**
      * @return array<array{rrule: string, start: string, description: string}>
      */
     public static function generateByDayPatterns(): array
@@ -136,6 +148,9 @@ final class RrulePatternGenerator
      *
      * @return array<array{rrule: string, start: string, description: string}>
      */
+    /**
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
     public static function generateByMonthDayPatterns(): array
     {
         $patterns = [];
@@ -164,6 +179,9 @@ final class RrulePatternGenerator
     /**
      * Generate BYMONTH patterns.
      *
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
+    /**
      * @return array<array{rrule: string, start: string, description: string}>
      */
     public static function generateByMonthPatterns(): array
@@ -197,6 +215,9 @@ final class RrulePatternGenerator
      *
      * @return array<array{rrule: string, start: string, description: string}>
      */
+    /**
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
     public static function generateByWeekNoPatterns(): array
     {
         return [
@@ -226,6 +247,9 @@ final class RrulePatternGenerator
     /**
      * Generate BYSETPOS patterns.
      *
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
+    /**
      * @return array<array{rrule: string, start: string, description: string}>
      */
     public static function generateBySetPosPatterns(): array
@@ -264,6 +288,9 @@ final class RrulePatternGenerator
      *
      * @return array<array{rrule: string, start: string, description: string}>
      */
+    /**
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
     public static function generateComplexPatterns(): array
     {
         return [
@@ -295,6 +322,9 @@ final class RrulePatternGenerator
      *
      * @return array<array{rrule: string, start: string, description: string}>
      */
+    /**
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
     public static function generateAllPatterns(): array
     {
         return array_merge(
@@ -313,6 +343,9 @@ final class RrulePatternGenerator
     /**
      * Generate edge case patterns for boundary testing.
      *
+     * @return array<array{rrule: string, start: string, description: string}>
+     */
+    /**
      * @return array<array{rrule: string, start: string, description: string}>
      */
     public static function generateEdgeCasePatterns(): array

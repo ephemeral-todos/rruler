@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Integration\EnhancedIcal;
 
 use EphemeralTodos\Rruler\Ical\IcalParser;
-use EphemeralTodos\Rruler\Tests\Compatibility\EnhancedIcalCompatibilityFramework;
+use EphemeralTodos\Rruler\Testing\Utilities\EnhancedIcalCompatibilityFramework;
 use PHPUnit\Framework\TestCase;
 
 /**

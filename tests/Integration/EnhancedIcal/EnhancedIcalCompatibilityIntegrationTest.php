@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace EphemeralTodos\Rruler\Tests\Integration\EnhancedIcal;
 
-use EphemeralTodos\Rruler\Tests\Compatibility\EnhancedCompatibilityReportGenerator;
-use EphemeralTodos\Rruler\Tests\Compatibility\EnhancedIcalCompatibilityFramework;
+use EphemeralTodos\Rruler\Testing\Utilities\EnhancedCompatibilityReportGenerator;
+use EphemeralTodos\Rruler\Testing\Utilities\EnhancedIcalCompatibilityFramework;
 use PHPUnit\Framework\TestCase;
 
 final class EnhancedIcalCompatibilityIntegrationTest extends TestCase

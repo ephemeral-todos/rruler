@@ -108,12 +108,12 @@ final class PythonDateutilFixtureCompatibilityTest extends CompatibilityTestCase
             foreach ($basicPatternsProvider as $testName => $testData) {
                 $this->assertIsString($testName);
                 $this->assertIsArray($testData);
-                $this->assertCount(6, $testData); // [rrule, dtstart, timezone, range, expected_occurrences, metadata]
+                $this->assertCount(5, $testData); // [rrule, dtstart, timezone, expected_occurrences, metadata]
                 $this->assertIsString($testData[0]); // rrule
                 $this->assertIsString($testData[1]); // dtstart
                 $this->assertIsString($testData[2]); // timezone
-                $this->assertIsArray($testData[4]); // expected_occurrences
-                $this->assertIsArray($testData[5]); // metadata
+                $this->assertIsArray($testData[3]); // expected_occurrences
+                $this->assertIsArray($testData[4]); // metadata
             }
         } else {
             $this->markTestSkipped('No basic pattern fixtures available for data provider test');

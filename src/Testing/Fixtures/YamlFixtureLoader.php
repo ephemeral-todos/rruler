@@ -163,7 +163,6 @@ final class YamlFixtureLoader
                     $fixture['input']['rrule'],
                     $fixture['input']['dtstart'],
                     $fixture['input']['timezone'] ?? 'UTC',
-                    $fixture['input']['range'] ?? null,
                     $fixture['expected_occurrences'],
                     $fixture['metadata'],
                 ];
@@ -547,7 +546,6 @@ final class YamlFixtureLoader
             'rrule' => is_string($inputData['rrule'] ?? null) ? $inputData['rrule'] : '',
             'dtstart' => is_string($inputData['dtstart'] ?? null) ? $inputData['dtstart'] : '',
             'timezone' => is_string($inputData['timezone'] ?? null) ? $inputData['timezone'] : 'UTC',
-            'range' => is_array($inputData['range'] ?? null) ? $inputData['range'] : [],
         ];
 
         $serialized = serialize($canonical);

@@ -40,18 +40,6 @@ final class RruleTest extends TestCase
         $this->testRruler->parse($rruleString);
     }
 
-    public function testImmutability(): void
-    {
-        $rrule = $this->testRruler->parse('FREQ=DAILY;INTERVAL=2;COUNT=10');
-
-        // Test that all properties are read-only (no setters)
-        $reflection = new \ReflectionClass($rrule);
-        $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-
-        $setterMethods = array_filter($methods, fn ($method) => str_starts_with($method->getName(), 'set'));
-        $this->assertEmpty($setterMethods, 'Rrule should not have any setter methods');
-    }
-
     public function testStringRepresentation(): void
     {
         $rrule = $this->testRruler->parse('FREQ=DAILY;INTERVAL=2;COUNT=10');

@@ -105,7 +105,6 @@ final class YamlFixtureLoaderTest extends TestCase
         // Create fixture missing required keys
         $incompleteFixture = [
             'metadata' => [
-                'generated_at' => '2023-12-08T10:30:00Z',
                 'input_hash' => 'abc123def456',
                 'python_dateutil_version' => '2.8.2',
                 'script_version' => '1.0.0',
@@ -126,7 +125,6 @@ final class YamlFixtureLoaderTest extends TestCase
     {
         $fixture = [
             'metadata' => [
-                'generated_at' => '2023-12-08T10:30:00Z',
                 // Missing required metadata keys
             ],
             'input' => [
@@ -207,7 +205,6 @@ final class YamlFixtureLoaderTest extends TestCase
         $fixtures = [
             'test_fixture' => [
                 'metadata' => [
-                    'generated_at' => '2023-12-08T10:30:00Z',
                     'input_hash' => str_repeat('a', 64),
                     'python_dateutil_version' => '2.8.2',
                     'script_version' => '1.0.0',
@@ -234,9 +231,8 @@ final class YamlFixtureLoaderTest extends TestCase
         $this->assertEquals('FREQ=DAILY;COUNT=2', $testData[0]); // rrule
         $this->assertEquals('2023-01-01T10:00:00', $testData[1]); // dtstart
         $this->assertEquals('UTC', $testData[2]); // timezone
-        $this->assertEquals(['start' => '2023-01-01', 'end' => '2023-01-02'], $testData[3]); // range
-        $this->assertCount(2, $testData[4]); // expected_occurrences
-        $this->assertArrayHasKey('generated_at', $testData[5]); // metadata
+        $this->assertCount(2, $testData[3]); // expected_occurrences
+        $this->assertArrayHasKey('input_hash', $testData[4]); // metadata
     }
 
     public function testGetAvailableCategories(): void

@@ -66,7 +66,6 @@ final class PythonDateutilFixtureGeneratorTest extends TestCase
         // Create a sample generated fixture to test the expected structure
         $generatedFixture = [
             'metadata' => [
-                'generated_at' => '2023-12-08T10:30:00Z',
                 'input_hash' => 'abc123def456',
                 'python_dateutil_version' => '2.8.2',
                 'script_version' => '1.0.0',
@@ -92,7 +91,6 @@ final class PythonDateutilFixtureGeneratorTest extends TestCase
         ];
 
         $this->assertIsArray($generatedFixture['metadata']);
-        $this->assertArrayHasKey('generated_at', $generatedFixture['metadata']);
         $this->assertArrayHasKey('input_hash', $generatedFixture['metadata']);
         $this->assertArrayHasKey('python_dateutil_version', $generatedFixture['metadata']);
         $this->assertArrayHasKey('script_version', $generatedFixture['metadata']);

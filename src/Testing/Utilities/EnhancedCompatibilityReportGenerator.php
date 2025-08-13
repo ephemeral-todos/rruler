@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EphemeralTodos\Rruler\Tests\Compatibility;
+namespace EphemeralTodos\Rruler\Testing\Utilities;
 
 /**
  * Generate comprehensive compatibility reports between Rruler and sabre/vobject.
@@ -19,6 +19,8 @@ final class EnhancedCompatibilityReportGenerator
 
     /**
      * Generate a comprehensive compatibility report from comparison results.
+     *
+     * @param array<string, mixed> $comparisonResults
      */
     public function generateReport(array $comparisonResults, string $testName = 'enhanced-ical-compatibility'): string
     {
@@ -39,6 +41,8 @@ final class EnhancedCompatibilityReportGenerator
 
     /**
      * Generate a performance benchmark report.
+     *
+     * @param array<string, mixed> $benchmarkResults
      */
     public function generatePerformanceReport(array $benchmarkResults, string $testName = 'performance-benchmark'): string
     {
@@ -68,6 +72,9 @@ final class EnhancedCompatibilityReportGenerator
 HEADER;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generateExecutiveSummary(array $results): string
     {
         $totalTests = count($results);
@@ -76,6 +83,9 @@ HEADER;
         $overallCompatibility = 0;
 
         foreach ($results as $result) {
+            if (!is_array($result)) {
+                continue;
+            }
             if (empty($result['parsing_errors'])) {
                 ++$parsingSuccessCount;
             }
@@ -83,8 +93,8 @@ HEADER;
                 ++$occurrenceSuccessCount;
             }
 
-            if (isset($result['similarities']['field_match_percentage'])) {
-                $overallCompatibility += $result['similarities']['field_match_percentage'];
+            if (isset($result['similarities']['field_match_percentage']) && is_numeric($result['similarities']['field_match_percentage'])) {
+                $overallCompatibility += (float) $result['similarities']['field_match_percentage'];
             }
         }
 
@@ -110,6 +120,9 @@ Rruler and sabre/vobject for complex iCalendar parsing and occurrence generation
 SUMMARY;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generateParsingComparisonSection(array $results): string
     {
         $section = "## Parsing Comparison Results\n\n";
@@ -154,6 +167,9 @@ SUMMARY;
         return $section;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generateOccurrenceComparisonSection(array $results): string
     {
         $section = "## Occurrence Generation Comparison\n\n";
@@ -190,6 +206,9 @@ SUMMARY;
         return $section;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generateDifferencesSection(array $results): string
     {
         $section = "## Detailed Differences Analysis\n\n";
@@ -231,6 +250,9 @@ SUMMARY;
         return $section;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generateRecommendationsSection(array $results): string
     {
         $section = "## Recommendations\n\n";
@@ -281,6 +303,9 @@ SUMMARY;
         return $section;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generateAppendixSection(array $results): string
     {
         $section = "## Appendix\n\n";
@@ -302,18 +327,27 @@ SUMMARY;
         return $section;
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generatePerformanceExecutiveSummary(array $results): string
     {
         // Implementation for performance summary
         return "## Performance Executive Summary\n\n*Performance analysis implementation pending*\n\n---\n\n";
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generatePerformanceMetricsSection(array $results): string
     {
         // Implementation for performance metrics
         return "## Performance Metrics\n\n*Performance metrics implementation pending*\n\n---\n\n";
     }
 
+    /**
+     * @param array<string, mixed> $results
+     */
     private function generatePerformanceAnalysisSection(array $results): string
     {
         // Implementation for performance analysis

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EphemeralTodos\Rruler\Tests\Compatibility;
 
 use DateTimeImmutable;
+use EphemeralTodos\Rruler\Testing\Utilities\RrulePatternGenerator;
 
 /**
  * Basic frequency pattern compatibility tests between Rruler and sabre/vobject.

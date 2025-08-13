@@ -28,15 +28,4 @@ final class SabreCompatibilityFrameworkTest extends TestCase
         $this->assertInstanceOf('Sabre\VObject\Component\VCalendar', $vcalendar);
         $this->assertCount(1, $vcalendar->VEVENT);
     }
-
-    // Note: The Enhanced Ical Compatibility Framework classes were planned but not implemented
-    // because the existing compatibility testing infrastructure already provides comprehensive
-    // sabre/dav compatibility validation with 98.7% compatibility rate achieved through:
-    // 1. Existing sabre-dav-incompatibility test group for documenting intentional differences
-    // 2. Comprehensive integration tests with sabre/vobject validation
-    // 3. Detailed compatibility reporting already built into the test suite
-    //
-    // The planned EnhancedIcalCompatibilityFramework, EnhancedCompatibilityReportGenerator,
-    // and EnhancedPerformanceBenchmark classes are not needed given the current robust
-    // compatibility testing infrastructure already in place.
 }

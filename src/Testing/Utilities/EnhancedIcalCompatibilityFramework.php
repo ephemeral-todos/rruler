@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EphemeralTodos\Rruler\Tests\Compatibility;
+namespace EphemeralTodos\Rruler\Testing\Utilities;
 
 use EphemeralTodos\Rruler\Ical\IcalParser;
 use EphemeralTodos\Rruler\Occurrence\Adapter\DefaultOccurrenceGenerator;
@@ -166,6 +166,10 @@ final class EnhancedIcalCompatibilityFramework
     /**
      * Normalize Rruler parsing results to a standard format for comparison.
      */
+    /**
+     * @param array<string, mixed> $rrulerResults
+     * @return array<string, mixed>
+     */
     private function normalizeRrulerResults(array $rrulerResults): array
     {
         $normalized = [];
@@ -208,6 +212,11 @@ final class EnhancedIcalCompatibilityFramework
     /**
      * Identify differences between Rruler and sabre/vobject parsing results.
      */
+    /**
+     * @param array<string, mixed> $rrulerResults
+     * @param array<string, mixed> $sabreResults
+     * @return array<string, mixed>
+     */
     private function identifyDifferences(array $rrulerResults, array $sabreResults): array
     {
         $differences = [];
@@ -244,6 +253,11 @@ final class EnhancedIcalCompatibilityFramework
 
     /**
      * Identify similarities between Rruler and sabre/vobject parsing results.
+     */
+    /**
+     * @param array<string, mixed> $rrulerResults
+     * @param array<string, mixed> $sabreResults
+     * @return array<string, mixed>
      */
     private function identifySimilarities(array $rrulerResults, array $sabreResults): array
     {
@@ -284,6 +298,11 @@ final class EnhancedIcalCompatibilityFramework
 
     /**
      * Compare occurrence generation arrays between Rruler and sabre/vobject.
+     */
+    /**
+     * @param array<string, array<\DateTimeImmutable>> $rrulerOccurrences
+     * @param array<string, array<\DateTimeImmutable>> $sabreOccurrences
+     * @return array<string, mixed>
      */
     private function compareOccurrenceArrays(array $rrulerOccurrences, array $sabreOccurrences): array
     {
@@ -337,6 +356,11 @@ final class EnhancedIcalCompatibilityFramework
     /**
      * Calculate similarity metrics for occurrence generation.
      */
+    /**
+     * @param array<string, array<\DateTimeImmutable>> $rrulerOccurrences
+     * @param array<string, array<\DateTimeImmutable>> $sabreOccurrences
+     * @return array<string, mixed>
+     */
     private function calculateOccurrenceSimilarities(array $rrulerOccurrences, array $sabreOccurrences): array
     {
         $similarities = [];
@@ -346,8 +370,11 @@ final class EnhancedIcalCompatibilityFramework
         $matchingOccurrences = 0;
 
         foreach ($rrulerOccurrences as $uid => $rrulerOccs) {
+            if (!is_array($rrulerOccs)) {
+                continue;
+            }
             ++$totalComponents;
-            if (isset($sabreOccurrences[$uid])) {
+            if (isset($sabreOccurrences[$uid]) && is_array($sabreOccurrences[$uid])) {
                 $sabreOccs = $sabreOccurrences[$uid];
                 $commonOccurrences = array_intersect($rrulerOccs, $sabreOccs);
                 $matchingOccurrences += count($commonOccurrences);
@@ -379,6 +406,9 @@ final class EnhancedIcalCompatibilityFramework
      * @param string $icalContent The iCalendar content to benchmark
      * @param int $iterations Number of iterations to run for averaging
      * @return array Performance benchmark results
+     */
+    /**
+     * @return array<string, mixed>
      */
     public function benchmarkPerformance(string $icalContent, int $iterations = 5): array
     {
